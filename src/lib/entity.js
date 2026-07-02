@@ -4,16 +4,23 @@ function parseSortField(sortStr) {
   if (!sortStr) return null;
   const desc = sortStr.startsWith('-');
   const field = desc ? sortStr.slice(1) : sortStr;
-  const colMap = {
-    created_date: 'created_at',
-    updated_date: 'updated_at',
-    created_at: 'created_at',
-    updated_at: 'updated_at',
-  };
-  return { column: colMap[field] || field, ascending: !desc };
+  // Sem remapeamento: algumas tabelas (legadas, migradas do base44) usam
+  // literalmente "created_date"/"updated_date" como nome de coluna; outras
+  // (criadas depois, direto no Supabase) usam "created_at"/"updated_at".
+  // Cada chamador já passa o nome de coluna real da sua tabela.
+  return { column: field, ascending: !desc };
 }
 
-export function createEntity(tableName) {
+/**
+ * @param {string} tableName
+ * @param {{ legacyTimestamps?: boolean }} [options] - Defina legacyTimestamps: true
+ *   para tabelas migradas do base44 que usam as colunas "created_date"/"updated_date"
+ *   em vez de "created_at"/"updated_at".
+ */
+export function createEntity(tableName, options = {}) {
+  const createdColumn = options.legacyTimestamps ? 'created_date' : 'created_at';
+  const updatedColumn = options.legacyTimestamps ? 'updated_date' : 'updated_at';
+
   return {
     async filter(conditions = {}, sort = null, limit = 1000) {
       let query = supabase.from(tableName).select('*');
@@ -28,7 +35,7 @@ export function createEntity(tableName) {
       if (sortParsed) {
         query = query.order(sortParsed.column, { ascending: sortParsed.ascending });
       } else {
-        query = query.order('created_at', { ascending: false });
+        query = query.order(createdColumn, { ascending: false });
       }
 
       query = query.limit(limit);
@@ -71,7 +78,7 @@ export function createEntity(tableName) {
 
     async update(id, payload) {
       const { data: { user } } = await supabase.auth.getUser();
-      const row = { ...payload, updated_at: new Date().toISOString() };
+      const row = { ...payload, [updatedColumn]: new Date().toISOString() };
       if (user?.email) row.updated_by = user.email;
 
       const { data, error } = await supabase

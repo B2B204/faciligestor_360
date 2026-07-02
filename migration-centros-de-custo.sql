@@ -10,12 +10,16 @@ CREATE TABLE IF NOT EXISTS cost_centers (
   name        TEXT NOT NULL,
   code        TEXT,
   description TEXT,
+  contract_id TEXT,
   is_active   BOOLEAN DEFAULT true,
   created_by  TEXT,
   updated_by  TEXT,
   created_at  TIMESTAMPTZ DEFAULT now(),
   updated_at  TIMESTAMPTZ DEFAULT now()
 );
+
+-- Idempotente: garante a coluna caso a tabela ja tenha sido criada antes.
+ALTER TABLE cost_centers ADD COLUMN IF NOT EXISTS contract_id TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_cost_centers_cnpj ON cost_centers(cnpj);
 

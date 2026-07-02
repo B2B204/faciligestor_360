@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { CostCenter } from '@/entities/CostCenter';
+import { Contract } from '@/entities/Contract';
 import { User } from '@/entities/User';
 import { Tags, Plus, Edit2, Trash2, Info } from 'lucide-react';
 
@@ -14,21 +15,39 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
 } from '@/components/ui/dialog';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-const EMPTY_FORM = { name: '', code: '', description: '' };
+const EMPTY_FORM = { name: '', code: '', description: '', contract_id: '' };
+const NONE_VALUE = '__none__';
 
-function CostCenterDialog({ open, onOpenChange, initial, onSave }) {
+function contractLabel(c) {
+  return [c.contract_number, c.client_name || c.name].filter(Boolean).join(' - ');
+}
+
+function CostCenterDialog({ open, onOpenChange, initial, contracts, onSave }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => { setForm(initial ? { ...EMPTY_FORM, ...initial } : EMPTY_FORM); }, [initial, open]);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
+  const handleContractChange = (v) => {
+    if (v === NONE_VALUE) { set('contract_id', ''); return; }
+    const contract = contracts.find((c) => c.id === v);
+    setForm((f) => ({
+      ...f,
+      contract_id: v,
+      name: f.name.trim() ? f.name : (contract ? contractLabel(contract) : f.name),
+    }));
+  };
+
   const handle = async () => {
     if (!form.name.trim()) { alert('Informe o nome do centro de custo.'); return; }
     setSaving(true);
-    try { await onSave({ ...form }); }
+    try { await onSave({ ...form, contract_id: form.contract_id || null }); }
     finally { setSaving(false); }
   };
 
@@ -41,6 +60,18 @@ function CostCenterDialog({ open, onOpenChange, initial, onSave }) {
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Contrato Vinculado</Label>
+            <Select value={form.contract_id || NONE_VALUE} onValueChange={handleContractChange}>
+              <SelectTrigger className="bg-background border-border"><SelectValue placeholder="Selecionar contrato (opcional)" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_VALUE}>Nenhum (centro de custo avulso)</SelectItem>
+                {contracts.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{contractLabel(c)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Nome *</Label>
             <Input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Ex: Filial Águas Claras, Obra CFMV, Administrativo..." className="bg-background border-border" />
@@ -66,6 +97,7 @@ function CostCenterDialog({ open, onOpenChange, initial, onSave }) {
 export default function CostCenters() {
   const [user, setUser] = useState(null);
   const [items, setItems] = useState([]);
+  const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -74,8 +106,12 @@ export default function CostCenters() {
     setLoading(true);
     const me = await User.me();
     setUser(me);
-    const data = await CostCenter.filter({ cnpj: me.cnpj }, '-created_at');
+    const [data, contractData] = await Promise.all([
+      CostCenter.filter({ cnpj: me.cnpj }, '-created_at'),
+      Contract.filter({ cnpj: me.cnpj, deleted_at: null }, '-created_date'),
+    ]);
     setItems(data);
+    setContracts(contractData);
     setLoading(false);
   }, []);
 

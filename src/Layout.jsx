@@ -7,7 +7,7 @@ import { BRAND } from "@/components/common/Branding";
 import BrandLogo from "@/components/common/BrandLogo";
 import { LayoutDashboard, FileText, Users, DollarSign, BarChart3,
   Menu, X, LogOut, Settings, Bell, ChevronDown, Package, Calculator,
-  ClipboardCheck, ShoppingCart, ShieldCheck, Banknote, HeartPulse, Mail, Award, HandCoins, UsersRound, LineChart, LifeBuoy, Shirt, SlidersHorizontal, RefreshCw, Wallet, CalendarRange, Star, Landmark
+  ClipboardCheck, ShoppingCart, ShieldCheck, Banknote, HeartPulse, Mail, Award, HandCoins, UsersRound, LineChart, LifeBuoy, Shirt, SlidersHorizontal, RefreshCw, Wallet, CalendarRange, Star, Landmark, Tags
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -73,6 +73,7 @@ const navItems = [
       { title: "Configurações Fiscais", url: "/fiscal", icon: Settings },
       { title: "Regras Fiscais", url: "/regras-fiscais", icon: Landmark },
       { title: "Custos Indiretos", url: createPageUrl("IndirectCosts"), icon: Calculator },
+      { title: "Centros de Custo", url: "/centros-de-custo", icon: Tags },
     ],
   },
 
@@ -833,6 +834,7 @@ export default function Layout({ children, currentPageName }) {
                    currentPageName === "LeaveCalendar" ? "Férias e Ausências" :
                    currentPageName === "PerformanceReviews" ? "Avaliação de Desempenho" :
                    currentPageName === "FiscalPositions" ? "Regras Fiscais" :
+                   currentPageName === "CostCenters" ? "Centros de Custo" :
                    currentPageName === "Profile" ? "Perfil" : currentPageName}
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">

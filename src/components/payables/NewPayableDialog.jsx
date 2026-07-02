@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, Plus } from 'lucide-react';
 import { lookupCnpj } from '@/functions/lookupCnpj';
 
-export default function NewPayableDialog({ open, onOpenChange, banks = [], onCreate }) {
+export default function NewPayableDialog({ open, onOpenChange, banks = [], costCenters = [], onCreate }) {
   const [form, setForm] = useState({
     supplier_cnpj: '',
     supplier_name: '',
@@ -16,6 +16,7 @@ export default function NewPayableDialog({ open, onOpenChange, banks = [], onCre
     face_value: '',
     bank_account_id: '',
     category: 'fornecedor',
+    cost_center_id: '',
     observations: ''
   });
   const [loadingLookup, setLoadingLookup] = useState(false);
@@ -43,7 +44,7 @@ export default function NewPayableDialog({ open, onOpenChange, banks = [], onCre
     setSaving(true);
     try {
       await onCreate?.({ ...form });
-      setForm({ supplier_cnpj: '', supplier_name: '', document_number: '', due_date: '', face_value: '', bank_account_id: '', category: 'fornecedor', observations: '' });
+      setForm({ supplier_cnpj: '', supplier_name: '', document_number: '', due_date: '', face_value: '', bank_account_id: '', category: 'fornecedor', cost_center_id: '', observations: '' });
     } finally {
       setSaving(false);
     }
@@ -101,18 +102,31 @@ export default function NewPayableDialog({ open, onOpenChange, banks = [], onCre
             </div>
           </div>
 
-          <div>
-            <label className="text-sm font-medium">Categoria</label>
-            <Select value={form.category} onValueChange={(v)=>setForm(s=>({...s, category:v}))}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="fornecedor">Fornecedor</SelectItem>
-                <SelectItem value="impostos">Impostos</SelectItem>
-                <SelectItem value="salarios">Salários</SelectItem>
-                <SelectItem value="servicos">Serviços</SelectItem>
-                <SelectItem value="outros">Outros</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm font-medium">Categoria</label>
+              <Select value={form.category} onValueChange={(v)=>setForm(s=>({...s, category:v}))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fornecedor">Fornecedor</SelectItem>
+                  <SelectItem value="impostos">Impostos</SelectItem>
+                  <SelectItem value="salarios">Salários</SelectItem>
+                  <SelectItem value="servicos">Serviços</SelectItem>
+                  <SelectItem value="outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Centro de Custo</label>
+              <Select value={form.cost_center_id} onValueChange={(v)=>setForm(s=>({...s, cost_center_id:v}))}>
+                <SelectTrigger><SelectValue placeholder="Selecionar (opcional)" /></SelectTrigger>
+                <SelectContent>
+                  {costCenters.map(cc => (
+                    <SelectItem key={cc.id} value={cc.id}>{cc.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { AccountsPayable as APEntity } from '@/entities/AccountsPayable';
 import { BankAccount } from '@/entities/BankAccount';
+import { CostCenter } from '@/entities/CostCenter';
 import { User } from '@/entities/User';
 import { PayablePayment } from '@/entities/PayablePayment';
 import { generateDueRecurringEntries } from '@/lib/recurringGenerator';
@@ -309,7 +310,7 @@ function PaymentHistoryDialog({ open, onOpenChange, item, banks }) {
 
 // ─── Edit Dialog ──────────────────────────────────────────────────────────────
 
-function EditDialog({ open, onOpenChange, item, banks, onSave }) {
+function EditDialog({ open, onOpenChange, item, banks, costCenters = [], onSave }) {
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
 
@@ -387,6 +388,15 @@ function EditDialog({ open, onOpenChange, item, banks, onSave }) {
                 <SelectTrigger className="bg-background border-border"><SelectValue placeholder="Selecionar" /></SelectTrigger>
                 <SelectContent>
                   {banks.map(b => <SelectItem key={b.id} value={b.id}>{b.bank_name} — {b.account_name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Centro de Custo</Label>
+              <Select value={form.cost_center_id || ''} onValueChange={v => set('cost_center_id', v)}>
+                <SelectTrigger className="bg-background border-border"><SelectValue placeholder="Selecionar (opcional)" /></SelectTrigger>
+                <SelectContent>
+                  {costCenters.map(cc => <SelectItem key={cc.id} value={cc.id}>{cc.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -713,6 +723,7 @@ function AgingTable({ items }) {
 export default function AccountsPayable() {
   const [allItems, setAllItems] = useState([]);
   const [banks, setBanks] = useState([]);
+  const [costCenters, setCostCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userCnpj, setUserCnpj] = useState('');
 
@@ -750,12 +761,14 @@ export default function AccountsPayable() {
   const load = useCallback(async () => {
     const me = await User.me();
     if (me?.cnpj) await generateDueRecurringEntries(me.cnpj);
-    const [rows, bks] = await Promise.all([
-      APEntity.list('-updated_date', 5000),
-      BankAccount.list('-updated_date', 200),
+    const [rows, bks, ccs] = await Promise.all([
+      APEntity.list('-updated_at', 5000),
+      BankAccount.list('-updated_at', 200),
+      me?.cnpj ? CostCenter.filter({ cnpj: me.cnpj }, '-created_at') : Promise.resolve([]),
     ]);
     setAllItems(rows || []);
     setBanks(bks || []);
+    setCostCenters(ccs || []);
     setUserCnpj(me?.cnpj || '');
     setLoading(false);
   }, []);
@@ -866,6 +879,7 @@ export default function AccountsPayable() {
       status: 'aberto',
       bank_account_id: data.bank_account_id || null,
       category: data.category || 'outros',
+      cost_center_id: data.cost_center_id || null,
       observations: data.observations || '',
       cnpj: userCnpj,
     });
@@ -914,6 +928,7 @@ export default function AccountsPayable() {
       status: form.status,
       bank_account_id: form.bank_account_id || null,
       category: form.category,
+      cost_center_id: form.cost_center_id || null,
       observations: form.observations || '',
     });
     setEditItem(null);
@@ -1187,7 +1202,14 @@ export default function AccountsPayable() {
                         <TableCell>
                           <span className={`text-sm ${dueDateColor(p.due_date, p.status)}`}>{fmtDate(p.due_date)}</span>
                         </TableCell>
-                        <TableCell><CategoryBadge category={p.category} /></TableCell>
+                        <TableCell>
+                          <CategoryBadge category={p.category} />
+                          {p.cost_center_id && (
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {costCenters.find(cc => cc.id === p.cost_center_id)?.name || '—'}
+                            </div>
+                          )}
+                        </TableCell>
                         <TableCell className="text-right text-sm font-medium text-foreground">R$ {fmt(p.face_value)}</TableCell>
                         <TableCell className="text-right text-sm">
                           <span className={Number(p.open_amount || 0) > 0 && p.status !== 'pago' ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-muted-foreground'}>
@@ -1296,7 +1318,7 @@ export default function AccountsPayable() {
       )}
 
       {/* ── Dialogs ── */}
-      <NewPayableDialog open={showNew} onOpenChange={setShowNew} banks={banks} onCreate={handleCreate} />
+      <NewPayableDialog open={showNew} onOpenChange={setShowNew} banks={banks} costCenters={costCenters} onCreate={handleCreate} />
 
       <ParcelamentoDialog
         open={showParcelamento}
@@ -1318,6 +1340,7 @@ export default function AccountsPayable() {
         onOpenChange={v => !v && setEditItem(null)}
         item={editItem}
         banks={banks}
+        costCenters={costCenters}
         onSave={handleEdit}
       />
 

@@ -27,6 +27,7 @@ import EmployeeOnboarding from './pages/EmployeeOnboarding';
 import LeaveCalendar from './pages/LeaveCalendar';
 import PerformanceReviews from './pages/PerformanceReviews';
 import FiscalPositions from './pages/FiscalPositions';
+import CostCenters from './pages/CostCenters';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -117,6 +118,7 @@ const AuthenticatedApp = () => {
       <Route path="/ferias-ausencias" element={<ProtectedRoute><LayoutWrapper currentPageName="LeaveCalendar"><LeaveCalendar /></LayoutWrapper></ProtectedRoute>} />
       <Route path="/avaliacao-desempenho" element={<ProtectedRoute><LayoutWrapper currentPageName="PerformanceReviews"><PerformanceReviews /></LayoutWrapper></ProtectedRoute>} />
       <Route path="/regras-fiscais" element={<ProtectedRoute><LayoutWrapper currentPageName="FiscalPositions"><FiscalPositions /></LayoutWrapper></ProtectedRoute>} />
+      <Route path="/centros-de-custo" element={<ProtectedRoute><LayoutWrapper currentPageName="CostCenters"><CostCenters /></LayoutWrapper></ProtectedRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

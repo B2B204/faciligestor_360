@@ -194,7 +194,7 @@ export default function EmployeesPage() {
       const currentUser = await User.me();
       setUser(currentUser);
       const [empData, contractData] = await Promise.all([
-        Employee.filter({ cnpj: currentUser.cnpj }, "-created_date"),
+        Employee.filter({ cnpj: currentUser.cnpj }, "-created_at"),
         Contract.filter({ cnpj: currentUser.cnpj, status: 'ativo' })
       ]);
       setEmployees(empData);

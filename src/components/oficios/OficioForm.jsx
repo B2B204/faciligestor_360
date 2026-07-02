@@ -39,7 +39,7 @@ export default function OficioForm({ oficio, onSave, onCancel, currentUser, sugg
     const loadEmployees = async () => {
       try {
         if (!currentUser?.cnpj) return;
-        const list = await Employee.filter({ cnpj: currentUser.cnpj }, "-created_date", 200);
+        const list = await Employee.filter({ cnpj: currentUser.cnpj }, "-created_at", 200);
         setEmployees(list);
       } catch (e) {
         console.log("Não foi possível carregar funcionários para assinatura:", e?.message || e);

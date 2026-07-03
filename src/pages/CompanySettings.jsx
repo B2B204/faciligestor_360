@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { CompanyCnpj } from "@/entities/CompanyCnpj";
+import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
+import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
 import { User } from "@/entities/User";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, Building2, ShieldAlert, Loader2 } from "lucide-react";
+import { Trash2, Plus, Building2, ShieldAlert, Loader2, Check, X, KeyRound } from "lucide-react";
 
 export default function CompanySettings() {
   const [user, setUser] = useState(null);
   const [items, setItems] = useState([]);
+  const [accessRequests, setAccessRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
 
@@ -25,8 +29,31 @@ export default function CompanySettings() {
   }, []);
 
   const load = async () => {
-    const rows = await CompanyCnpj.list();
+    const [rows, requests] = await Promise.all([
+      CompanyCnpj.list(),
+      CnpjAccessRequest.list('-created_at'),
+    ]);
     setItems(rows || []);
+    setAccessRequests(requests || []);
+  };
+
+  const handleApproveRequest = async (req) => {
+    await UserCnpjAccess.create({ user_email: req.requester_email, cnpj: req.cnpj });
+    await CnpjAccessRequest.update(req.id, {
+      status: 'aprovado',
+      decided_by: user.email,
+      decided_at: new Date().toISOString(),
+    });
+    await load();
+  };
+
+  const handleRejectRequest = async (req) => {
+    await CnpjAccessRequest.update(req.id, {
+      status: 'rejeitado',
+      decided_by: user.email,
+      decided_at: new Date().toISOString(),
+    });
+    await load();
   };
 
   if (loading) {
@@ -130,6 +157,84 @@ export default function CompanySettings() {
               Adicionar CNPJ
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Solicitações de Acesso a CNPJ */}
+      <Card className="bg-card border-border shadow-sm">
+        <CardHeader className="border-b border-border">
+          <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <KeyRound className="w-5 h-5 text-primary" />
+            Solicitações de Acesso a CNPJ
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Aprove ou rejeite pedidos de usuários para acessar dados de outro CNPJ.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {accessRequests.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center px-4">
+              <p className="text-sm text-muted-foreground">Nenhuma solicitação de acesso.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-muted-foreground font-medium">Solicitante</TableHead>
+                    <TableHead className="text-muted-foreground font-medium">CNPJ</TableHead>
+                    <TableHead className="text-muted-foreground font-medium">Justificativa</TableHead>
+                    <TableHead className="text-muted-foreground font-medium">Status</TableHead>
+                    <TableHead className="text-right text-muted-foreground font-medium">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {accessRequests.map((req) => (
+                    <TableRow key={req.id} className="border-border hover:bg-muted/50">
+                      <TableCell className="font-medium text-foreground">{req.requester_email}</TableCell>
+                      <TableCell className="text-muted-foreground">{req.cnpj}</TableCell>
+                      <TableCell className="text-muted-foreground">{req.reason || <span className="italic text-muted-foreground/60">—</span>}</TableCell>
+                      <TableCell>
+                        <Badge className={
+                          req.status === 'aprovado' ? 'bg-green-100 text-green-800' :
+                          req.status === 'rejeitado' ? 'bg-red-100 text-red-800' :
+                          'bg-amber-100 text-amber-800'
+                        }>
+                          {req.status || 'pendente'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {(!req.status || req.status === 'pendente') ? (
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleApproveRequest(req)}
+                              className="text-muted-foreground hover:text-green-600 hover:bg-green-50"
+                            >
+                              <Check className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleRejectRequest(req)}
+                              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">
+                            {req.decided_by ? `por ${req.decided_by}` : '—'}
+                          </span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { CompanyCnpj } from "@/entities/CompanyCnpj";
+import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
 import { User } from "@/entities/User";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-// RequestCnpjDialog removido conforme política: cadastro via Configurações da Empresa
+import RequestCnpjDialog from "./RequestCnpjDialog";
 
 export default function CnpjSwitcher({ user, onChanged }) {
   const [list, setList] = useState([]);
@@ -11,7 +11,11 @@ export default function CnpjSwitcher({ user, onChanged }) {
   const [aggregate, setAggregate] = useState(false);
 
   const load = async () => {
-    const rows = await CompanyCnpj.filter({ is_active: true });
+    if (!user?.email) return;
+    // Segurança: só entram na lista CNPJs efetivamente aprovados para este usuário
+    // (user_cnpj_access) mais o CNPJ atual do próprio perfil — nunca todos os CNPJs
+    // ativos do sistema, para não permitir troca livre para dados de outra empresa.
+    const rows = await UserCnpjAccess.filter({ user_email: user.email });
     const cnpjs = Array.from(new Set([...(rows || []).map(r => r.cnpj), user?.cnpj || ""].filter(Boolean)));
     setList(cnpjs);
     setValue(user?.cnpj || cnpjs[0] || "");
@@ -53,6 +57,8 @@ export default function CnpjSwitcher({ user, onChanged }) {
         <Switch checked={aggregate} onCheckedChange={toggleAggregate} />
         <span className="text-sm text-gray-600">Agregado</span>
       </div>
+
+      <RequestCnpjDialog user={user} onSubmitted={load} />
     </div>
   );
 }

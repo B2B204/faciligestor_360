@@ -13,7 +13,7 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    await CnpjAccessRequest.create({ requester_email: user.email, cnpj, reason });
+    await CnpjAccessRequest.create({ requester_email: user.email, cnpj, reason, status: "pendente" });
     setLoading(false);
     setOpen(false);
     setCnpj("");

@@ -185,6 +185,7 @@ export default function CostCenters() {
                 <TableHeader>
                   <TableRow className="bg-muted/50 border-border hover:bg-muted/50">
                     <TableHead className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Nome</TableHead>
+                    <TableHead className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Contrato Vinculado</TableHead>
                     <TableHead className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Código</TableHead>
                     <TableHead className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Descrição</TableHead>
                     <TableHead className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Status</TableHead>
@@ -195,6 +196,9 @@ export default function CostCenters() {
                   {items.map((item) => (
                     <TableRow key={item.id} className="border-border hover:bg-muted/30">
                       <TableCell className="font-medium text-foreground text-sm">{item.name}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {item.contract_id ? (contracts.find((c) => c.id === item.contract_id) ? contractLabel(contracts.find((c) => c.id === item.contract_id)) : '—') : '—'}
+                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground font-mono">{item.code || '—'}</TableCell>
                       <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{item.description || '—'}</TableCell>
                       <TableCell>
@@ -228,6 +232,7 @@ export default function CostCenters() {
         open={showForm}
         onOpenChange={(v) => { setShowForm(v); if (!v) setEditing(null); }}
         initial={editing}
+        contracts={contracts}
         onSave={editing ? handleUpdate : handleCreate}
       />
     </div>

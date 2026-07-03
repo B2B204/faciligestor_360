@@ -13,13 +13,16 @@ function parseSortField(sortStr) {
 
 /**
  * @param {string} tableName
- * @param {{ legacyTimestamps?: boolean }} [options] - Defina legacyTimestamps: true
- *   para tabelas migradas do base44 que usam as colunas "created_date"/"updated_date"
- *   em vez de "created_at"/"updated_at".
+ * @param {{ legacyTimestamps?: boolean, hasUpdatedBy?: boolean }} [options]
+ *   - legacyTimestamps: true para tabelas migradas do base44 que usam as
+ *     colunas "created_date"/"updated_date" em vez de "created_at"/"updated_at".
+ *   - hasUpdatedBy: false para tabelas que nao tem a coluna "updated_by"
+ *     (algumas tabelas legadas so tem "created_by").
  */
 export function createEntity(tableName, options = {}) {
   const createdColumn = options.legacyTimestamps ? 'created_date' : 'created_at';
   const updatedColumn = options.legacyTimestamps ? 'updated_date' : 'updated_at';
+  const hasUpdatedBy = options.hasUpdatedBy !== false;
 
   return {
     async filter(conditions = {}, sort = null, limit = 1000) {
@@ -79,7 +82,7 @@ export function createEntity(tableName, options = {}) {
     async update(id, payload) {
       const { data: { user } } = await supabase.auth.getUser();
       const row = { ...payload, [updatedColumn]: new Date().toISOString() };
-      if (user?.email) row.updated_by = user.email;
+      if (user?.email && hasUpdatedBy) row.updated_by = user.email;
 
       const { data, error } = await supabase
         .from(tableName)

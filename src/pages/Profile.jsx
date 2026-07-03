@@ -272,10 +272,11 @@ Você pode reativar este usuário posteriormente se necessário.`;
         });
         console.log("✅ Membro de convite desativado na entidade TeamMember");
       } else {
-        // Se for um usuário da base, marcar como inativo
-        await User.update(member.id, { 
-          department: 'canceled', // Usar um department especial para cancelados
-          status: 'inativo' // Se a entidade User tiver esse campo
+        // Se for um usuário da base, marcar como inativo (profiles não tem coluna
+        // "status" própria — "department: canceled" já é o sinal usado em toda
+        // esta página para identificar usuários cancelados, ver isInactive acima).
+        await User.update(member.id, {
+          department: 'canceled'
         });
         console.log("✅ Usuário base marcado como cancelado");
       }
@@ -313,9 +314,8 @@ Esta ação irá:
           reactivated_by: user.email
         });
       } else {
-        await User.update(member.id, { 
-          department: 'comercial', // Função padrão ao reativar
-          status: 'ativo'
+        await User.update(member.id, {
+          department: 'comercial' // Função padrão ao reativar; volta a passar em isInactive === false
         });
       }
 
@@ -772,7 +772,7 @@ Esta ação irá:
                                   value={member.department || 'comercial'}
                                   onValueChange={(newDepartment) => handleUpdateMemberRole(member.id, newDepartment)}
                                 >
-                                  <SelectTrigger className="w-32">
+                                  <SelectTrigger className="w-40">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>

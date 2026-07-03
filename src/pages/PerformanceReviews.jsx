@@ -502,17 +502,22 @@ export default function PerformanceReviewsPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const me = await User.me();
-    setUser(me);
-    const [emps, cycs, revs] = await Promise.all([
-      Employee.filter({ cnpj: me.cnpj, status: 'ativo' }),
-      PerformanceCycle.filter({ cnpj: me.cnpj }, '-created_at'),
-      PerformanceReview.filter({ cnpj: me.cnpj }, '-created_at', 5000),
-    ]);
-    setEmployees(emps);
-    setCycles(cycs);
-    setReviews(revs);
-    setLoading(false);
+    try {
+      const me = await User.me();
+      setUser(me);
+      const [emps, cycs, revs] = await Promise.all([
+        Employee.filter({ cnpj: me.cnpj, status: 'ativo' }),
+        PerformanceCycle.filter({ cnpj: me.cnpj }, '-created_at'),
+        PerformanceReview.filter({ cnpj: me.cnpj }, '-created_at', 5000),
+      ]);
+      setEmployees(emps);
+      setCycles(cycs);
+      setReviews(revs);
+    } catch (error) {
+      console.error("Erro ao carregar avaliações de desempenho:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { load(); }, [load]);

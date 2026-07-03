@@ -70,14 +70,19 @@ export default function TechnicianPlanning() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const me = await User.me();
-    const [emps, os] = await Promise.all([
-      Employee.filter({ cnpj: me?.cnpj, status: 'ativo' }, 'name', 1000),
-      ServiceOrder.filter({ cnpj: me?.cnpj }, '-opened_at', 2000),
-    ]);
-    setEmployees((emps || []).sort((a, b) => (a.name || '').localeCompare(b.name || '')));
-    setOrders(os || []);
-    setLoading(false);
+    try {
+      const me = await User.me();
+      const [emps, os] = await Promise.all([
+        Employee.filter({ cnpj: me?.cnpj, status: 'ativo' }, 'name', 1000),
+        ServiceOrder.filter({ cnpj: me?.cnpj }, '-opened_at', 2000),
+      ]);
+      setEmployees((emps || []).sort((a, b) => (a.name || '').localeCompare(b.name || '')));
+      setOrders(os || []);
+    } catch (error) {
+      console.error("Erro ao carregar planejamento técnico:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { load(); }, [load]);

@@ -52,14 +52,14 @@ export default function Invoices(){
   const [form, setForm] = useState({ type:'nfe', number:'', series:'', issue_date:'', total_amount:'', cnpj_issuer:'', cnpj_recipient:'', issuer_name:'', recipient_name:'', access_key:'' });
   const [list, setList] = useState([]);
 
-  const load = async ()=>{ const rows = await Invoice.list('-updated_date', 50); setList(rows); };
+  const load = async ()=>{ const rows = await Invoice.list('-updated_at', 50); setList(rows); };
   useEffect(()=>{ load(); },[]);
 
   const createFinRecord = async (inv)=>{
     if(!me?.cnpj) return;
     if(inv.cnpj_issuer === me.cnpj){
       await AccountsReceivable.create({
-        contract_id: '', customer_name: inv.recipient_name||'', document_number: inv.number||inv.access_key||'NF', status:'aberto', issue_date: inv.issue_date, competence_month: inv.issue_date?.slice(0,7), due_date: inv.issue_date, face_value: inv.total_amount, open_amount: inv.total_amount, cnpj: me.cnpj
+        contract_id: null, customer_name: inv.recipient_name||'', document_number: inv.number||inv.access_key||'NF', status:'aberto', issue_date: inv.issue_date, competence_month: inv.issue_date?.slice(0,7), due_date: inv.issue_date, face_value: inv.total_amount, open_amount: inv.total_amount, cnpj: me.cnpj
       });
     } else if(inv.cnpj_recipient === me.cnpj){
       await AccountsPayable.create({
@@ -73,17 +73,19 @@ export default function Invoices(){
     setCreating(true);
     const text = await file.text();
     const parsed = parseXmlInvoice(text) || {};
+    const { issuer_name, recipient_name, ...parsedForInvoice } = parsed;
     const { file_uri } = await UploadPrivateFile({ file });
-    const payload = { ...parsed, total_amount: Number(parsed.total_amount)||0, xml_file_uri: file_uri, status: 'uploaded', environment: 'homologacao', cnpj: me?.cnpj };
+    const payload = { ...parsedForInvoice, total_amount: Number(parsed.total_amount)||0, xml_file_uri: file_uri, status: 'uploaded', environment: 'homologacao', cnpj: me?.cnpj };
     const inv = await Invoice.create(payload);
-    await createFinRecord(inv);
+    await createFinRecord({ ...inv, issuer_name, recipient_name });
     setFile(null); setCreating(false); await load();
   };
 
   const handleCreateManual = async (e)=>{
     e.preventDefault(); setCreating(true);
-    const inv = await Invoice.create({ ...form, total_amount: Number(form.total_amount)||0, environment:'homologacao', cnpj: me?.cnpj });
-    await createFinRecord(inv);
+    const { issuer_name, recipient_name, ...formForInvoice } = form;
+    const inv = await Invoice.create({ ...formForInvoice, total_amount: Number(form.total_amount)||0, environment:'homologacao', cnpj: me?.cnpj });
+    await createFinRecord({ ...inv, issuer_name, recipient_name });
     setForm({ type:'nfe', number:'', series:'', issue_date:'', total_amount:'', cnpj_issuer:'', cnpj_recipient:'', access_key:'' });
     setCreating(false); await load();
   };

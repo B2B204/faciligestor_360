@@ -24,12 +24,12 @@ export default function ContactsTab({ user }) {
   const loadData = async () => {
     try {
       const [contactsData, companiesData] = await Promise.all([
-        CrmContact.filter({ cnpj: user.cnpj }, '-created_date'),
+        CrmContact.filter({ cnpj: user.cnpj }, '-created_at'),
         CrmCompany.filter({ cnpj: user.cnpj })
       ]);
       setContacts(contactsData);
       const companiesMap = companiesData.reduce((acc, company) => {
-        acc[company.id] = company.company_name;
+        acc[company.id] = company.name;
         return acc;
       }, {});
       setCompanies(companiesMap);

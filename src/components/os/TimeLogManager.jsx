@@ -42,7 +42,7 @@ export default function TimeLogManager({ serviceOrderId, onChanged }) {
     });
     setForm({ employee_id:"", date:"", hours:"", notes:"" });
     await load();
-    await ServiceOrder.update(serviceOrderId, { total_hours: totalHours + hours, last_updated_at: new Date().toISOString(), last_updated_by: user.email });
+    await ServiceOrder.update(serviceOrderId, { total_hours: totalHours + hours });
     onChanged?.();
   };
 
@@ -50,7 +50,7 @@ export default function TimeLogManager({ serviceOrderId, onChanged }) {
     await ServiceOrderTimeLog.delete(id);
     await load();
     const newHours = list.filter(i=>i.id!==id).reduce((s,t)=> s+(t.hours||0), 0);
-    await ServiceOrder.update(serviceOrderId, { total_hours: newHours, last_updated_at: new Date().toISOString(), last_updated_by: user?.email });
+    await ServiceOrder.update(serviceOrderId, { total_hours: newHours });
     onChanged?.();
   };
 

@@ -145,8 +145,9 @@ export default function CSVImport({ contracts, user, onSuccess, onCancel }) {
         const socialChargesCost = (baseSalary * chargesPercentage) / 100;
         const totalCost = totalSalary + benefitsCost + socialChargesCost;
 
+        const { contract_name: _contractName, ...empRest } = emp;
         const processedRow = {
-          ...emp,
+          ...empRest,
           base_salary: baseSalary,
           meal_allowance: meal,
           transport_allowance: transport,

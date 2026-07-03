@@ -13,9 +13,9 @@ export default function LeadForm({ lead, onSave, onCancel, user }) {
     email: '',
     phone: '',
     company: '',
-    origin: '',
+    source: '',
     status: 'novo',
-    observations: '',
+    notes: '',
     assigned_to: user?.email || '',
   });
 
@@ -28,9 +28,9 @@ export default function LeadForm({ lead, onSave, onCancel, user }) {
         email: lead.email || '',
         phone: lead.phone || '',
         company: lead.company || '',
-        origin: lead.origin || '',
+        source: lead.source || '',
         status: lead.status || 'novo',
-        observations: lead.observations || '',
+        notes: lead.notes || '',
         assigned_to: lead.assigned_to || user?.email || '',
       });
     }
@@ -44,7 +44,6 @@ export default function LeadForm({ lead, onSave, onCancel, user }) {
       const dataToSave = {
         ...formData,
         cnpj: user.cnpj,
-        updated_by: user.email,
       };
 
       if (lead) {
@@ -70,7 +69,7 @@ export default function LeadForm({ lead, onSave, onCancel, user }) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const originOptions = [
+  const sourceOptions = [
     { value: 'google_ads', label: 'Google Ads' },
     { value: 'indicacao', label: 'Indicação' },
     { value: 'orgao_publico', label: 'Órgão Público' },
@@ -139,13 +138,13 @@ export default function LeadForm({ lead, onSave, onCancel, user }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="origin">Origem *</Label>
-          <Select name="origin" value={formData.origin} onValueChange={(value) => handleChange({ target: { name: 'origin', value } })}>
+          <Label htmlFor="source">Origem *</Label>
+          <Select name="source" value={formData.source} onValueChange={(value) => handleChange({ target: { name: 'source', value } })}>
             <SelectTrigger>
               <SelectValue placeholder="Selecione a origem" />
             </SelectTrigger>
             <SelectContent>
-              {originOptions.map(option => (
+              {sourceOptions.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -183,11 +182,11 @@ export default function LeadForm({ lead, onSave, onCancel, user }) {
       </div>
 
       <div>
-        <Label htmlFor="observations">Observações</Label>
+        <Label htmlFor="notes">Observações</Label>
         <Textarea
-          id="observations"
-          name="observations"
-          value={formData.observations}
+          id="notes"
+          name="notes"
+          value={formData.notes}
           onChange={handleChange}
           rows={3}
           placeholder="Observações sobre o lead..."

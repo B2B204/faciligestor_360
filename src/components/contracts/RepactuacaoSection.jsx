@@ -34,10 +34,10 @@ export default function RepactuacaoSection({ contractId }) {
 
   const [formData, setFormData] = useState({
     cct_number: "",
-    request_date: "",
-    effective_date: "",
-    description: "",
-    status: "solicitada",
+    data_solicitacao: "",
+    data_efetivacao: "",
+    descricao: "",
+    status_licitacao: "solicitada",
     observations: ""
   });
 
@@ -54,7 +54,7 @@ export default function RepactuacaoSection({ contractId }) {
       const repactuacoesData = await Repactuacao.filter({ 
         contract_id: contractId,
         cnpj: currentUser.cnpj 
-      }, "-request_date");
+      }, "-data_solicitacao");
       
       setRepactuacoes(repactuacoesData);
     } catch (error) {
@@ -66,10 +66,10 @@ export default function RepactuacaoSection({ contractId }) {
   const resetForm = () => {
     setFormData({
       cct_number: "",
-      request_date: "",
-      effective_date: "",
-      description: "",
-      status: "solicitada",
+      data_solicitacao: "",
+      data_efetivacao: "",
+      descricao: "",
+      status_licitacao: "solicitada",
       observations: ""
     });
     setEditingRepactuacao(null);
@@ -79,10 +79,10 @@ export default function RepactuacaoSection({ contractId }) {
     setEditingRepactuacao(repactuacao);
     setFormData({
       cct_number: repactuacao.cct_number || "",
-      request_date: repactuacao.request_date ? repactuacao.request_date.split('T')[0] : "",
-      effective_date: repactuacao.effective_date ? repactuacao.effective_date.split('T')[0] : "",
-      description: repactuacao.description || "",
-      status: repactuacao.status || "solicitada",
+      data_solicitacao: repactuacao.data_solicitacao ? repactuacao.data_solicitacao.split('T')[0] : "",
+      data_efetivacao: repactuacao.data_efetivacao ? repactuacao.data_efetivacao.split('T')[0] : "",
+      descricao: repactuacao.descricao || "",
+      status_licitacao: repactuacao.status_licitacao || "solicitada",
       observations: repactuacao.observations || ""
     });
     setIsFormOpen(true);
@@ -109,7 +109,7 @@ export default function RepactuacaoSection({ contractId }) {
       return;
     }
     
-    if (!formData.request_date) {
+    if (!formData.data_solicitacao) {
       alert("📅 Data da solicitação é obrigatória.");
       return;
     }
@@ -206,10 +206,10 @@ export default function RepactuacaoSection({ contractId }) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status_licitacao">Status</Label>
                   <Select
-                    value={formData.status}
-                    onValueChange={(v) => handleSelectChange("status", v)}
+                    value={formData.status_licitacao}
+                    onValueChange={(v) => handleSelectChange("status_licitacao", v)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -223,34 +223,34 @@ export default function RepactuacaoSection({ contractId }) {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="request_date">Data da Solicitação *</Label>
+                  <Label htmlFor="data_solicitacao">Data da Solicitação *</Label>
                   <Input
                     type="date"
-                    id="request_date"
-                    name="request_date"
-                    value={formData.request_date}
+                    id="data_solicitacao"
+                    name="data_solicitacao"
+                    value={formData.data_solicitacao}
                     onChange={handleChange}
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="effective_date">Data Efetiva</Label>
+                  <Label htmlFor="data_efetivacao">Data Efetiva</Label>
                   <Input
                     type="date"
-                    id="effective_date"
-                    name="effective_date"
-                    value={formData.effective_date}
+                    id="data_efetivacao"
+                    name="data_efetivacao"
+                    value={formData.data_efetivacao}
                     onChange={handleChange}
                   />
                 </div>
               </div>
-              
+
               <div>
-                <Label htmlFor="description">Descrição</Label>
+                <Label htmlFor="descricao">Descrição</Label>
                 <Textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
+                  id="descricao"
+                  name="descricao"
+                  value={formData.descricao}
                   onChange={handleChange}
                   rows={3}
                   placeholder="Descrição da repactuação..."
@@ -302,16 +302,16 @@ export default function RepactuacaoSection({ contractId }) {
               <TableRow key={repactuacao.id}>
                 <TableCell className="font-medium">{repactuacao.cct_number}</TableCell>
                 <TableCell>
-                  <Badge className={statusColors[repactuacao.status]}>
-                    {statusLabels[repactuacao.status]}
+                  <Badge className={statusColors[repactuacao.status_licitacao]}>
+                    {statusLabels[repactuacao.status_licitacao]}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {format(new Date(repactuacao.request_date), "dd/MM/yyyy")}
+                  {format(new Date(repactuacao.data_solicitacao), "dd/MM/yyyy")}
                 </TableCell>
                 <TableCell>
-                  {repactuacao.effective_date 
-                    ? format(new Date(repactuacao.effective_date), "dd/MM/yyyy") 
+                  {repactuacao.data_efetivacao
+                    ? format(new Date(repactuacao.data_efetivacao), "dd/MM/yyyy")
                     : "-"}
                 </TableCell>
                 <TableCell>

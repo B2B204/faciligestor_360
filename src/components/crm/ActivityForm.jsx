@@ -11,12 +11,9 @@ import { Save } from 'lucide-react';
 export default function ActivityForm({ activity, onSave, onCancel, user }) {
   const [formData, setFormData] = useState({
     type: 'chamada',
-    title: '',
     description: '',
-    activity_date: '',
-    activity_time: '',
+    date: '',
     deal_id: '',
-    status: 'planejada',
   });
   const [deals, setDeals] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,12 +34,9 @@ export default function ActivityForm({ activity, onSave, onCancel, user }) {
     if (activity) {
       setFormData({
         type: activity.type || 'chamada',
-        title: activity.title || '',
         description: activity.description || '',
-        activity_date: activity.activity_date ? activity.activity_date.split('T')[0] : '',
-        activity_time: activity.activity_time || '',
+        date: activity.date ? activity.date.slice(0, 16) : '',
         deal_id: activity.deal_id || '',
-        status: activity.status || 'planejada',
       });
     }
   }, [activity]);
@@ -51,7 +45,7 @@ export default function ActivityForm({ activity, onSave, onCancel, user }) {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const dataToSave = { ...formData, cnpj: user.cnpj, updated_by: user.email };
+      const dataToSave = { ...formData, cnpj: user.cnpj };
       if (activity) {
         await CrmActivity.update(activity.id, dataToSave);
       } else {
@@ -90,13 +84,9 @@ export default function ActivityForm({ activity, onSave, onCancel, user }) {
           </Select>
         </div>
         <div>
-          <Label htmlFor="title">Título *</Label>
-          <Input id="title" name="title" value={formData.title} onChange={handleChange} required />
+          <Label htmlFor="date">Data/Hora *</Label>
+          <Input id="date" name="date" type="datetime-local" value={formData.date} onChange={handleChange} required />
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><Label htmlFor="activity_date">Data *</Label><Input id="activity_date" name="activity_date" type="date" value={formData.activity_date} onChange={handleChange} required /></div>
-        <div><Label htmlFor="activity_time">Hora</Label><Input id="activity_time" name="activity_time" type="time" value={formData.activity_time} onChange={handleChange} /></div>
       </div>
       <div>
         <Label htmlFor="deal_id">Negócio Relacionado</Label>

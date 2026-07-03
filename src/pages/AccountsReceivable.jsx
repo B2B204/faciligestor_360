@@ -158,18 +158,19 @@ export default function AccountsReceivablePage() {
 
       if (prefs && prefs.length) {
         const p = prefs[0];
+        const prefsData = p.preferences || {};
         setPreferenceId(p.id);
-        setPeriodType(p.period_type || "mensal");
-        setSelectedMonth(p.selected_month || format(new Date(), 'yyyy-MM'));
-        setCustomFrom(p.custom_from || "");
-        setCustomTo(p.custom_to || "");
-        setSelectedContractIds(p.contract_ids || []);
-        setSelectedClients(p.clients || []);
-        setSelectedStatuses(p.statuses || []);
-        setSelectedMethods(p.billing_methods || []);
-        setSelectedUnits(p.units || []);
-        setSelectedResponsibles(p.responsibles || []);
-        setPageSize(p.page_size || 50);
+        setPeriodType(prefsData.period_type || "mensal");
+        setSelectedMonth(prefsData.selected_month || format(new Date(), 'yyyy-MM'));
+        setCustomFrom(prefsData.custom_from || "");
+        setCustomTo(prefsData.custom_to || "");
+        setSelectedContractIds(prefsData.contract_ids || []);
+        setSelectedClients(prefsData.clients || []);
+        setSelectedStatuses(prefsData.statuses || []);
+        setSelectedMethods(prefsData.billing_methods || []);
+        setSelectedUnits(prefsData.units || []);
+        setSelectedResponsibles(prefsData.responsibles || []);
+        setPageSize(prefsData.page_size || 50);
       }
 
       // calculateDashboardData will be called by useEffect on filteredAccounts
@@ -184,17 +185,19 @@ export default function AccountsReceivablePage() {
     const data = {
       user_email: user.email,
       cnpj: user.cnpj,
-      period_type: periodType,
-      selected_month: selectedMonth,
-      custom_from: customFrom || null,
-      custom_to: customTo || null,
-      contract_ids: selectedContractIds,
-      clients: selectedClients,
-      statuses: selectedStatuses,
-      billing_methods: selectedMethods,
-      units: selectedUnits,
-      responsibles: selectedResponsibles,
-      page_size: pageSize
+      preferences: {
+        period_type: periodType,
+        selected_month: selectedMonth,
+        custom_from: customFrom || null,
+        custom_to: customTo || null,
+        contract_ids: selectedContractIds,
+        clients: selectedClients,
+        statuses: selectedStatuses,
+        billing_methods: selectedMethods,
+        units: selectedUnits,
+        responsibles: selectedResponsibles,
+        page_size: pageSize
+      }
     };
     try {
       if (preferenceId) {
@@ -338,7 +341,7 @@ export default function AccountsReceivablePage() {
     // Received in period logic, filters payments based on their payment_date and selected filters
     const receivedInPeriod = payments.filter(p => {
       if (!p.payment_date) return false;
-      const paymentAccount = accounts.find(a => a.id === p.accounts_receivable_id);
+      const paymentAccount = accounts.find(a => a.id === p.receivable_id);
       if (!paymentAccount) return false; // Payment for a non-existent or deleted account
 
       // Check if the payment's associated account would be included by contract filters
@@ -411,11 +414,9 @@ export default function AccountsReceivablePage() {
         created_by: user.email
       });
       await AccountsReceivableHistory.create({
-        accounts_receivable_id: dup.id,
-        type: "duplicated",
-        description: `Título duplicado a partir de ${acc.document_number}. Novo documento: ${dup.document_number}.`,
-        date: new Date().toISOString(),
-        performed_by: user.email,
+        receivable_id: dup.id,
+        action: "duplicated",
+        notes: `Título duplicado a partir de ${acc.document_number}. Novo documento: ${dup.document_number}.`,
         cnpj: user.cnpj
       });
       alert(`Título ${dup.document_number} duplicado com sucesso!`);

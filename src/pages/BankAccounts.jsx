@@ -17,14 +17,14 @@ export default function BankAccounts(){
   const [saving, setSaving] = useState(false);
 
   const load = async ()=>{
-    const rows = await BankAccount.list('-updated_date', 100);
+    const rows = await BankAccount.list('-updated_at', 100);
     setList(rows);
     setLoading(false);
   };
   useEffect(()=>{ load(); },[]);
 
   const recomputeBalance = async (acc)=>{
-    const txs = await BankTransaction.filter({ bank_account_id: acc.id }, '-created_date', 5000);
+    const txs = await BankTransaction.filter({ bank_account_id: acc.id }, '-created_at', 5000);
     const net = txs.reduce((sum,t)=> sum + Number(t.amount||0), 0);
     const newBal = Number(acc.initial_balance||0) + net;
     if (Number((acc.current_balance??0).toFixed(2)) !== Number(newBal.toFixed(2))){
@@ -33,7 +33,7 @@ export default function BankAccounts(){
   };
 
   const recomputeAll = async ()=>{
-    const rows = await BankAccount.list('-updated_date', 200);
+    const rows = await BankAccount.list('-updated_at', 200);
     for(const acc of rows){ await recomputeBalance(acc); }
     await load();
   };

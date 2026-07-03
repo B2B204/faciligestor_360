@@ -190,9 +190,9 @@ export default function PostCard({ post, author, currentUser, onLike, onDelete }
               <span>{likeCount > 0 ? likeCount : ''} {likeCount === 1 ? 'curtida' : likeCount > 1 ? 'curtidas' : 'Curtir'}</span>
             </button>
 
-            {post.updated_at && post.updated_at !== post.created_at && (
+            {post.updated_date && post.updated_date !== post.created_date && (
               <span className="text-xs text-gray-300">
-                Editado em {format(new Date(post.updated_at), "dd/MM 'às' HH:mm")}
+                Editado em {format(new Date(post.updated_date), "dd/MM 'às' HH:mm")}
               </span>
             )}
           </div>

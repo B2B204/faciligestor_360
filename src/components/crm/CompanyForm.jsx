@@ -9,15 +9,11 @@ import { Save } from 'lucide-react';
 
 export default function CompanyForm({ company, onSave, onCancel, user }) {
   const [formData, setFormData] = useState({
-    company_name: '',
-    cnpj_company: '',
-    address: '',
-    phone: '',
-    email: '',
-    website: '',
-    industry: '',
-    size: 'pequena',
-    observations: '',
+    name: '',
+    cnpj_client: '',
+    sector: '',
+    status: 'ativo',
+    notes: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,15 +21,11 @@ export default function CompanyForm({ company, onSave, onCancel, user }) {
   useEffect(() => {
     if (company) {
       setFormData({
-        company_name: company.company_name || '',
-        cnpj_company: company.cnpj_company || '',
-        address: company.address || '',
-        phone: company.phone || '',
-        email: company.email || '',
-        website: company.website || '',
-        industry: company.industry || '',
-        size: company.size || 'pequena',
-        observations: company.observations || '',
+        name: company.name || '',
+        cnpj_client: company.cnpj_client || '',
+        sector: company.sector || '',
+        status: company.status || 'ativo',
+        notes: company.notes || '',
       });
     }
   }, [company]);
@@ -45,7 +37,6 @@ export default function CompanyForm({ company, onSave, onCancel, user }) {
       const dataToSave = {
         ...formData,
         cnpj: user.cnpj,
-        updated_by: user.email,
       };
       if (company) {
         await CrmCompany.update(company.id, dataToSave);
@@ -70,53 +61,33 @@ export default function CompanyForm({ company, onSave, onCancel, user }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="company_name">Razão Social *</Label>
-          <Input id="company_name" name="company_name" value={formData.company_name} onChange={handleChange} required />
+          <Label htmlFor="name">Razão Social *</Label>
+          <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
         </div>
         <div>
-          <Label htmlFor="cnpj_company">CNPJ</Label>
-          <Input id="cnpj_company" name="cnpj_company" value={formData.cnpj_company} onChange={handleChange} />
-        </div>
-      </div>
-      <div>
-        <Label htmlFor="address">Endereço</Label>
-        <Input id="address" name="address" value={formData.address} onChange={handleChange} />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="phone">Telefone</Label>
-          <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} />
-        </div>
-        <div>
-          <Label htmlFor="email">E-mail</Label>
-          <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} />
+          <Label htmlFor="cnpj_client">CNPJ</Label>
+          <Input id="cnpj_client" name="cnpj_client" value={formData.cnpj_client} onChange={handleChange} />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="website">Website</Label>
-          <Input id="website" name="website" value={formData.website} onChange={handleChange} />
+          <Label htmlFor="sector">Setor</Label>
+          <Input id="sector" name="sector" value={formData.sector} onChange={handleChange} />
         </div>
         <div>
-          <Label htmlFor="industry">Setor</Label>
-          <Input id="industry" name="industry" value={formData.industry} onChange={handleChange} />
+          <Label htmlFor="status">Status</Label>
+          <Select value={formData.status} onValueChange={(v) => handleChange({target: {name: 'status', value: v}})}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ativo">Ativo</SelectItem>
+              <SelectItem value="inativo">Inativo</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div>
-        <Label htmlFor="size">Porte da Empresa</Label>
-        <Select value={formData.size} onValueChange={(v) => handleChange({target: {name: 'size', value: v}})}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pequena">Pequena</SelectItem>
-            <SelectItem value="media">Média</SelectItem>
-            <SelectItem value="grande">Grande</SelectItem>
-            <SelectItem value="multinacional">Multinacional</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="observations">Observações</Label>
-        <Textarea id="observations" name="observations" value={formData.observations} onChange={handleChange} />
+        <Label htmlFor="notes">Observações</Label>
+        <Textarea id="notes" name="notes" value={formData.notes} onChange={handleChange} />
       </div>
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>

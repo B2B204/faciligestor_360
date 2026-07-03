@@ -170,11 +170,10 @@ export default function Budget() {
       });
 
     indirectCosts
-      .filter((c) => c.status === 'ativo')
       .forEach((c) => {
-        const cat = c.cost_type || 'outros';
+        const cat = c.category || 'outros';
         if (!byCategory[cat]) byCategory[cat] = { category: cat, label: CATEGORY_LABELS[cat] || cat, budgeted: 0, budgetId: null, realizedPayable: 0, realizedIndirect: 0 };
-        byCategory[cat].realizedIndirect += Number(c.monthly_value || 0);
+        byCategory[cat].realizedIndirect += Number(c.amount || 0);
       });
 
     return Object.values(byCategory)

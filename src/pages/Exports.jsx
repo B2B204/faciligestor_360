@@ -14,11 +14,11 @@ import JSZip from 'jszip';
 
 async function fetchData(month){
   const [invoices, pay, recv, bank, accounts] = await Promise.all([
-    Invoice.filter({ }, '-created_date', 2000),
-    AccountsPayable.filter({ }, '-created_date', 2000),
+    Invoice.filter({ }, '-created_at', 2000),
+    AccountsPayable.filter({ }, '-created_at', 2000),
     AccountsReceivable.filter({ }, '-created_date', 2000),
-    BankTransaction.filter({ }, '-created_date', 5000),
-    BankAccount.list('-updated_date', 200),
+    BankTransaction.filter({ }, '-created_at', 5000),
+    BankAccount.list('-updated_at', 200),
   ]);
   const filt = (rows, field)=> rows.filter(r=> (r[field]||'').startsWith(month));
   return {

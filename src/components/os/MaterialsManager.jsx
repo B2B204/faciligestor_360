@@ -48,7 +48,7 @@ export default function MaterialsManager({ serviceOrderId, onChanged }) {
     // It's safer to re-calculate from the *newly loaded* list if `load` is awaited.
     const updatedListAfterAdd = await ServiceOrderMaterial.filter({ cnpj: user.cnpj, service_order_id: serviceOrderId });
     const newTotalAfterAdd = updatedListAfterAdd.reduce((s,m)=> s + (m.total_cost||0), 0);
-    await ServiceOrder.update(serviceOrderId, { total_material_cost: newTotalAfterAdd, last_updated_at: new Date().toISOString(), last_updated_by: user.email });
+    await ServiceOrder.update(serviceOrderId, { total_material_cost: newTotalAfterAdd });
     onChanged?.();
   };
 
@@ -59,7 +59,7 @@ export default function MaterialsManager({ serviceOrderId, onChanged }) {
     // Recalculate total materials cost after removing, based on the *updated* list
     const updatedListAfterRemove = await ServiceOrderMaterial.filter({ cnpj: u.cnpj, service_order_id: serviceOrderId });
     const newTotalAfterRemove = updatedListAfterRemove.reduce((s,m)=> s+(m.total_cost||0), 0);
-    await ServiceOrder.update(serviceOrderId, { total_material_cost: newTotalAfterRemove, last_updated_at: new Date().toISOString(), last_updated_by: u.email });
+    await ServiceOrder.update(serviceOrderId, { total_material_cost: newTotalAfterRemove });
     onChanged?.();
   };
 

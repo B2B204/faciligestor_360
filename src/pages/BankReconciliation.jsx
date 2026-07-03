@@ -141,7 +141,7 @@ async function runAutoMatch(created, bankAccountId) {
   );
   const openPay = await AccountsPayable.filter(
     { status: 'aberto' },
-    '-created_date',
+    '-created_at',
     500
   );
   const updates = [];
@@ -199,13 +199,13 @@ async function recalcBalance(bankAccountId, bankAccounts, setBankAccounts) {
   if (!acc) return;
   const txsAcc = await BankTransaction.filter(
     { bank_account_id: bankAccountId },
-    '-created_date',
+    '-created_at',
     5000
   );
   const net = txsAcc.reduce((s, t) => s + Number(t.amount || 0), 0);
   const newBal = Number(acc.initial_balance || 0) + net;
   await BankAccount.update(acc.id, { current_balance: newBal });
-  const refreshed = await BankAccount.list('-updated_date', 200);
+  const refreshed = await BankAccount.list('-updated_at', 200);
   setBankAccounts(refreshed);
 }
 
@@ -239,7 +239,7 @@ export default function BankReconciliation() {
   useEffect(() => {
     (async () => {
       const [b, user] = await Promise.all([
-        BankAccount.list('-updated_date', 200),
+        BankAccount.list('-updated_at', 200),
         User.me(),
       ]);
       setBankAccounts(b);
@@ -490,7 +490,7 @@ export default function BankReconciliation() {
       // Check for already-imported fitids
       const existingTxs = await BankTransaction.filter(
         { bank_account_id: selectedLocalBankId },
-        '-created_date',
+        '-created_at',
         5000
       );
       const existingFitids = new Set(existingTxs.map((t) => t.fitid).filter(Boolean));

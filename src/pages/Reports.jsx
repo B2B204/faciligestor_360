@@ -125,7 +125,7 @@ export default function ReportsPage() {
 
     const revenue = reportData.financialEntries.reduce((sum, item) => sum + (item.net_revenue || 0), 0);
     const personnelCost = reportData.employees.reduce((sum, item) => sum + (item.total_cost || 0), 0);
-    const materialCost = reportData.materials.reduce((sum, item) => sum + (item.monthly_value || 0), 0);
+    const materialCost = reportData.materials.reduce((sum, item) => sum + (item.unit_price || 0), 0);
     const totalTaxes = reportData.taxes.reduce((sum, item) => 
       sum + (item.inss || 0) + (item.irrf || 0) + (item.iss || 0) + 
       (item.csll || 0) + (item.pis || 0) + (item.cofins || 0), 0);
@@ -150,7 +150,7 @@ export default function ReportsPage() {
 
     const revenue = reportData.financialEntries.reduce((sum, item) => sum + (item.net_revenue || 0), 0);
     const personnelCost = reportData.employees.reduce((sum, item) => sum + (item.total_cost || 0), 0);
-    const materialCost = reportData.materials.reduce((sum, item) => sum + (item.monthly_value || 0), 0);
+    const materialCost = reportData.materials.reduce((sum, item) => sum + (item.unit_price || 0), 0);
     const totalCost = personnelCost + materialCost;
     const totalTaxes = reportData.taxes.reduce((sum, item) => 
       sum + (item.inss || 0) + (item.irrf || 0) + (item.iss || 0) + 
@@ -247,7 +247,7 @@ export default function ReportsPage() {
   const PersonnelReport = () => {
     if (!reportData) return null;
 
-    const totalSalaries = reportData.employees.reduce((sum, emp) => sum + (emp.salary || 0), 0);
+    const totalSalaries = reportData.employees.reduce((sum, emp) => sum + (emp.base_salary || 0), 0);
     const totalCosts = reportData.employees.reduce((sum, emp) => sum + (emp.total_cost || 0), 0);
 
     return (
@@ -306,7 +306,7 @@ export default function ReportsPage() {
                     <tr key={index} className="border-b">
                       <td className="p-3 font-medium">{emp.name}</td>
                       <td className="p-3">{emp.role}</td>
-                      <td className="p-3 text-right">{formatCurrency(emp.salary)}</td>
+                      <td className="p-3 text-right">{formatCurrency(emp.base_salary)}</td>
                       <td className="p-3 text-right">
                         {formatCurrency((emp.meal_allowance || 0) + (emp.transport_allowance || 0))}
                       </td>
@@ -380,7 +380,7 @@ export default function ReportsPage() {
 
     const revenue = reportData.financialEntries.reduce((sum, item) => sum + (item.net_revenue || 0), 0);
     const costs = reportData.employees.reduce((sum, item) => sum + (item.total_cost || 0), 0) +
-                  reportData.materials.reduce((sum, item) => sum + (item.monthly_value || 0), 0);
+                  reportData.materials.reduce((sum, item) => sum + (item.unit_price || 0), 0);
     const taxes = reportData.taxes.reduce((sum, item) => 
       sum + (item.inss || 0) + (item.irrf || 0) + (item.iss || 0) + 
       (item.csll || 0) + (item.pis || 0) + (item.cofins || 0), 0);

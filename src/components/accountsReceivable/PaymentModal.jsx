@@ -26,14 +26,13 @@ export default function PaymentModal({ open, onOpenChange, account, user, onSave
     }
     setSaving(true);
     try {
+      const paymentNotes = [observation, proofUrl ? `Comprovante: ${proofUrl}` : ""].filter(Boolean).join(" | ");
       await ReceivablePayment.create({
-        accounts_receivable_id: account.id,
+        receivable_id: account.id,
         amount: numAmount,
         payment_date: paymentDate,
         method,
-        proof_url: proofUrl || "",
-        observation,
-        received_by: user.email,
+        notes: paymentNotes,
         cnpj: user.cnpj
       });
 
@@ -53,13 +52,9 @@ export default function PaymentModal({ open, onOpenChange, account, user, onSave
       });
 
       await AccountsReceivableHistory.create({
-        accounts_receivable_id: account.id,
-        type: "payment",
-        description: `Recebimento registrado: ${formatCurrency(numAmount)} via ${method}${proofUrl ? " (comprovante anexado)" : ""}.`,
-        amount: numAmount,
-        date: new Date().toISOString(),
-        attachment_url: proofUrl || "",
-        performed_by: user.email,
+        receivable_id: account.id,
+        action: "payment",
+        notes: `Recebimento registrado: ${formatCurrency(numAmount)} via ${method}${proofUrl ? " (comprovante anexado)" : ""}.`,
         cnpj: user.cnpj
       });
 

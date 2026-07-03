@@ -91,8 +91,8 @@ export default function FinancialPage() {
       setUser(currentUser);
       const [contractsData, financialEntries, taxExcessData] = await Promise.all([
         Contract.filter({ cnpj: currentUser.cnpj, status: 'ativo' }),
-        FinancialEntry.filter({ cnpj: currentUser.cnpj }, "-created_date"),
-        TaxExcess.filter({ cnpj: currentUser.cnpj }, "-created_date")
+        FinancialEntry.filter({ cnpj: currentUser.cnpj }, "-created_at"),
+        TaxExcess.filter({ cnpj: currentUser.cnpj }, "-created_at")
       ]);
       setContracts(contractsData);
       setFinancialData(financialEntries);
@@ -172,7 +172,7 @@ export default function FinancialPage() {
       total_materials: 0,
       total_costs: 0,
       final_result: 0,
-      observations: ""
+      notes: ""
     });
     const [isSaving, setIsSaving] = useState(false);
 
@@ -209,7 +209,7 @@ export default function FinancialPage() {
           total_materials: editingEntry.total_materials || 0,
           total_costs: editingEntry.total_costs || 0,
           final_result: editingEntry.final_result || 0,
-          observations: editingEntry.observations || ""
+          notes: editingEntry.notes || ""
         });
       } else {
         setFormData({
@@ -238,7 +238,7 @@ export default function FinancialPage() {
           total_materials: 0,
           total_costs: 0,
           final_result: 0,
-          observations: ""
+          notes: ""
         });
       }
     }, [editingEntry]);
@@ -586,8 +586,8 @@ export default function FinancialPage() {
 
         {/* Observações */}
         <div>
-          <Label htmlFor="observations">Observações</Label>
-          <Textarea id="observations" name="observations" value={formData.observations} onChange={(e) => setFormData(prev => ({ ...prev, observations: e.target.value }))} rows={3} />
+          <Label htmlFor="notes">Observações</Label>
+          <Textarea id="notes" name="notes" value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} rows={3} />
         </div>
 
         <div className="flex justify-end gap-2 pt-4 border-t border-border">
@@ -798,14 +798,14 @@ export default function FinancialPage() {
               </p>
             </div>
 
-            {entry.observations && (
+            {entry.notes && (
               <div>
                 <Label>Observações</Label>
-                <p className="text-sm text-foreground bg-muted/50 p-3 rounded border border-border">{entry.observations}</p>
+                <p className="text-sm text-foreground bg-muted/50 p-3 rounded border border-border">{entry.notes}</p>
               </div>
             )}
             <div className="text-right text-xs text-muted-foreground">
-              Última Alteração: {entry.updated_by || entry.created_by} em {format(new Date(entry.updated_date || entry.created_date), "dd/MM/yy HH:mm")}
+              Última Alteração: {entry.updated_by || entry.created_by} em {format(new Date(entry.updated_at || entry.created_at), "dd/MM/yy HH:mm")}
             </div>
           </div>
         </DialogContent>
@@ -852,7 +852,7 @@ export default function FinancialPage() {
       const s = searchTerm.trim().toLowerCase();
       const searchMatch = s === "" ||
         (contract?.name?.toLowerCase().includes(s)) ||
-        (entry.observations?.toLowerCase().includes(s));
+        (entry.notes?.toLowerCase().includes(s));
 
       return contractMatch && periodMatch && unitMatch && respMatch && resultMatch && searchMatch;
     });

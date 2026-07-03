@@ -32,18 +32,6 @@ function getContractEndDate(c) {
   return null;
 }
 
-function severityForExpiryTier(tier) {
-  if (tier <= 30) return 'high';
-  if (tier <= 60) return 'medium';
-  return 'low';
-}
-
-function severityForSlaTier(tier) {
-  if (tier >= 90) return 'high';
-  if (tier >= 60) return 'medium';
-  return 'low';
-}
-
 /**
  * Gera alertas operacionais (vencimento de contrato em camadas de 30/60/90 dias,
  * SLA de reajuste/repactuação pendente, seguros e laudos a vencer) para o cnpj
@@ -87,7 +75,6 @@ export async function generateOperationalAlerts(cnpj, userEmail) {
           entity_id: c.id,
           entity_type: 'Contract',
           due_date: format(end, 'yyyy-MM-dd'),
-          severity: severityForExpiryTier(tier),
           status: 'pending',
           message: `Contrato "${c.name}" vence em ${daysLeft} dia(s) (${format(end, 'dd/MM/yyyy')}) — alerta de ${tier} dias.`,
         });
@@ -111,7 +98,6 @@ export async function generateOperationalAlerts(cnpj, userEmail) {
             entity_id: r.id,
             entity_type: 'Repactuacao',
             due_date: null,
-            severity: severityForSlaTier(tier),
             status: 'pending',
             message: `Reajuste do contrato "${contractName}" está pendente há ${daysSince} dia(s) desde a solicitação (${format(requestedAt, 'dd/MM/yyyy')}) — SLA de ${tier} dias estourado.`,
           });
@@ -131,7 +117,6 @@ export async function generateOperationalAlerts(cnpj, userEmail) {
         entity_id: s.id,
         entity_type: 'Seguro',
         due_date: format(end, 'yyyy-MM-dd'),
-        severity: severityForExpiryTier(30),
         status: 'pending',
         message: `Seguro ${s.apolice || ''} prestes a expirar em ${daysLeft} dia(s) (${format(end, 'dd/MM/yyyy')}).`,
       });
@@ -150,7 +135,6 @@ export async function generateOperationalAlerts(cnpj, userEmail) {
         entity_id: l.id,
         entity_type: 'Laudo',
         due_date: format(end, 'yyyy-MM-dd'),
-        severity: severityForExpiryTier(30),
         status: 'pending',
         message: `Laudo ${l.tipo_laudo || ''} prestes a expirar em ${daysLeft} dia(s) (${format(end, 'dd/MM/yyyy')}).`,
       });

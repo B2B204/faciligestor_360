@@ -816,7 +816,7 @@ export default function UniformsPage() {
                   const employee = employees.find(e => e.id === first.employee_id);
                   const contract = contracts.find(c => c.id === first.contract_id);
                   const total = group.list.reduce((s, it) => s + (it.total_cost || 0), 0);
-                  const filteredBySearch = employee?.name.toLowerCase().includes(searchTerm.toLowerCase());
+                  const filteredBySearch = employee?.name?.toLowerCase().includes(searchTerm.toLowerCase());
                   if (!filteredBySearch) return null;
 
                   return (

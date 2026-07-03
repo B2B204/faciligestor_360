@@ -358,7 +358,7 @@ Esta ação irá:
     try {
       const { file_url } = await UploadFile({ file });
       const fieldToUpdate = fileType === 'profile' ? 'photo_url' : 'company_logo_url';
-      await User.updateMyUserData({ [fieldToUpdate]: file_url });
+      await User.update(user.id, { [fieldToUpdate]: file_url });
       loadAllData();
       alert(`Sua ${fileType === 'profile' ? 'foto de perfil' : 'logo da empresa'} foi atualizada!`);
     } catch (error) {
@@ -379,7 +379,7 @@ Esta ação irá:
 
     setIsSaving(true);
     try {
-      await User.updateMyUserData(formData);
+      await User.update(user.id, formData);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       loadAllData();
@@ -642,11 +642,11 @@ Esta ação irá:
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label className="text-sm font-medium text-foreground">Data de Cadastro</Label>
-                  <Input value={user.created_date ? new Date(user.created_date).toLocaleDateString('pt-BR') : 'Não disponível'} disabled className="mt-1 bg-muted" />
+                  <Input value={user.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : 'Não disponível'} disabled className="mt-1 bg-muted" />
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-foreground">Última Atualização</Label>
-                  <Input value={user.updated_date ? new Date(user.updated_date).toLocaleDateString('pt-BR') : 'Não disponível'} disabled className="mt-1 bg-muted" />
+                  <Input value={user.updated_at ? new Date(user.updated_at).toLocaleDateString('pt-BR') : 'Não disponível'} disabled className="mt-1 bg-muted" />
                 </div>
               </div>
             </div>

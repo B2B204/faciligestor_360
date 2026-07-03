@@ -61,6 +61,19 @@ export default function AlertsPage() {
     low: "bg-blue-100 text-blue-800",
   };
 
+  const SLA_TYPES = ["contract_readjustment_sla"];
+  const severityFor = (a) => {
+    if (a.tier == null) return null;
+    if (SLA_TYPES.includes(a.type)) {
+      if (a.tier >= 90) return "high";
+      if (a.tier >= 60) return "medium";
+      return "low";
+    }
+    if (a.tier <= 30) return "high";
+    if (a.tier <= 60) return "medium";
+    return "low";
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -108,9 +121,9 @@ export default function AlertsPage() {
                     <TableCell>{typeLabel[a.type]||a.type}</TableCell>
                     <TableCell>{a.message}</TableCell>
                     <TableCell>
-                      {a.severity ? (
-                        <Badge className={severityColor[a.severity] || "bg-muted text-muted-foreground"}>
-                          {a.tier ? `${a.tier}d` : a.severity}
+                      {a.tier != null ? (
+                        <Badge className={severityColor[severityFor(a)] || "bg-muted text-muted-foreground"}>
+                          {`${a.tier}d`}
                         </Badge>
                       ) : "-"}
                     </TableCell>
@@ -128,7 +141,7 @@ export default function AlertsPage() {
                   </TableRow>
                 ))}
                 {filtered.length===0 && (
-                  <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Sem alertas neste filtro.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Sem alertas neste filtro.</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>

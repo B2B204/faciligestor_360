@@ -34,9 +34,8 @@ export default function IndirectCostsPage() {
     // Contracts are already filtered by status 'ativo' in loadData
     const revenue = contractList.reduce((sum, contract) => sum + (contract.monthly_value || 0), 0);
     
-    // Calcular total de custos indiretos ativos
-    const activeCosts = costs.filter(c => c.status === 'ativo');
-    const costsTotal = activeCosts.reduce((sum, cost) => sum + (cost.monthly_value || 0), 0);
+    // Calcular total de custos indiretos
+    const costsTotal = costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
     
     // Calcular percentual sobre faturamento
     const percentage = revenue > 0 ? (costsTotal / revenue) * 100 : 0;
@@ -52,7 +51,7 @@ export default function IndirectCostsPage() {
       setUser(currentUser); // Set user state
 
       const [costsData, contractsData] = await Promise.all([
-        IndirectCost.filter({ cnpj: currentUser.cnpj }, "-created_date"), // Filter IndirectCosts by user's CNPJ
+        IndirectCost.filter({ cnpj: currentUser.cnpj }, "-created_at"), // Filter IndirectCosts by user's CNPJ
         Contract.filter({ cnpj: currentUser.cnpj, status: 'ativo' }) // Filter Contracts by user's CNPJ and status
       ]);
       setIndirectCosts(costsData);
@@ -69,18 +68,17 @@ export default function IndirectCostsPage() {
 
   const CostForm = ({ cnpj }) => { // Added cnpj prop
     const [formData, setFormData] = useState({
-      cost_type: "outros",
+      category: "outros",
       description: "",
-      monthly_value: 0,
-      reference_month: "",
-      status: "ativo"
+      amount: 0,
+      competence_month: ""
     });
 
     const handleChange = (e) => {
       const { name, value } = e.target;
-      setFormData(prev => ({ 
-        ...prev, 
-        [name]: name === 'monthly_value' ? Number(value) : value 
+      setFormData(prev => ({
+        ...prev,
+        [name]: name === 'amount' ? Number(value) : value
       }));
     };
 
@@ -99,11 +97,10 @@ export default function IndirectCostsPage() {
         loadData();
         setIsFormOpen(false);
         setFormData({
-          cost_type: "outros",
+          category: "outros",
           description: "",
-          monthly_value: 0,
-          reference_month: "",
-          status: "ativo"
+          amount: 0,
+          competence_month: ""
         });
         alert("Custo indireto adicionado com sucesso!");
       } catch (error) {
@@ -131,9 +128,9 @@ export default function IndirectCostsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Tipo de Custo *</Label>
-              <Select 
-                value={formData.cost_type} 
-                onValueChange={(v) => handleSelectChange("cost_type", v)} 
+              <Select
+                value={formData.category}
+                onValueChange={(v) => handleSelectChange("category", v)}
                 required
               >
                 <SelectTrigger>
@@ -147,53 +144,38 @@ export default function IndirectCostsPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="monthly_value">Valor Mensal (R$) *</Label>
-              <Input 
-                type="number" 
+              <Label htmlFor="amount">Valor Mensal (R$) *</Label>
+              <Input
+                type="number"
                 step="0.01"
-                id="monthly_value" 
-                name="monthly_value" 
-                value={formData.monthly_value} 
-                onChange={handleChange} 
+                id="amount"
+                name="amount"
+                value={formData.amount}
+                onChange={handleChange}
                 required
                 min="0"
               />
             </div>
             <div className="md:col-span-2">
               <Label htmlFor="description">Descrição *</Label>
-              <Input 
-                id="description" 
-                name="description" 
-                value={formData.description} 
-                onChange={handleChange} 
+              <Input
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
                 required
                 placeholder="Descreva o custo específico..."
               />
             </div>
             <div>
-              <Label htmlFor="reference_month">Mês/Ano de Referência</Label>
-              <Input 
-                type="month" 
-                id="reference_month" 
-                name="reference_month" 
-                value={formData.reference_month} 
+              <Label htmlFor="competence_month">Mês/Ano de Referência</Label>
+              <Input
+                type="month"
+                id="competence_month"
+                name="competence_month"
+                value={formData.competence_month}
                 onChange={handleChange}
               />
-            </div>
-            <div>
-              <Label>Status</Label>
-              <Select 
-                value={formData.status} 
-                onValueChange={(v) => handleSelectChange("status", v)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ativo">Ativo</SelectItem>
-                  <SelectItem value="inativo">Inativo</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </div>
@@ -363,14 +345,13 @@ export default function IndirectCostsPage() {
                   <TableHead className="min-w-[260px]">Descrição</TableHead>
                   <TableHead className="min-w-[160px]">Valor Mensal</TableHead>
                   <TableHead className="min-w-[140px]">Mês/Ano</TableHead>
-                  <TableHead className="min-w-[120px]">Status</TableHead>
                   <TableHead className="min-w-[100px]">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {indirectCosts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       Nenhum custo indireto cadastrado
                     </TableCell>
                   </TableRow>
@@ -379,23 +360,14 @@ export default function IndirectCostsPage() {
                     <TableRow key={cost.id}>
                       <TableCell className="min-w-[180px]">
                         <Badge variant="outline" className="capitalize">
-                          {costTypeLabels[cost.cost_type] || cost.cost_type}
+                          {costTypeLabels[cost.category] || cost.category}
                         </Badge>
                       </TableCell>
                       <TableCell className="min-w-[260px] font-medium">{cost.description}</TableCell>
                       <TableCell className="min-w-[160px] text-red-600 font-medium kpi-value">
-                        {formatCurrency(cost.monthly_value)}
+                        {formatCurrency(cost.amount)}
                       </TableCell>
-                      <TableCell className="min-w-[140px]">{cost.reference_month || '-'}</TableCell>
-                      <TableCell className="min-w-[120px]">
-                        <Badge className={`${
-                          cost.status === 'ativo'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-muted text-muted-foreground'
-                        }`}>
-                          {cost.status}
-                        </Badge>
-                      </TableCell>
+                      <TableCell className="min-w-[140px]">{cost.competence_month || '-'}</TableCell>
                       <TableCell className="min-w-[100px]">
                         {canEdit && (
                           <Button
@@ -425,8 +397,8 @@ export default function IndirectCostsPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {Object.entries(costTypeLabels).map(([type, label]) => {
-              const categoryCosts = indirectCosts.filter(c => c.cost_type === type && c.status === 'ativo');
-              const categoryTotal = categoryCosts.reduce((sum, c) => sum + (c.monthly_value || 0), 0);
+              const categoryCosts = indirectCosts.filter(c => c.category === type);
+              const categoryTotal = categoryCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
               
               if (categoryTotal === 0) return null;
               

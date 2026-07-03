@@ -39,7 +39,7 @@ export default function LeadsTab({ user }) {
         filter.assigned_to = user.email;
       }
 
-      const data = await Lead.filter(filter, '-created_date');
+      const data = await Lead.filter(filter, '-created_at');
       setLeads(data);
     } catch (error) {
       console.error('Erro ao carregar leads:', error);
@@ -93,7 +93,6 @@ export default function LeadsTab({ user }) {
         status: 'convertido',
         converted_to_deal: true,
         deal_id: newDeal.id,
-        updated_by: user.email
       });
 
       alert('Lead convertido em negócio com sucesso!');
@@ -125,7 +124,7 @@ export default function LeadsTab({ user }) {
     descartado: 'bg-red-100 text-red-800'
   };
 
-  const originLabels = {
+  const sourceLabels = {
     google_ads: 'Google Ads',
     indicacao: 'Indicação',
     orgao_publico: 'Órgão Público',
@@ -214,7 +213,7 @@ export default function LeadsTab({ user }) {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">
-                      {originLabels[lead.origin] || lead.origin}
+                      {sourceLabels[lead.source] || lead.source}
                     </Badge>
                   </TableCell>
                   <TableCell>

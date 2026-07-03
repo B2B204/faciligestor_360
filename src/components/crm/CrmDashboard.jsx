@@ -36,7 +36,7 @@ export default function CrmDashboard({ user }) {
       const [leads, deals, activities] = await Promise.all([
         Lead.filter({ cnpj: user.cnpj }),
         Deal.filter({ cnpj: user.cnpj }),
-        CrmActivity.filter({ cnpj: user.cnpj }, '-created_date', 10)
+        CrmActivity.filter({ cnpj: user.cnpj }, '-created_at', 10)
       ]);
 
       // Calcular KPIs
@@ -51,7 +51,7 @@ export default function CrmDashboard({ user }) {
       // Leads por origem
       const originCounts = {};
       leads.forEach(lead => {
-        const origin = lead.origin || 'outros';
+        const origin = lead.source || 'outros';
         originCounts[origin] = (originCounts[origin] || 0) + 1;
       });
       const leadsByOrigin = Object.entries(originCounts).map(([name, value]) => ({
@@ -250,7 +250,7 @@ export default function CrmDashboard({ user }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <h4 className="text-sm font-medium text-gray-900 truncate">{activity.title}</h4>
+                      <h4 className="text-sm font-medium text-gray-900 truncate capitalize">{activity.type?.replace('_', ' ')}</h4>
                       <Badge variant="outline" className="mt-1 sm:mt-0 self-start">
                         {activity.type}
                       </Badge>
@@ -259,8 +259,7 @@ export default function CrmDashboard({ user }) {
                       <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{activity.description}</p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
-                      {new Date(activity.activity_date).toLocaleDateString('pt-BR')}
-                      {activity.activity_time && ` às ${activity.activity_time}`}
+                      {new Date(activity.date).toLocaleString('pt-BR')}
                     </p>
                   </div>
                 </div>

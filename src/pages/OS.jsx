@@ -41,7 +41,7 @@ export default function OSPage() {
     const u = await User.me(); setUser(u);
     const cs = await Contract.filter({ cnpj: u.cnpj });
     setContracts(cs);
-    const data = await ServiceOrder.filter({ cnpj: u.cnpj }, "-created_date");
+    const data = await ServiceOrder.filter({ cnpj: u.cnpj }, "-created_at");
     setList(data.map(o => ({
       ...o,
       contract_name: cs.find(c=>c.id===o.contract_id)?.name || "",

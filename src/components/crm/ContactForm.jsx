@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Save } from 'lucide-react';
 
 export default function ContactForm({ contact, onSave, onCancel, user }) {
@@ -14,10 +13,9 @@ export default function ContactForm({ contact, onSave, onCancel, user }) {
     name: '',
     email: '',
     phone: '',
-    position: '',
+    role: '',
     company_id: '',
-    is_decision_maker: false,
-    observations: '',
+    notes: '',
   });
 
   const [companies, setCompanies] = useState([]);
@@ -41,10 +39,9 @@ export default function ContactForm({ contact, onSave, onCancel, user }) {
         name: contact.name || '',
         email: contact.email || '',
         phone: contact.phone || '',
-        position: contact.position || '',
+        role: contact.role || '',
         company_id: contact.company_id || '',
-        is_decision_maker: contact.is_decision_maker || false,
-        observations: contact.observations || '',
+        notes: contact.notes || '',
       });
     }
   }, [contact]);
@@ -53,7 +50,7 @@ export default function ContactForm({ contact, onSave, onCancel, user }) {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const dataToSave = { ...formData, cnpj: user.cnpj, updated_by: user.email };
+      const dataToSave = { ...formData, cnpj: user.cnpj };
       if (contact) {
         await CrmContact.update(contact.id, dataToSave);
       } else {
@@ -81,24 +78,20 @@ export default function ContactForm({ contact, onSave, onCancel, user }) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div><Label htmlFor="phone">Telefone</Label><Input id="phone" name="phone" value={formData.phone} onChange={handleChange} /></div>
-        <div><Label htmlFor="position">Cargo</Label><Input id="position" name="position" value={formData.position} onChange={handleChange} /></div>
+        <div><Label htmlFor="role">Cargo</Label><Input id="role" name="role" value={formData.role} onChange={handleChange} /></div>
       </div>
       <div>
         <Label htmlFor="company_id">Empresa</Label>
         <Select value={formData.company_id} onValueChange={(v) => handleChange({ target: { name: 'company_id', value: v } })}>
           <SelectTrigger><SelectValue placeholder="Vincule a uma empresa" /></SelectTrigger>
           <SelectContent>
-            {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.company_name}</SelectItem>)}
+            {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox id="is_decision_maker" checked={formData.is_decision_maker} onCheckedChange={(c) => handleChange({ target: { name: 'is_decision_maker', value: c } })} />
-        <Label htmlFor="is_decision_maker">Tomador de Decisão</Label>
-      </div>
       <div>
-        <Label htmlFor="observations">Observações</Label>
-        <Textarea id="observations" name="observations" value={formData.observations} onChange={handleChange} />
+        <Label htmlFor="notes">Observações</Label>
+        <Textarea id="notes" name="notes" value={formData.notes} onChange={handleChange} />
       </div>
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>

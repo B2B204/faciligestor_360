@@ -29,7 +29,7 @@ export default function CompaniesTab({ user }) {
   const loadCompanies = async () => {
     setIsLoading(true);
     try {
-      const data = await CrmCompany.filter({ cnpj: user.cnpj }, '-created_date');
+      const data = await CrmCompany.filter({ cnpj: user.cnpj }, '-created_at');
       setCompanies(data);
     } catch (error) {
       console.error('Erro ao carregar empresas:', error);
@@ -62,8 +62,8 @@ export default function CompaniesTab({ user }) {
   };
 
   const filteredCompanies = companies.filter(c =>
-    c.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.cnpj_company?.toLowerCase().includes(searchTerm.toLowerCase())
+    c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.cnpj_client?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -115,18 +115,18 @@ export default function CompaniesTab({ user }) {
               <TableRow>
                 <TableHead>Razão Social</TableHead>
                 <TableHead>CNPJ</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>E-mail</TableHead>
+                <TableHead>Setor</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredCompanies.map((company) => (
                 <TableRow key={company.id}>
-                  <TableCell className="font-medium">{company.company_name}</TableCell>
-                  <TableCell>{company.cnpj_company || '-'}</TableCell>
-                  <TableCell>{company.phone || '-'}</TableCell>
-                  <TableCell>{company.email || '-'}</TableCell>
+                  <TableCell className="font-medium">{company.name}</TableCell>
+                  <TableCell>{company.cnpj_client || '-'}</TableCell>
+                  <TableCell>{company.sector || '-'}</TableCell>
+                  <TableCell>{company.status || '-'}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

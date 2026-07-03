@@ -182,11 +182,11 @@ export default function Dashboard() {
 
       // Custos indiretos no período
       const indirectInPeriod = indirectCosts.filter(cost => {
-        const rm = cost.reference_month || "";
+        const rm = cost.competence_month || "";
         if (periodType === "anual") return rm.startsWith(`${refYear}-`);
         return months.includes(rm);
       });
-      const periodIndirectCosts = indirectInPeriod.reduce((s, c) => s + (c.monthly_value || 0), 0);
+      const periodIndirectCosts = indirectInPeriod.reduce((s, c) => s + (c.amount || 0), 0);
 
       // KPIs principais (lucro líquido REAL = soma dos final_result - indiretos)
       const activeContracts = filteredContracts.filter(c => c.status === 'ativo');

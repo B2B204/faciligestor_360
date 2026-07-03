@@ -172,7 +172,7 @@ export default function RecurringTemplates() {
     setUserCnpj(me?.cnpj || '');
     const [tpls, bks] = await Promise.all([
       RecurringTemplate.filter({ cnpj: me?.cnpj }, '-created_at'),
-      BankAccount.list('-updated_date', 200),
+      BankAccount.list('-updated_at', 200),
     ]);
     setTemplates(tpls || []);
     setBanks(bks || []);

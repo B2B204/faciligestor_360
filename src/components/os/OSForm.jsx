@@ -89,8 +89,6 @@ export default function OSForm({ os, onSaved, onCancel }) {
       assignee_id: assignee.assignee_id || undefined,
       assignee_name: assignee.assignee_name || (employees.find(e=>e.id===assignee.assignee_id)?.name),
       contract_number: selectedContract?.contract_number,
-      last_updated_by: user.email,
-      last_updated_at: new Date().toISOString(),
       cnpj: user.cnpj
     };
     if (nextStatus) payload.status = nextStatus;

@@ -22,7 +22,7 @@ export default function FiscalSettings() {
   const load = async () => {
     const me = await User.me();
     setUser(me);
-    const all = await FiscalSettingsEntity.filter({}, '-updated_date', 1);
+    const all = await FiscalSettingsEntity.filter({}, '-updated_at', 1);
     const s = all[0] || { environment: 'homologacao', cnpj: me?.cnpj };
     setSettings(s);
     setEnv(s.environment || 'homologacao');

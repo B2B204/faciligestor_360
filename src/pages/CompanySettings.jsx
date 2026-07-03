@@ -40,7 +40,7 @@ export default function CompanySettings() {
     );
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || user.department !== 'admin') {
     return (
       <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-background flex items-center justify-center">
         <Card className="w-full max-w-md bg-card border-border shadow-sm text-center">

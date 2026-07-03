@@ -197,7 +197,7 @@ export default function CashFlow() {
         const [rec, pay, banks] = await Promise.all([
           AccountsReceivable.list("-due_date", 5000),
           AccountsPayable.list("-due_date", 5000),
-          BankAccount.list("-updated_date", 100),
+          BankAccount.list("-updated_at", 100),
         ]);
         setReceivables(rec ?? []);
         setPayables(pay ?? []);

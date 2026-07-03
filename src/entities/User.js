@@ -44,6 +44,11 @@ export const User = {
     return data;
   },
 
+  delete: async (id) => {
+    const { error } = await supabase.from('profiles').delete().eq('id', id);
+    if (error) throw error;
+  },
+
   logout: async () => {
     await supabase.auth.signOut();
     window.location.href = '/login';

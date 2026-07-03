@@ -314,13 +314,31 @@ Esta ação irá:
 
       await loadAllData();
       alert(`✅ Usuário "${member.full_name}" foi reativado com sucesso.`);
-      
+
     } catch (error) {
       console.error("❌ Erro ao reativar usuário:", error);
       alert(`❌ Erro ao reativar usuário: ${error.message}`);
     }
   };
-  
+
+  const handleDeleteMember = async (member) => {
+    if (!window.confirm(`Excluir definitivamente "${member.full_name}"? Essa ação não pode ser desfeita.`)) {
+      return;
+    }
+    try {
+      if (member.from_invite) {
+        await TeamMember.delete(member.id);
+      } else {
+        await User.delete(member.id);
+      }
+      await loadAllData();
+      alert(`✅ "${member.full_name}" foi excluído.`);
+    } catch (error) {
+      console.error("❌ Erro ao excluir membro:", error);
+      alert(`❌ Erro ao excluir membro: ${error.message}`);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -764,15 +782,25 @@ Esta ação irá:
                                       <Trash2 className="w-4 h-4" />
                                     </Button>
                                   ) : (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleReactivateUser(member)}
-                                      title="Reativar usuário"
-                                      className="text-green-600 hover:text-green-800"
-                                    >
-                                      <CheckCircle className="w-4 h-4" />
-                                    </Button>
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleReactivateUser(member)}
+                                        title="Reativar usuário"
+                                        className="text-green-600 hover:text-green-800"
+                                      >
+                                        <CheckCircle className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => handleDeleteMember(member)}
+                                        title="Excluir definitivamente"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </>
                                   )}
                                 </div>
                               )}

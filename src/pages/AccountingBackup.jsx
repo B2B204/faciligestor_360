@@ -50,28 +50,34 @@ export default function AccountingBackup() {
   const generate = async () => {
     if (!months.length) return;
     setWorking(true);
-    const zip = new JSZip();
-    for (const m of months) {
-      const data = await fetchMonth(m);
-      const folder = zip.folder(m);
-      folder.file('invoices.csv', toCsv(data.invoices));
-      folder.file('payables.csv', toCsv(data.payables));
-      folder.file('receivables.csv', toCsv(data.receivables));
-      folder.file('bank.csv', toCsv(data.bank));
-      const balances = data.accounts.map(a => ({
-        bank_name: a.bank_name,
-        account_name: a.account_name,
-        account_number: a.account_number,
-        current_balance: a.current_balance
-      }));
-      folder.file('balances.csv', toCsv(balances));
+    try {
+      const zip = new JSZip();
+      for (const m of months) {
+        const data = await fetchMonth(m);
+        const folder = zip.folder(m);
+        folder.file('invoices.csv', toCsv(data.invoices));
+        folder.file('payables.csv', toCsv(data.payables));
+        folder.file('receivables.csv', toCsv(data.receivables));
+        folder.file('bank.csv', toCsv(data.bank));
+        const balances = data.accounts.map(a => ({
+          bank_name: a.bank_name,
+          account_name: a.account_name,
+          account_number: a.account_number,
+          current_balance: a.current_balance
+        }));
+        folder.file('balances.csv', toCsv(balances));
+      }
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `backup-contabil-${months.length}m.zip`;
+      a.click();
+    } catch (error) {
+      console.error("Erro ao gerar backup contábil:", error);
+      alert("Erro ao gerar o pacote de backup. Tente novamente.");
+    } finally {
+      setWorking(false);
     }
-    const blob = await zip.generateAsync({ type: 'blob' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `backup-contabil-${months.length}m.zip`;
-    a.click();
-    setWorking(false);
   };
 
   const formatMonth = (m) => {

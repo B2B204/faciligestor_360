@@ -81,7 +81,7 @@ export default function EmployeesPage() {
 
     if (filters?.name) {
       filtered = filtered.filter(emp =>
-        emp.name.toLowerCase().includes(filters.name.toLowerCase())
+        (emp.name || '').toLowerCase().includes(filters.name.toLowerCase())
       );
     }
     if (filters?.email) {
@@ -101,7 +101,7 @@ export default function EmployeesPage() {
     }
     if (filters?.role) {
       filtered = filtered.filter(emp =>
-        emp.role.toLowerCase().includes(filters.role.toLowerCase())
+        (emp.role || '').toLowerCase().includes(filters.role.toLowerCase())
       );
     }
     if (filters?.contract_id) {
@@ -169,7 +169,7 @@ export default function EmployeesPage() {
     }
 
     filtered = applyStatusView(filtered);
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
+    filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     return filtered;
   }, [applyStatusView]);
 

@@ -361,7 +361,7 @@ export default function OficiosPage() {
                   <TableCell className="font-medium">{oficio.numero_oficio}</TableCell>
                   <TableCell className="max-w-xs truncate">{oficio.assunto}</TableCell>
                   <TableCell className="max-w-xs truncate">{oficio.destinatario}</TableCell>
-                  <TableCell>{format(new Date(oficio.data_emissao), 'dd/MM/yyyy')}</TableCell>
+                  <TableCell>{oficio.data_emissao ? format(new Date(oficio.data_emissao), 'dd/MM/yyyy') : '-'}</TableCell>
                   <TableCell><Badge className={`${statusColors[oficio.status]} capitalize`}>{oficio.status}</Badge></TableCell>
                   <TableCell>
                     <Badge className={`${approvalColors[oficio.approval_status || 'pendente']} capitalize`}>

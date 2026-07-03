@@ -56,43 +56,50 @@ export default function ProfilePage() {
   const [pendingInvites, setPendingInvites] = useState([]);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [effectivePlan, setEffectivePlan] = useState('none');
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     loadAllData();
   }, []);
 
   const loadAllData = async () => {
-    const currentUser = await User.me();
-    setUser(currentUser);
-    
-    // Compute effective plan inherited from account owner for non-admins
-    let plan = currentUser.plan || 'none';
-    if (currentUser && currentUser.department !== 'admin') {
-      try {
-        const owners = await User.filter({ cnpj: currentUser.cnpj, department: 'admin' });
-        if (owners && owners.length) plan = owners[0].plan || 'none';
-      } catch (e) {}
-    }
-    setEffectivePlan(plan);
-    
-    // Assegura que o usuário seja carregado antes de outras chamadas
-    if (currentUser) {
-        setFormData({
-            full_name: currentUser.full_name || "",
-            phone: currentUser.phone || "",
-            cnpj: currentUser.cnpj || "",
-            tax_regime: currentUser.tax_regime || "simples_nacional",
-            company_logo_url: currentUser.company_logo_url || "",
-            company_name: currentUser.company_name || "",
-            company_address: currentUser.company_address || "",
-            cargo: currentUser.cargo || "",
-            matricula: currentUser.matricula || ""
-        });
-        await Promise.all([
-            loadTeamMembers(currentUser),
-            loadPendingInvites(currentUser),
-            loadStats(currentUser)
-        ]);
+    try {
+      setLoadError(false);
+      const currentUser = await User.me();
+      setUser(currentUser);
+
+      // Compute effective plan inherited from account owner for non-admins
+      let plan = currentUser.plan || 'none';
+      if (currentUser && currentUser.department !== 'admin') {
+        try {
+          const owners = await User.filter({ cnpj: currentUser.cnpj, department: 'admin' });
+          if (owners && owners.length) plan = owners[0].plan || 'none';
+        } catch (e) {}
+      }
+      setEffectivePlan(plan);
+
+      // Assegura que o usuário seja carregado antes de outras chamadas
+      if (currentUser) {
+          setFormData({
+              full_name: currentUser.full_name || "",
+              phone: currentUser.phone || "",
+              cnpj: currentUser.cnpj || "",
+              tax_regime: currentUser.tax_regime || "simples_nacional",
+              company_logo_url: currentUser.company_logo_url || "",
+              company_name: currentUser.company_name || "",
+              company_address: currentUser.company_address || "",
+              cargo: currentUser.cargo || "",
+              matricula: currentUser.matricula || ""
+          });
+          await Promise.all([
+              loadTeamMembers(currentUser),
+              loadPendingInvites(currentUser),
+              loadStats(currentUser)
+          ]);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados do perfil:", error);
+      setLoadError(true);
     }
   };
   
@@ -404,8 +411,17 @@ Esta ação irá:
     return (
       <div className="p-8 flex justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando perfil...</p>
+          {loadError ? (
+            <>
+              <p className="text-muted-foreground mb-3">Não foi possível carregar o perfil.</p>
+              <Button onClick={loadAllData}>Tentar novamente</Button>
+            </>
+          ) : (
+            <>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Carregando perfil...</p>
+            </>
+          )}
         </div>
       </div>
     );

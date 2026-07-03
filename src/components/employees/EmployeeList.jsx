@@ -161,7 +161,7 @@ export default function EmployeeList({ employees, contracts, onEdit, onDataChang
                       </TableCell>
                       <TableCell>
                         <Badge className={`${employee.status === 'ativo' ? 'bg-green-100 text-green-800' : employee.status === 'ferias' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                          {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
+                          {employee.status ? employee.status.charAt(0).toUpperCase() + employee.status.slice(1) : '-'}
                         </Badge>
                       </TableCell>
                       <TableCell>

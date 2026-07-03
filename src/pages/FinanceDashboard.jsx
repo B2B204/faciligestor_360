@@ -34,6 +34,7 @@ export default function FinanceDashboard(){
   useEffect(()=>{
     (async()=>{
       setLoading(true);
+      try {
       const me = await User.me();
       const cnpj = me?.cnpj;
       const thisMonth = ym(new Date());
@@ -93,7 +94,11 @@ export default function FinanceDashboard(){
       setTopDue({ receivables: upcomingRecvs(recvs), payables: upcomingPays(pays) });
 
       setKpi({ bankTotal, bankCount, recvOpen, recvOverdue, recvDueToday, payOpen, payOverdue, payDueToday, invCountMonth, invTotalMonth, unreconciled, dreRevenue, dreCosts, dreResult, fiscalOk });
-      setLoading(false);
+      } catch (error) {
+        console.error("Erro ao carregar dashboard financeiro:", error);
+      } finally {
+        setLoading(false);
+      }
     })();
   },[]);
 

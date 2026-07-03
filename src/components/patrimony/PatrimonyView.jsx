@@ -188,10 +188,10 @@ export default function PatrimonyView({ patrimony, contract, movements = [] }) {
                 <div key={index} className="border-l-2 border-blue-200 pl-4 pb-3">
                   <div className="flex items-center justify-between">
                     <Badge variant="outline" className="capitalize">
-                      {movement.movement_type.replace('_', ' ')}
+                      {(movement.movement_type || '').replace('_', ' ') || '-'}
                     </Badge>
                     <span className="text-sm text-gray-500">
-                      {format(new Date(movement.movement_date), 'dd/MM/yyyy', { locale: pt })}
+                      {movement.movement_date ? format(new Date(movement.movement_date), 'dd/MM/yyyy', { locale: pt }) : '-'}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mt-1">{movement.observations}</p>

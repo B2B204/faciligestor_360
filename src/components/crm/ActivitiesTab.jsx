@@ -95,7 +95,7 @@ export default function ActivitiesTab({ user }) {
                 <div className="flex-grow">
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold capitalize">{activity.type?.replace('_', ' ')}</h3>
-                    <Badge variant="outline">{format(new Date(activity.date), 'dd/MM/yyyy HH:mm')}</Badge>
+                    <Badge variant="outline">{activity.date ? format(new Date(activity.date), 'dd/MM/yyyy HH:mm') : '-'}</Badge>
                   </div>
                   <p className="text-sm text-gray-600">{activity.description}</p>
                   {activity.deal_id && deals[activity.deal_id] && (

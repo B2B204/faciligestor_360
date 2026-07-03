@@ -858,7 +858,7 @@ export default function UniformsPage() {
                                     <td className="py-2 pr-4 font-medium text-foreground">{uniform?.item_name}</td>
                                     <td className="py-2 pr-4 text-muted-foreground">{uniform?.size}</td>
                                     <td className="py-2 pr-4 text-muted-foreground">{delivery.quantity}</td>
-                                    <td className="py-2 pr-4 capitalize text-muted-foreground">{delivery.status.replace('_',' ')}</td>
+                                    <td className="py-2 pr-4 capitalize text-muted-foreground">{(delivery.status || '').replace('_',' ') || '-'}</td>
                                     <td className={`py-2 pr-4 ${isExpiring ? 'text-red-600 font-medium' : 'text-muted-foreground'}`}>{delivery.expiry_date ? new Date(delivery.expiry_date).toLocaleDateString() : '—'}</td>
                                     <td className="py-2 font-medium text-foreground">{formatCurrency(delivery.total_cost)}</td>
                                     <td className="py-2">

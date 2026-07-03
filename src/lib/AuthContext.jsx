@@ -37,6 +37,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       loadProfile(session?.user ?? null);
+    }).catch((error) => {
+      console.error('[AuthContext] Falha ao verificar sessão:', error);
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsLoadingAuth(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

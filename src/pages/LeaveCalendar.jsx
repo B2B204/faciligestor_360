@@ -145,15 +145,20 @@ export default function LeaveCalendar() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const me = await User.me();
-    setUser(me);
-    const [emps, lvs] = await Promise.all([
-      Employee.filter({ cnpj: me.cnpj }),
-      EmployeeLeave.filter({ cnpj: me.cnpj }, '-start_date', 2000),
-    ]);
-    setEmployees(emps);
-    setLeaves(lvs);
-    setLoading(false);
+    try {
+      const me = await User.me();
+      setUser(me);
+      const [emps, lvs] = await Promise.all([
+        Employee.filter({ cnpj: me.cnpj }),
+        EmployeeLeave.filter({ cnpj: me.cnpj }, '-start_date', 2000),
+      ]);
+      setEmployees(emps);
+      setLeaves(lvs);
+    } catch (error) {
+      console.error("Erro ao carregar férias/ausências:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { load(); }, [load]);

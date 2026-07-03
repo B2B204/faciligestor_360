@@ -71,23 +71,38 @@ export default function Invoices(){
   const handleUpload = async () => {
     if(!file) return;
     setCreating(true);
-    const text = await file.text();
-    const parsed = parseXmlInvoice(text) || {};
-    const { issuer_name, recipient_name, ...parsedForInvoice } = parsed;
-    const { file_uri } = await UploadPrivateFile({ file });
-    const payload = { ...parsedForInvoice, total_amount: Number(parsed.total_amount)||0, xml_file_uri: file_uri, status: 'uploaded', environment: 'homologacao', cnpj: me?.cnpj };
-    const inv = await Invoice.create(payload);
-    await createFinRecord({ ...inv, issuer_name, recipient_name });
-    setFile(null); setCreating(false); await load();
+    try {
+      const text = await file.text();
+      const parsed = parseXmlInvoice(text) || {};
+      const { issuer_name, recipient_name, ...parsedForInvoice } = parsed;
+      const { file_uri } = await UploadPrivateFile({ file });
+      const payload = { ...parsedForInvoice, total_amount: Number(parsed.total_amount)||0, xml_file_uri: file_uri, status: 'uploaded', environment: 'homologacao', cnpj: me?.cnpj };
+      const inv = await Invoice.create(payload);
+      await createFinRecord({ ...inv, issuer_name, recipient_name });
+      setFile(null);
+      await load();
+    } catch (error) {
+      console.error("Erro ao importar nota fiscal:", error);
+      alert("Erro ao importar nota fiscal. Verifique o arquivo e tente novamente.");
+    } finally {
+      setCreating(false);
+    }
   };
 
   const handleCreateManual = async (e)=>{
     e.preventDefault(); setCreating(true);
-    const { issuer_name, recipient_name, ...formForInvoice } = form;
-    const inv = await Invoice.create({ ...formForInvoice, total_amount: Number(form.total_amount)||0, environment:'homologacao', cnpj: me?.cnpj });
-    await createFinRecord({ ...inv, issuer_name, recipient_name });
-    setForm({ type:'nfe', number:'', series:'', issue_date:'', total_amount:'', cnpj_issuer:'', cnpj_recipient:'', access_key:'' });
-    setCreating(false); await load();
+    try {
+      const { issuer_name, recipient_name, ...formForInvoice } = form;
+      const inv = await Invoice.create({ ...formForInvoice, total_amount: Number(form.total_amount)||0, environment:'homologacao', cnpj: me?.cnpj });
+      await createFinRecord({ ...inv, issuer_name, recipient_name });
+      setForm({ type:'nfe', number:'', series:'', issue_date:'', total_amount:'', cnpj_issuer:'', cnpj_recipient:'', access_key:'' });
+      await load();
+    } catch (error) {
+      console.error("Erro ao criar nota fiscal:", error);
+      alert("Erro ao criar nota fiscal. Tente novamente.");
+    } finally {
+      setCreating(false);
+    }
   };
 
   const fmt = (val) => Number(val||0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });

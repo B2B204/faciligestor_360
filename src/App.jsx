@@ -6,6 +6,7 @@ import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import Login from './pages/Login';
 import AcceptInvite from './pages/AcceptInvite';
 import FiscalSettings from './pages/FiscalSettings';
@@ -57,7 +58,9 @@ function ProtectedRoute({ children }) {
 }
 
 const AuthenticatedApp = () => {
+  const location = useLocation();
   return (
+    <ErrorBoundary key={location.pathname}>
     <Routes>
       {/* Rotas públicas */}
       <Route path="/login" element={<Login />} />
@@ -121,20 +124,23 @@ const AuthenticatedApp = () => {
       <Route path="/centros-de-custo" element={<ProtectedRoute><LayoutWrapper currentPageName="CostCenters"><CostCenters /></LayoutWrapper></ProtectedRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </ErrorBoundary>
   );
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <NavigationTracker />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <NavigationTracker />
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

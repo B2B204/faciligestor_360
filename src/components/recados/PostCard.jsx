@@ -128,10 +128,9 @@ export default function PostCard({ post, author, currentUser, onLike, onDelete }
               {author?.full_name || author?.email || 'Usuário'}
             </p>
             <p className="text-xs text-gray-400 mt-0.5">
-              {formatDistanceToNow(new Date(post.created_date), {
-                addSuffix: true,
-                locale: pt
-              })}
+              {post.created_date
+                ? formatDistanceToNow(new Date(post.created_date), { addSuffix: true, locale: pt })
+                : ''}
             </p>
           </div>
 

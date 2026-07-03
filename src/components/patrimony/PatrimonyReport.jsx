@@ -200,7 +200,7 @@ export default function PatrimonyReport({ patrimonies, contracts, movements, use
                       <TableCell>{contract?.name || 'N/A'}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="capitalize">
-                          {patrimony.status.replace('_', ' ')}
+                          {(patrimony.status || '').replace('_', ' ') || '-'}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-medium">

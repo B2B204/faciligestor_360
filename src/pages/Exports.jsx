@@ -38,58 +38,76 @@ export default function Exports(){
 
   const exportExcel = async ()=>{
     setWorking(true);
-    const data = await fetchData(month);
-    const wb = XLSX.utils.book_new();
-    const inv = aoa(['Tipo','Número','Série','Emissão','Valor','Emitente','Destinatário'], data.invoices.map(i=>[i.type,i.number,i.series,i.issue_date,i.total_amount,i.cnpj_issuer,i.cnpj_recipient]));
-    const wsInv = XLSX.utils.aoa_to_sheet(inv); XLSX.utils.book_append_sheet(wb, wsInv, 'Notas');
-    const pay = aoa(['Documento','Vencimento','Valor','Status','Categoria','Conta'], data.payables.map(p=>[p.document_number,p.due_date,p.face_value,p.status,p.category||'',p.bank_account_id||'']));
-    const wsPay = XLSX.utils.aoa_to_sheet(pay); XLSX.utils.book_append_sheet(wb, wsPay, 'Pagar');
-    const rec = aoa(['Documento','Vencimento','Valor','Status','Conta'], data.receivables.map(r=>[r.document_number,r.due_date,r.face_value,r.status,r.bank_account_id||'']));
-    const wsRec = XLSX.utils.aoa_to_sheet(rec); XLSX.utils.book_append_sheet(wb, wsRec, 'Receber');
-    const btx = aoa(['Data','Tipo','Valor','FITID','Nome','Memo'], data.bank.map(b=>[b.posted_date,b.trn_type,b.amount,b.fitid,b.name,b.memo]));
-    const wsB = XLSX.utils.aoa_to_sheet(btx); XLSX.utils.book_append_sheet(wb, wsB, 'Banco');
-    const bals = aoa(['Banco','Conta','Número','Saldo Atual'], data.accounts.map(a=>[a.bank_name,a.account_name,a.account_number,a.current_balance]));
-    const wsBA = XLSX.utils.aoa_to_sheet(bals); XLSX.utils.book_append_sheet(wb, wsBA, 'Saldos');
-    const xbuf = XLSX.write(wb, { type:'array', bookType:'xlsx' });
-    const blob = new Blob([xbuf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `export-${month}.xlsx`; a.click();
-    setWorking(false);
+    try {
+      const data = await fetchData(month);
+      const wb = XLSX.utils.book_new();
+      const inv = aoa(['Tipo','Número','Série','Emissão','Valor','Emitente','Destinatário'], data.invoices.map(i=>[i.type,i.number,i.series,i.issue_date,i.total_amount,i.cnpj_issuer,i.cnpj_recipient]));
+      const wsInv = XLSX.utils.aoa_to_sheet(inv); XLSX.utils.book_append_sheet(wb, wsInv, 'Notas');
+      const pay = aoa(['Documento','Vencimento','Valor','Status','Categoria','Conta'], data.payables.map(p=>[p.document_number,p.due_date,p.face_value,p.status,p.category||'',p.bank_account_id||'']));
+      const wsPay = XLSX.utils.aoa_to_sheet(pay); XLSX.utils.book_append_sheet(wb, wsPay, 'Pagar');
+      const rec = aoa(['Documento','Vencimento','Valor','Status','Conta'], data.receivables.map(r=>[r.document_number,r.due_date,r.face_value,r.status,r.bank_account_id||'']));
+      const wsRec = XLSX.utils.aoa_to_sheet(rec); XLSX.utils.book_append_sheet(wb, wsRec, 'Receber');
+      const btx = aoa(['Data','Tipo','Valor','FITID','Nome','Memo'], data.bank.map(b=>[b.posted_date,b.trn_type,b.amount,b.fitid,b.name,b.memo]));
+      const wsB = XLSX.utils.aoa_to_sheet(btx); XLSX.utils.book_append_sheet(wb, wsB, 'Banco');
+      const bals = aoa(['Banco','Conta','Número','Saldo Atual'], data.accounts.map(a=>[a.bank_name,a.account_name,a.account_number,a.current_balance]));
+      const wsBA = XLSX.utils.aoa_to_sheet(bals); XLSX.utils.book_append_sheet(wb, wsBA, 'Saldos');
+      const xbuf = XLSX.write(wb, { type:'array', bookType:'xlsx' });
+      const blob = new Blob([xbuf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `export-${month}.xlsx`; a.click();
+    } catch (error) {
+      console.error("Erro ao gerar Excel:", error);
+      alert("Erro ao gerar a exportação em Excel. Tente novamente.");
+    } finally {
+      setWorking(false);
+    }
   };
 
   const exportPdf = async ()=>{
     setWorking(true);
-    const data = await fetchData(month);
-    const { jsPDF } = await import('jspdf');
-    const doc = new jsPDF();
-    doc.setFontSize(16); doc.text(`Resumo Financeiro - ${month}`, 14, 18);
-    let y = 28; doc.setFontSize(12);
-    const addRow = (label, value)=>{ doc.text(`${label}: ${value}`, 14, y); y += 6; if (y > 280){ doc.addPage(); y = 20; } };
-    const totalInv = data.invoices.reduce((s,i)=> s+Number(i.total_amount||0),0);
-    const totalPay = data.payables.reduce((s,p)=> s+Number(p.face_value||0),0);
-    const totalRec = data.receivables.reduce((s,r)=> s+Number(r.face_value||0),0);
-    const credits = data.bank.filter(b=>b.trn_type==='CREDIT').reduce((s,b)=> s+Number(b.amount||0),0);
-    const debits = data.bank.filter(b=>b.trn_type==='DEBIT').reduce((s,b)=> s+Number(b.amount||0),0);
-    addRow('Notas fiscais (valor total)', `R$ ${totalInv.toFixed(2)}`);
-    addRow('Contas a pagar (lançadas)', `R$ ${totalPay.toFixed(2)}`);
-    addRow('Contas a receber (lançadas)', `R$ ${totalRec.toFixed(2)}`);
-    addRow('Créditos bancários no mês', `R$ ${credits.toFixed(2)}`);
-    addRow('Débitos bancários no mês', `R$ ${debits.toFixed(2)}`);
-    doc.save(`financeiro-${month}.pdf`);
-    setWorking(false);
+    try {
+      const data = await fetchData(month);
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      doc.setFontSize(16); doc.text(`Resumo Financeiro - ${month}`, 14, 18);
+      let y = 28; doc.setFontSize(12);
+      const addRow = (label, value)=>{ doc.text(`${label}: ${value}`, 14, y); y += 6; if (y > 280){ doc.addPage(); y = 20; } };
+      const totalInv = data.invoices.reduce((s,i)=> s+Number(i.total_amount||0),0);
+      const totalPay = data.payables.reduce((s,p)=> s+Number(p.face_value||0),0);
+      const totalRec = data.receivables.reduce((s,r)=> s+Number(r.face_value||0),0);
+      const credits = data.bank.filter(b=>b.trn_type==='CREDIT').reduce((s,b)=> s+Number(b.amount||0),0);
+      const debits = data.bank.filter(b=>b.trn_type==='DEBIT').reduce((s,b)=> s+Number(b.amount||0),0);
+      addRow('Notas fiscais (valor total)', `R$ ${totalInv.toFixed(2)}`);
+      addRow('Contas a pagar (lançadas)', `R$ ${totalPay.toFixed(2)}`);
+      addRow('Contas a receber (lançadas)', `R$ ${totalRec.toFixed(2)}`);
+      addRow('Créditos bancários no mês', `R$ ${credits.toFixed(2)}`);
+      addRow('Débitos bancários no mês', `R$ ${debits.toFixed(2)}`);
+      doc.save(`financeiro-${month}.pdf`);
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      alert("Erro ao gerar o resumo em PDF. Tente novamente.");
+    } finally {
+      setWorking(false);
+    }
   };
 
   const exportZip = async ()=>{
     setWorking(true);
-    const data = await fetchData(month);
-    const zip = new JSZip();
-    const toCsv = (arr)=> arr.map(r=> Object.values(r).map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(';')).join('\n');
-    zip.file('invoices.csv', toCsv(data.invoices));
-    zip.file('payables.csv', toCsv(data.payables));
-    zip.file('receivables.csv', toCsv(data.receivables));
-    zip.file('bank.csv', toCsv(data.bank));
-    const blob = await zip.generateAsync({ type: 'blob' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pacote-contabil-${month}.zip`; a.click();
-    setWorking(false);
+    try {
+      const data = await fetchData(month);
+      const zip = new JSZip();
+      const toCsv = (arr)=> arr.map(r=> Object.values(r).map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(';')).join('\n');
+      zip.file('invoices.csv', toCsv(data.invoices));
+      zip.file('payables.csv', toCsv(data.payables));
+      zip.file('receivables.csv', toCsv(data.receivables));
+      zip.file('bank.csv', toCsv(data.bank));
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pacote-contabil-${month}.zip`; a.click();
+    } catch (error) {
+      console.error("Erro ao gerar pacote contábil:", error);
+      alert("Erro ao gerar o pacote contábil (.zip). Tente novamente.");
+    } finally {
+      setWorking(false);
+    }
   };
 
   return (

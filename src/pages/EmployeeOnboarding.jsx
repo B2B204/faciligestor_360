@@ -156,17 +156,22 @@ export default function EmployeeOnboardingPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const me = await User.me();
-    setUser(me);
-    const [emps, empTasks, tpls] = await Promise.all([
-      Employee.filter({ cnpj: me.cnpj }),
-      EmployeeTask.filter({ cnpj: me.cnpj }, '-created_at', 5000),
-      HrChecklistTemplate.filter({ cnpj: me.cnpj }),
-    ]);
-    setEmployees(emps);
-    setTasks(empTasks);
-    setTemplates(tpls);
-    setLoading(false);
+    try {
+      const me = await User.me();
+      setUser(me);
+      const [emps, empTasks, tpls] = await Promise.all([
+        Employee.filter({ cnpj: me.cnpj }),
+        EmployeeTask.filter({ cnpj: me.cnpj }, '-created_at', 5000),
+        HrChecklistTemplate.filter({ cnpj: me.cnpj }),
+      ]);
+      setEmployees(emps);
+      setTasks(empTasks);
+      setTemplates(tpls);
+    } catch (error) {
+      console.error("Erro ao carregar dados de onboarding:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { load(); }, [load]);

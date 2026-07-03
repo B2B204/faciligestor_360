@@ -106,15 +106,15 @@ export default function AcceptInvite() {
 
       // Link profile to company CNPJ
       if (userId) {
-        await supabase
+        const { error: profileError } = await supabase
           .from("profiles")
           .update({
             full_name: invite.full_name,
             department: invite.department,
             cnpj: invite.cnpj,
-            is_active: true,
           })
           .eq("id", userId);
+        if (profileError) throw profileError;
       }
 
       // Create / update TeamMember

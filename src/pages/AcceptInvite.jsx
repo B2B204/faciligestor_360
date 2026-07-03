@@ -40,10 +40,11 @@ export default function AcceptInvite() {
       if (!code) { setPhase("invalid"); setErrorMsg("Código de convite não encontrado."); return; }
 
       try {
-        const [inv] = await UserInvite.filter({ invite_code: code, status: "pendente" });
+        const { data, error } = await supabase.rpc("validate_invite", { p_code: code });
+        if (error) throw error;
+        const inv = data?.[0];
         if (!inv) { setPhase("invalid"); setErrorMsg("Convite inválido ou já utilizado."); return; }
-        if (new Date() > new Date(inv.expires_at)) {
-          await UserInvite.update(inv.id, { status: "expirado" });
+        if (inv.status === "expirado") {
           setPhase("expired"); setErrorMsg("Este convite expirou. Solicite um novo ao administrador."); return;
         }
         setInvite(inv);

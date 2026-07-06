@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Plus } from 'lucide-react';
-import { lookupCnpj } from '@/functions/lookupCnpj';
+import { Plus } from 'lucide-react';
+import CnpjLookupInput from '@/components/common/CnpjLookupInput';
 
 export default function NewPayableDialog({ open, onOpenChange, banks = [], costCenters = [], onCreate }) {
   const [form, setForm] = useState({
@@ -19,23 +19,7 @@ export default function NewPayableDialog({ open, onOpenChange, banks = [], costC
     cost_center_id: '',
     observations: ''
   });
-  const [loadingLookup, setLoadingLookup] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const handleLookup = async () => {
-    const cnpj = (form.supplier_cnpj || '').replace(/\D/g, '');
-    if (cnpj.length !== 14) return alert('Informe um CNPJ válido (14 dígitos).');
-    setLoadingLookup(true);
-    try {
-      const res = await lookupCnpj({ cnpj });
-      const data = res.data || res; // compat
-      setForm((s) => ({ ...s, supplier_name: data.razao_social || data.nome_fantasia || s.supplier_name }));
-    } catch (e) {
-      alert('CNPJ não encontrado na Receita.');
-    } finally {
-      setLoadingLookup(false);
-    }
-  };
 
   const handleSave = async () => {
     if (!form.supplier_name || !form.due_date || !form.face_value) {
@@ -58,14 +42,15 @@ export default function NewPayableDialog({ open, onOpenChange, banks = [], costC
         </DialogHeader>
 
         <div className="grid grid-cols-1 gap-3">
-          <div className="grid grid-cols-3 gap-2 items-end">
-            <div className="col-span-2">
-              <label className="text-sm font-medium">CNPJ do Fornecedor</label>
-              <Input placeholder="00.000.000/0000-00" value={form.supplier_cnpj} onChange={(e)=>setForm(s=>({...s, supplier_cnpj:e.target.value}))}/>
-            </div>
-            <Button onClick={handleLookup} disabled={loadingLookup} className="mt-6 gap-2">
-              <Search className="w-4 h-4" /> {loadingLookup ? 'Buscando...' : 'Buscar CNPJ'}
-            </Button>
+          <div>
+            <label className="text-sm font-medium">CNPJ do Fornecedor</label>
+            <CnpjLookupInput
+              name="supplier_cnpj"
+              placeholder="00.000.000/0000-00"
+              value={form.supplier_cnpj}
+              onChange={(e)=>setForm(s=>({...s, supplier_cnpj:e.target.value}))}
+              onFound={(data) => setForm((s) => ({ ...s, supplier_name: s.supplier_name || data.nome || s.supplier_name }))}
+            />
           </div>
 
           <div>

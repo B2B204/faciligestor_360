@@ -8,6 +8,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ExternalLink, Save, CheckCircle, PlusCircle } from "lucide-react"; // Added PlusCircle icon for notes
 import RepactuacaoSection from "./RepactuacaoSection";
+import CnpjLookupInput from "@/components/common/CnpjLookupInput";
 
 export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
   const [formData, setFormData] = useState({
@@ -256,11 +257,25 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
           </div>
           <div>
             <Label htmlFor="client_cnpj">CNPJ do Cliente *</Label>
-            <Input id="client_cnpj" name="client_cnpj" value={formData.client_cnpj} onChange={handleChange} required placeholder="00.000.000/0001-00" />
+            <CnpjLookupInput
+              id="client_cnpj"
+              name="client_cnpj"
+              value={formData.client_cnpj}
+              onChange={handleChange}
+              onFound={(data) => setFormData((prev) => ({ ...prev, client_name: prev.client_name || data.nome || prev.client_name }))}
+              required
+              placeholder="00.000.000/0001-00"
+            />
           </div>
           <div>
             <Label htmlFor="contractor_cnpj">CNPJ da Empresa Contratada (opcional)</Label>
-            <Input id="contractor_cnpj" name="contractor_cnpj" value={formData.contractor_cnpj} onChange={handleChange} placeholder="00.000.000/0001-00" />
+            <CnpjLookupInput
+              id="contractor_cnpj"
+              name="contractor_cnpj"
+              value={formData.contractor_cnpj}
+              onChange={handleChange}
+              placeholder="00.000.000/0001-00"
+            />
           </div>
           <div className="md:col-span-2"> {/* Useful link now within the grid and spans 2 columns */}
             <Label htmlFor="useful_link">Link Útil do Cliente (Portal)</Label>

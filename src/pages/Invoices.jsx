@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Upload, FilePlus2, FileText, CheckCircle } from 'lucide-react';
+import CnpjLookupInput from '@/components/common/CnpjLookupInput';
 
 function useMe() { const [me,setMe]=useState(null); useEffect(()=>{User.me().then(setMe)},[]); return me; }
 
@@ -191,7 +192,13 @@ export default function Invoices(){
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-foreground">Emitente (CNPJ)</Label>
-              <Input value={form.cnpj_issuer} onChange={e=>setForm(s=>({...s,cnpj_issuer:e.target.value}))} className="bg-background border-border" placeholder="00.000.000/0000-00" />
+              <CnpjLookupInput
+                value={form.cnpj_issuer}
+                onChange={e=>setForm(s=>({...s,cnpj_issuer:e.target.value}))}
+                onFound={(data) => setForm((s) => ({ ...s, issuer_name: s.issuer_name || data.nome || s.issuer_name }))}
+                className="bg-background border-border"
+                placeholder="00.000.000/0000-00"
+              />
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-foreground">Emitente (Nome)</Label>
@@ -199,7 +206,13 @@ export default function Invoices(){
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-foreground">Destinatário (CNPJ)</Label>
-              <Input value={form.cnpj_recipient} onChange={e=>setForm(s=>({...s,cnpj_recipient:e.target.value}))} className="bg-background border-border" placeholder="00.000.000/0000-00" />
+              <CnpjLookupInput
+                value={form.cnpj_recipient}
+                onChange={e=>setForm(s=>({...s,cnpj_recipient:e.target.value}))}
+                onFound={(data) => setForm((s) => ({ ...s, recipient_name: s.recipient_name || data.nome || s.recipient_name }))}
+                className="bg-background border-border"
+                placeholder="00.000.000/0000-00"
+              />
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-foreground">Destinatário (Nome)</Label>

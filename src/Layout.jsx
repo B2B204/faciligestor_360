@@ -23,6 +23,7 @@ import { hasPageAccess } from '@/components/permissions';
 import AccessDeniedPage from "./pages/AccessDeniedPage";
 import CnpjSwitcher from "./components/common/CnpjSwitcher";
 import ThemeToggle from "./components/common/ThemeToggle";
+import { lookupCnpj } from "@/functions/lookupCnpj";
 
 const navItems = [
   { type: "link", title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
@@ -148,17 +149,13 @@ function CnpjSetupScreen({ user, onSaved }) {
       setLookingUp(true);
       setError('');
       try {
-        const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`);
-        if (!res.ok) throw new Error('CNPJ não encontrado');
-        const data = await res.json();
-        const nome = data.nome_fantasia?.trim() || data.razao_social || '';
-        const endereco = [data.logradouro, data.numero, data.municipio, data.uf].filter(Boolean).join(', ');
-        setCompanyName(nome);
-        setCompanyAddress(endereco);
+        const data = await lookupCnpj(digits);
+        setCompanyName(data.nome);
+        setCompanyAddress(data.endereco);
         setRfInfo({
-          situacao: data.descricao_situacao_cadastral,
-          abertura: data.data_inicio_atividade,
-          atividade: data.cnae_fiscal_descricao,
+          situacao: data.situacao,
+          abertura: data.abertura,
+          atividade: data.atividade,
         });
       } catch (e) {
         setError('CNPJ não encontrado. Preencha os dados manualmente.');

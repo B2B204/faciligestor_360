@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import UserInviteModal from "@/components/UserInviteModal";
 import TrashManager from '@/components/common/TrashManager';
+import CnpjLookupInput from "@/components/common/CnpjLookupInput";
 import DataRecovery from "@/components/common/DataRecovery";
 import BackupManager from "@/components/common/BackupManager"; // NEW IMPORT
 import {
@@ -602,7 +603,20 @@ Esta ação irá:
                 </div>
                 <div>
                   <Label htmlFor="cnpj" className="text-sm font-medium text-foreground">CNPJ *</Label>
-                  <Input id="cnpj" name="cnpj" value={formData.cnpj} onChange={handleChange} required className="mt-1" placeholder="00.000.000/0000-00" />
+                  <CnpjLookupInput
+                    id="cnpj"
+                    name="cnpj"
+                    value={formData.cnpj}
+                    onChange={handleChange}
+                    onFound={(data) => setFormData((prev) => ({
+                      ...prev,
+                      company_name: prev.company_name || data.nome || prev.company_name,
+                      company_address: prev.company_address || data.endereco || prev.company_address,
+                    }))}
+                    required
+                    className="mt-1"
+                    placeholder="00.000.000/0000-00"
+                  />
                 </div>
                 <div className="md:col-span-2">
                   <Label htmlFor="company_address" className="text-sm font-medium text-foreground">Endereço da Empresa *</Label>

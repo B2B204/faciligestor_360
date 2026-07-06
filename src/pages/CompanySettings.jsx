@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2, Plus, Building2, ShieldAlert, Loader2, Check, X, KeyRound } from "lucide-react";
+import CnpjLookupInput from "@/components/common/CnpjLookupInput";
 
 export default function CompanySettings() {
   const [user, setUser] = useState(null);
@@ -132,11 +133,13 @@ export default function CompanySettings() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
             <div className="space-y-1">
               <Label className="text-sm font-medium text-foreground">CNPJ</Label>
-              <Input
+              <CnpjLookupInput
                 className="bg-background border-border"
                 placeholder="00.000.000/0001-00"
+                name="cnpj"
                 value={form.cnpj}
-                onChange={(e) => setForm({ ...form, cnpj: e.target.value })}
+                onChange={(e) => setForm((f) => ({ ...f, cnpj: e.target.value }))}
+                onFound={(data) => setForm((f) => ({ ...f, display_name: f.display_name || data.nome || f.display_name }))}
               />
             </div>
             <div className="space-y-1">

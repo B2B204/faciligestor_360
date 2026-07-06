@@ -31,6 +31,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import NewPayableDialog from '@/components/payables/NewPayableDialog';
+import CnpjLookupInput from '@/components/common/CnpjLookupInput';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -346,7 +347,12 @@ function EditDialog({ open, onOpenChange, item, banks, costCenters = [], onSave 
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">CNPJ Fornecedor</Label>
-              <Input value={form.supplier_cnpj || ''} onChange={e => set('supplier_cnpj', e.target.value)} className="bg-background border-border" />
+              <CnpjLookupInput
+                value={form.supplier_cnpj || ''}
+                onChange={e => set('supplier_cnpj', e.target.value)}
+                onFound={(data) => set('supplier_name', form.supplier_name || data.nome || form.supplier_name)}
+                className="bg-background border-border"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Valor Face (R$)</Label>

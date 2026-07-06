@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Save } from 'lucide-react';
+import CnpjLookupInput from '@/components/common/CnpjLookupInput';
 
 export default function CompanyForm({ company, onSave, onCancel, user }) {
   const [formData, setFormData] = useState({
@@ -66,7 +67,13 @@ export default function CompanyForm({ company, onSave, onCancel, user }) {
         </div>
         <div>
           <Label htmlFor="cnpj_client">CNPJ</Label>
-          <Input id="cnpj_client" name="cnpj_client" value={formData.cnpj_client} onChange={handleChange} />
+          <CnpjLookupInput
+            id="cnpj_client"
+            name="cnpj_client"
+            value={formData.cnpj_client}
+            onChange={handleChange}
+            onFound={(data) => setFormData((prev) => ({ ...prev, name: prev.name || data.nome || prev.name }))}
+          />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

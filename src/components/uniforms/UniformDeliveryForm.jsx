@@ -6,9 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
-import { Plus, Trash2, ShieldAlert } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
-export default function UniformDeliveryForm({ contracts, employees, uniforms, onSave, onCancel, epiMode = false }) {
+export default function UniformDeliveryForm({ contracts, employees, uniforms, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     contract_id: '',
     employee_id: '',
@@ -26,9 +26,8 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
-  const [epiAcknowledgment, setEpiAcknowledgment] = useState(false);
 
-  const availableItems = epiMode ? uniforms.filter((u) => u.category === 'epi') : uniforms;
+  const availableItems = uniforms;
 
   useEffect(() => {
     if (formData.contract_id) {
@@ -82,13 +81,9 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
     setIsSaving(true);
     // usa receiptId fixo do formulário para agrupar todos os itens
     try {
-      if (epiMode && !epiAcknowledgment) {
-        alert('Confirme o termo de ciência do EPI antes de registrar a entrega.');
-        return;
-      }
       const validItems = uniformItems.filter(item => item.uniform_id && item.quantity > 0);
       if (validItems.length === 0) {
-        alert(`Adicione pelo menos um item de ${epiMode ? 'EPI' : 'uniforme'}.`);
+        alert('Adicione pelo menos um item.');
         return;
       }
       for (const item of validItems) {
@@ -105,8 +100,7 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
           total_cost: itemTotalCost,
           expiry_date: expiryDate.toISOString().split('T')[0],
           receipt_id: receiptId,
-          is_epi: epiMode,
-          epi_acknowledgment: epiMode ? epiAcknowledgment : false,
+          is_epi: uniform?.category === 'epi',
         };
         await onSave(deliveryData);
       }
@@ -190,7 +184,7 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
       {/* Items de Uniforme */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <div className="flex justify-between items-center mb-4">
-          <h4 className="font-medium">{epiMode ? 'Itens de EPI' : 'Itens de Uniforme'}</h4>
+          <h4 className="font-medium">Itens</h4>
           <Button 
             type="button" 
             variant="outline" 
@@ -207,7 +201,7 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
           {uniformItems.map((item, index) => (
             <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end p-4 bg-white rounded border">
               <div>
-                <Label>{epiMode ? 'EPI *' : 'Uniforme *'}</Label>
+                <Label>Item *</Label>
                 <Select
                   value={item.uniform_id}
                   onValueChange={(value) => handleUniformItemChange(index, 'uniform_id', value)}
@@ -225,9 +219,6 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
                     ))}
                   </SelectContent>
                 </Select>
-                {epiMode && availableItems.length === 0 && (
-                  <p className="text-xs text-red-600 mt-1">Nenhum EPI cadastrado no catálogo ainda. Cadastre um item com categoria "EPI".</p>
-                )}
               </div>
 
               <div>
@@ -288,7 +279,7 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
             className="w-full flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            {epiMode ? 'Adicionar outro item de EPI' : 'Adicionar outro item de uniforme'}
+            Adicionar outro item
           </Button>
         </div>
 
@@ -310,34 +301,15 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
         />
       </div>
 
-      {epiMode && (
-        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <label className="flex items-start gap-2 text-sm text-amber-900 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={epiAcknowledgment}
-              onChange={(e) => setEpiAcknowledgment(e.target.checked)}
-              className="mt-1"
-            />
-            <span>
-              Confirmo que o colaborador foi orientado sobre o uso correto do(s) EPI(s), recebeu o(s) item(ns) em
-              perfeitas condições e está ciente da responsabilidade pela guarda, conservação e comunicação de danos
-              ou extravio (NR-6).
-            </span>
-          </label>
-        </div>
-      )}
-
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
         <Button
           type="submit"
-          disabled={isSaving || !formData.contract_id || !formData.employee_id || (epiMode && !epiAcknowledgment)}
+          disabled={isSaving || !formData.contract_id || !formData.employee_id}
         >
-          {isSaving ? 'Registrando...' : `Registrar Entrega${epiMode ? ' de EPI' : ''}`}
+          {isSaving ? 'Registrando...' : 'Registrar Entrega'}
         </Button>
       </div>
     </form>

@@ -40,7 +40,6 @@ export default function UniformsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUniformFormOpen, setIsUniformFormOpen] = useState(false);
   const [isDeliveryFormOpen, setIsDeliveryFormOpen] = useState(false);
-  const [deliveryMode, setDeliveryMode] = useState('uniforme'); // 'uniforme' | 'epi'
   const [isStockEntryOpen, setIsStockEntryOpen] = useState(false);
   const [stockEntryUniform, setStockEntryUniform] = useState(null);
   const [stockEntryQty, setStockEntryQty] = useState(1);
@@ -156,12 +155,11 @@ export default function UniformsPage() {
     }
   };
 
-  const handleOpenForm = (type, mode = 'uniforme') => {
+  const handleOpenForm = (type) => {
     if (type === 'uniform') {
       setSelectedUniform(null); // Ensure no uniform is selected for new form
       setIsUniformFormOpen(true);
     } else if (type === 'delivery') {
-      setDeliveryMode(mode);
       setIsDeliveryFormOpen(true);
     }
   };
@@ -460,11 +458,8 @@ export default function UniformsPage() {
         <div className="flex gap-2">
           {canPerformAction(userRole, 'create') && (
             <>
-              <Button variant="outline" onClick={() => handleOpenForm('delivery', 'uniforme')}>
+              <Button variant="outline" onClick={() => handleOpenForm('delivery')}>
                 <Truck className="w-4 h-4 mr-2" /> Nova Entrega
-              </Button>
-              <Button variant="outline" className="text-amber-700 border-amber-300 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-800 dark:hover:bg-amber-950/30" onClick={() => handleOpenForm('delivery', 'epi')}>
-                <ShieldAlert className="w-4 h-4 mr-2" /> Nova Entrega de EPI
               </Button>
               <Button onClick={() => handleOpenForm('uniform')}>
                 <Plus className="w-4 h-4 mr-2" /> Novo Item
@@ -529,13 +524,12 @@ export default function UniformsPage() {
       <Dialog open={isDeliveryFormOpen} onOpenChange={setIsDeliveryFormOpen}>
         <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
-            <DialogTitle>{deliveryMode === 'epi' ? 'Nova Entrega de EPI' : 'Nova Entrega de Uniforme'}</DialogTitle>
+            <DialogTitle>Nova Entrega</DialogTitle>
           </DialogHeader>
           <UniformDeliveryForm
             contracts={contracts}
             employees={employees}
             uniforms={uniforms}
-            epiMode={deliveryMode === 'epi'}
             onSave={handleDeliverySave}
             onCancel={() => setIsDeliveryFormOpen(false)}
           />

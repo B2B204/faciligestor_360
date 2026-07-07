@@ -24,7 +24,6 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
   ]);
 
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [totalCost, setTotalCost] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [epiAcknowledgment, setEpiAcknowledgment] = useState(false);
 
@@ -38,15 +37,6 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
       setFilteredEmployees([]);
     }
   }, [formData.contract_id, employees]);
-
-  useEffect(() => {
-    // Calcular custo total
-    const total = uniformItems.reduce((sum, item) => {
-      const uniform = uniforms.find(u => u.id === item.uniform_id);
-      return sum + ((item.quantity || 0) * (uniform?.unit_cost || 0));
-    }, 0);
-    setTotalCost(total);
-  }, [uniformItems, uniforms]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -115,9 +105,6 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
       setIsSaving(false);
     }
   };
-
-  const formatCurrency = (value) => 
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -219,7 +206,7 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
                   <SelectContent>
                     {availableItems.map(uniform => (
                       <SelectItem key={uniform.id} value={uniform.id}>
-                        {uniform.item_name} - {uniform.size} - {formatCurrency(uniform.unit_cost)}
+                        {uniform.item_name} - {uniform.size}
                         {uniform.ca_number ? ` - CA ${uniform.ca_number}` : ''}
                       </SelectItem>
                     ))}
@@ -258,11 +245,6 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
               </div>
 
               <div className="flex items-center gap-2">
-                {item.uniform_id && (
-                  <div className="text-sm text-green-600 font-medium">
-                    {formatCurrency((item.quantity || 0) * (uniforms.find(u => u.id === item.uniform_id)?.unit_cost || 0))}
-                  </div>
-                )}
                 {uniformItems.length > 1 && (
                   <Button
                     type="button"
@@ -287,11 +269,6 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
             <Plus className="w-4 h-4" />
             Adicionar outro item
           </Button>
-        </div>
-
-        <div className="mt-4 p-3 bg-blue-50 rounded flex justify-between items-center">
-          <span className="font-medium">Custo Total da Entrega:</span>
-          <span className="text-lg font-bold text-blue-600">{formatCurrency(totalCost)}</span>
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, ShieldAlert } from 'lucide-react';
 
 export default function UniformDeliveryForm({ contracts, employees, uniforms, onSave, onCancel }) {
   const [formData, setFormData] = useState({
@@ -26,6 +26,7 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [epiAcknowledgment, setEpiAcknowledgment] = useState(false);
 
   const availableItems = uniforms;
 
@@ -81,6 +82,10 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
     setIsSaving(true);
     // usa receiptId fixo do formulário para agrupar todos os itens
     try {
+      if (!epiAcknowledgment) {
+        alert('Confirme o termo de ciência (NR-6) antes de registrar a entrega.');
+        return;
+      }
       const validItems = uniformItems.filter(item => item.uniform_id && item.quantity > 0);
       if (validItems.length === 0) {
         alert('Adicione pelo menos um item.');
@@ -101,6 +106,7 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
           expiry_date: expiryDate.toISOString().split('T')[0],
           receipt_id: receiptId,
           is_epi: uniform?.category === 'epi',
+          epi_acknowledgment: epiAcknowledgment,
         };
         await onSave(deliveryData);
       }
@@ -301,13 +307,31 @@ export default function UniformDeliveryForm({ contracts, employees, uniforms, on
         />
       </div>
 
+      <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+        <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <label className="flex items-start gap-2 text-sm text-amber-900 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={epiAcknowledgment}
+            onChange={(e) => setEpiAcknowledgment(e.target.checked)}
+            className="mt-1"
+            required
+          />
+          <span>
+            Confirmo que o colaborador foi orientado sobre o uso correto do(s) EPI(s), recebeu o(s) item(ns) em
+            perfeitas condições e está ciente da responsabilidade pela guarda, conservação e comunicação de danos
+            ou extravio (NR-6).
+          </span>
+        </label>
+      </div>
+
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
         <Button
           type="submit"
-          disabled={isSaving || !formData.contract_id || !formData.employee_id}
+          disabled={isSaving || !formData.contract_id || !formData.employee_id || !epiAcknowledgment}
         >
           {isSaving ? 'Registrando...' : 'Registrar Entrega'}
         </Button>

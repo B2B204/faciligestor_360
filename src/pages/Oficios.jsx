@@ -385,7 +385,7 @@ export default function OficiosPage() {
                             </DropdownMenuItem>
                           </>
                         )}
-                        {canPerformAction(user?.department, 'delete') && (oficio.approval_status === 'rascunho' || oficio.approval_status === 'pendente' || oficio.approval_status === 'rejeitado') && (
+                        {canPerformAction(user?.department, 'delete') && (
                           <DropdownMenuItem onClick={() => handleDelete(oficio.id)} className="text-red-600"><Trash2 className="w-4 h-4 mr-2" /> Excluir</DropdownMenuItem>
                         )}
                       </DropdownMenuContent>

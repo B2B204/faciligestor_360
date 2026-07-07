@@ -27,6 +27,12 @@ export default function CnpjSwitcher({ user, onChanged }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.email]);
 
+  // Garante que o cnpj selecionado sempre tenha um SelectItem correspondente
+  // já renderizado, mesmo no primeiro paint (antes de load() resolver) —
+  // sem isso o Radix Select define o valor mas não acha o item para exibir
+  // o texto, e o seletor fica em branco.
+  const displayList = value && !list.includes(value) ? [...list, value] : list;
+
   const handleChange = async (cnpj) => {
     setValue(cnpj);
     const me = await User.me();
@@ -47,7 +53,7 @@ export default function CnpjSwitcher({ user, onChanged }) {
           <SelectValue placeholder="Selecionar CNPJ" />
         </SelectTrigger>
         <SelectContent>
-          {list.map(c => (
+          {displayList.map(c => (
             <SelectItem key={c} value={c}>{c}</SelectItem>
           ))}
         </SelectContent>

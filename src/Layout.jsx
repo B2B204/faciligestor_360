@@ -7,7 +7,7 @@ import { BRAND } from "@/components/common/Branding";
 import BrandLogo from "@/components/common/BrandLogo";
 import { LayoutDashboard, FileText, Users, DollarSign, BarChart3,
   Menu, X, LogOut, Settings, Bell, ChevronDown, Package, Calculator,
-  ClipboardCheck, ShoppingCart, ShieldCheck, Banknote, HeartPulse, Mail, Award, HandCoins, UsersRound, LineChart, LifeBuoy, Shirt, SlidersHorizontal, RefreshCw, Wallet, CalendarRange, Star, Landmark, Tags
+  ClipboardCheck, ShoppingCart, ShieldCheck, Banknote, HeartPulse, Mail, Award, HandCoins, UsersRound, LineChart, LifeBuoy, Shirt, SlidersHorizontal, RefreshCw, Wallet, CalendarRange, Star, Landmark, Tags, Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -119,6 +119,7 @@ const navItems = [
   },
 
   { type: "link", title: "Suporte", url: createPageUrl("Support"), icon: LifeBuoy },
+  { type: "external", title: "GPS Emprega", url: "https://gpsemprega.com.br/", icon: Briefcase },
 ];
 
 
@@ -678,6 +679,21 @@ export default function Layout({ children, currentPageName }) {
           {/* Navigation */}
           <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
+              if (item.type === "external") {
+                return (
+                  <a
+                    key={item.title}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 px-3 sm:px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="truncate">{item.title}</span>
+                  </a>
+                );
+              }
+
               if (item.type === "link") {
                 const isActive = location.pathname === item.url;
                 return (

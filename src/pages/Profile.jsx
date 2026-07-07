@@ -387,7 +387,11 @@ Esta ação irá:
 
     setIsSaving(true);
     try {
-      await User.update(user.id, formData);
+      // O cnpj é a chave usada para vincular todos os usuários da mesma
+      // empresa (Entity.filter faz igualdade exata) — precisa ir sem
+      // máscara, senão o usuário deixa de ver os dados dos colegas e
+      // vice-versa.
+      await User.update(user.id, { ...formData, cnpj: formData.cnpj.replace(/\D/g, '') });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       loadAllData();

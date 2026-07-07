@@ -104,16 +104,21 @@ export default function AcceptInvite() {
         userId = data.user?.id;
       }
 
-      // Link profile to company CNPJ
+      // Link profile to company CNPJ. Upsert (not update): the
+      // "handle_new_user" DB trigger that creates the profile row on
+      // signup can fail silently, so this must be able to create the
+      // row too, not just patch an existing one — otherwise the user
+      // ends up with no cnpj and their data never shows up for anyone.
       if (userId) {
         const { error: profileError } = await supabase
           .from("profiles")
-          .update({
+          .upsert({
+            id: userId,
+            email: invite.email,
             full_name: invite.full_name,
             department: invite.department,
             cnpj: invite.cnpj,
-          })
-          .eq("id", userId);
+          }, { onConflict: "id" });
         if (profileError) throw profileError;
       }
 

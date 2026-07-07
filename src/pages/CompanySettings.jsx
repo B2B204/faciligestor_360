@@ -87,7 +87,7 @@ export default function CompanySettings() {
   }
 
   const handleAdd = async () => {
-    await CompanyCnpj.create(form);
+    await CompanyCnpj.create({ ...form, cnpj: form.cnpj.replace(/\D/g, '') });
     setForm({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
     await load();
   };

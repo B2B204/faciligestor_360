@@ -39,23 +39,39 @@ DROP TRIGGER IF EXISTS profiles_updated_at ON profiles;
 CREATE TRIGGER profiles_updated_at BEFORE UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
--- Auto-criar profile ao registrar usuário (com fallback para não bloquear o signup)
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+-- Auto-criar profile ao registrar usuário (com fallback para não bloquear o signup).
+-- search_path fixado em "public": a role supabase_auth_admin (que o
+-- GoTrue usa para inserir em auth.users) roda com search_path=auth,
+-- e sem isso o "INSERT INTO profiles" abaixo procura a tabela no
+-- schema errado, falha, e o EXCEPTION engole o erro em silêncio —
+-- o usuário é criado mas nunca ganha profile/cnpj.
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  INSERT INTO profiles (id, email, full_name)
-  VALUES (NEW.id, NEW.email, COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email))
+  INSERT INTO public.profiles (id, email, full_name, cnpj, department)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+    NEW.raw_user_meta_data->>'cnpj',
+    COALESCE(NEW.raw_user_meta_data->>'department', 'admin')
+  )
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-  RETURN NEW; -- Não bloquear criação do usuário se o profile falhar
+  RAISE WARNING 'handle_new_user falhou para %: %', NEW.id, SQLERRM; -- Não bloquear criação do usuário se o profile falhar
+  RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- ============================================================
 -- COMPANY CNPJS

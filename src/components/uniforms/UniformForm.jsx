@@ -7,7 +7,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 
+const PRESET_SIZES = ['PP', 'P', 'M', 'G', 'GG', 'XG', 'Único'];
+
 export default function UniformForm({ uniform, onSave, onCancel }) {
+  const [customSize, setCustomSize] = useState(false);
   const [formData, setFormData] = useState({
     item_name: '',
     size: '',
@@ -40,6 +43,7 @@ export default function UniformForm({ uniform, onSave, onCancel }) {
         stock_location: uniform.stock_location || '',
         ca_number: uniform.ca_number || '',
       });
+      setCustomSize(!!uniform.size && !PRESET_SIZES.includes(uniform.size));
     }
   }, [uniform]);
 
@@ -106,25 +110,50 @@ export default function UniformForm({ uniform, onSave, onCancel }) {
         </div>
 
         <div>
-          <Label>Tamanho *</Label>
-          <Select 
-            value={formData.size} 
-            onValueChange={(value) => handleSelectChange('size', value)}
-            required
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione o tamanho" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="PP">PP</SelectItem>
-              <SelectItem value="P">P</SelectItem>
-              <SelectItem value="M">M</SelectItem>
-              <SelectItem value="G">G</SelectItem>
-              <SelectItem value="GG">GG</SelectItem>
-              <SelectItem value="XG">XG</SelectItem>
-              <SelectItem value="Único">Tamanho Único</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="size">Tamanho *</Label>
+          {customSize ? (
+            <div className="flex gap-2">
+              <Input
+                id="size"
+                name="size"
+                type="number"
+                value={formData.size}
+                onChange={(e) => handleSelectChange('size', e.target.value)}
+                required
+                placeholder="Ex: 38, 40, 42"
+              />
+              <Button type="button" variant="outline" onClick={() => { setCustomSize(false); handleSelectChange('size', ''); }}>
+                Padrão
+              </Button>
+            </div>
+          ) : (
+            <Select
+              value={formData.size}
+              onValueChange={(value) => {
+                if (value === '__numero__') {
+                  setCustomSize(true);
+                  handleSelectChange('size', '');
+                } else {
+                  handleSelectChange('size', value);
+                }
+              }}
+              required
+            >
+              <SelectTrigger id="size">
+                <SelectValue placeholder="Selecione o tamanho" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PP">PP</SelectItem>
+                <SelectItem value="P">P</SelectItem>
+                <SelectItem value="M">M</SelectItem>
+                <SelectItem value="G">G</SelectItem>
+                <SelectItem value="GG">GG</SelectItem>
+                <SelectItem value="XG">XG</SelectItem>
+                <SelectItem value="Único">Tamanho Único</SelectItem>
+                <SelectItem value="__numero__">Número (Ex: sapato, calça)</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         {formData.category === 'epi' && (

@@ -1,5 +1,19 @@
 import { supabase } from '@/api/supabaseClient';
 
+// Garante que todo registro criado carregue o cnpj da empresa do usuário
+// logado, mesmo que a tela que o criou tenha esquecido de informá-lo —
+// sem isso o registro não aparece para nenhum usuário da mesma empresa
+// (nem para quem criou), pois as listagens filtram por cnpj.
+async function getCurrentUserCnpj(user) {
+  if (!user?.id) return null;
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('cnpj')
+    .eq('id', user.id)
+    .single();
+  return profile?.cnpj || null;
+}
+
 function parseSortField(sortStr) {
   if (!sortStr) return null;
   const desc = sortStr.startsWith('-');
@@ -71,6 +85,10 @@ export function createEntity(tableName, options = {}) {
       const { data: { user } } = await supabase.auth.getUser();
       const row = { ...payload };
       if (user?.email && hasCreatedBy) row.created_by = user.email;
+      if (row.cnpj === undefined || row.cnpj === null || row.cnpj === '') {
+        const cnpj = await getCurrentUserCnpj(user);
+        if (cnpj) row.cnpj = cnpj;
+      }
 
       const { data, error } = await supabase
         .from(tableName)
@@ -106,9 +124,11 @@ export function createEntity(tableName, options = {}) {
 
     async bulkCreate(items) {
       const { data: { user } } = await supabase.auth.getUser();
+      const fallbackCnpj = items.some(item => !item.cnpj) ? await getCurrentUserCnpj(user) : null;
       const rows = items.map(item => ({
         ...item,
         ...(user?.email && hasCreatedBy ? { created_by: user.email } : {}),
+        ...(!item.cnpj && fallbackCnpj ? { cnpj: fallbackCnpj } : {}),
       }));
       const { data, error } = await supabase
         .from(tableName)

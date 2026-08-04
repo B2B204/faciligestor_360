@@ -18,6 +18,7 @@ import { Loader2, AlertTriangle, RotateCcw, Trash2, FileText, Users, Package, Sh
 import DeleteConfirmation from './DeleteConfirmation';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
+import { logDataAccess } from '@/lib/lgpdAudit';
 
 const ENTITY_CONFIG = {
   posts: {
@@ -150,6 +151,15 @@ export default function TrashManager({ user }) {
     try {
       const config = ENTITY_CONFIG[itemToDelete.entityType];
       await config.entity.delete(itemToDelete.id);
+      if (itemToDelete.entityType === 'employees') {
+        await logDataAccess({
+          user,
+          action: 'exclusao',
+          resourceType: 'employee',
+          resourceId: itemToDelete.id,
+          resourceLabel: getItemDisplayName(itemToDelete),
+        });
+      }
       setItemToDelete(null);
       loadAllDeletedItems();
       alert(`${itemToDelete.entityName} foi excluído permanentemente.`);

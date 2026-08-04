@@ -10,9 +10,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Camera, Save } from "lucide-react";
+import { Camera, Save, ShieldCheck } from "lucide-react";
 
 export default function EmployeeForm({ employee, contracts, onSave, onCancel, isSaving }) {
+  const [lgpdConsent, setLgpdConsent] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     cpf: "",
@@ -98,7 +99,9 @@ export default function EmployeeForm({ employee, contracts, onSave, onCancel, is
         uniform_hat_size: employee.uniform_hat_size || "",
         uniform_notes: employee.uniform_notes || ""
       });
+      setLgpdConsent(!!employee.lgpd_consent_at);
     } else {
+      setLgpdConsent(false);
       // Reset form data for new employee creation
       setFormData({
         name: "",
@@ -266,11 +269,23 @@ export default function EmployeeForm({ employee, contracts, onSave, onCancel, is
       alert("Por favor, informe um tamanho válido para a bota/sapato (maior que 0).");
       return;
     }
-    
-    console.log("🔄 Enviando dados do funcionário para salvamento:", formData);
-    
+
+    if (!lgpdConsent) {
+      alert("Confirme o consentimento para tratamento dos dados pessoais (LGPD) antes de salvar.");
+      return;
+    }
+
+    const dataWithConsent = {
+      ...formData,
+      // Só grava a data/autor do consentimento na primeira vez — edições
+      // seguintes não devem sobrescrever quando/quem obteve o consentimento original.
+      ...(employee?.lgpd_consent_at ? {} : { lgpd_consent_at: new Date().toISOString() }),
+    };
+
+    console.log("🔄 Enviando dados do funcionário para salvamento:", dataWithConsent);
+
     try {
-      await onSave(formData);
+      await onSave(dataWithConsent);
       console.log("✅ Funcionário salvo com sucesso via onSave");
     } catch (error) {
       console.error("❌ Erro no formulário de funcionário:", error);
@@ -596,6 +611,31 @@ export default function EmployeeForm({ employee, contracts, onSave, onCancel, is
             rows={3}
           />
         </div>
+      </div>
+
+      <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+        <label className="flex items-start gap-2 text-sm text-blue-900 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={lgpdConsent}
+            onChange={(e) => setLgpdConsent(e.target.checked)}
+            className="mt-1"
+            required
+          />
+          <span>
+            Confirmo que o consentimento do funcionário para o tratamento de seus dados pessoais foi obtido,
+            conforme a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), incluindo dados sensíveis como
+            CPF, dados bancários (PIX) e informações de saúde/benefícios, para fins de gestão de RH e folha de
+            pagamento.
+            {employee?.lgpd_consent_at && (
+              <span className="block text-xs text-blue-700 mt-1">
+                Consentimento registrado em {new Date(employee.lgpd_consent_at).toLocaleDateString('pt-BR')}
+                {employee.lgpd_consent_by ? ` por ${employee.lgpd_consent_by}` : ''}.
+              </span>
+            )}
+          </span>
+        </label>
       </div>
 
       <div className="flex justify-end space-x-2 pt-4 border-t">

@@ -29,6 +29,8 @@ import LeaveCalendar from './pages/LeaveCalendar';
 import PerformanceReviews from './pages/PerformanceReviews';
 import FiscalPositions from './pages/FiscalPositions';
 import CostCenters from './pages/CostCenters';
+import Privacy from './pages/Privacy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -65,6 +67,7 @@ const AuthenticatedApp = () => {
       {/* Rotas públicas */}
       <Route path="/login" element={<Login />} />
       <Route path="/accept-invite" element={<AcceptInvite />} />
+      <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
       <Route path="/logout-success" element={
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
@@ -122,6 +125,7 @@ const AuthenticatedApp = () => {
       <Route path="/avaliacao-desempenho" element={<ProtectedRoute><LayoutWrapper currentPageName="PerformanceReviews"><PerformanceReviews /></LayoutWrapper></ProtectedRoute>} />
       <Route path="/regras-fiscais" element={<ProtectedRoute><LayoutWrapper currentPageName="FiscalPositions"><FiscalPositions /></LayoutWrapper></ProtectedRoute>} />
       <Route path="/centros-de-custo" element={<ProtectedRoute><LayoutWrapper currentPageName="CostCenters"><CostCenters /></LayoutWrapper></ProtectedRoute>} />
+      <Route path="/privacidade-lgpd" element={<ProtectedRoute><LayoutWrapper currentPageName="Privacy"><Privacy /></LayoutWrapper></ProtectedRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </ErrorBoundary>

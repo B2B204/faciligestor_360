@@ -233,6 +233,10 @@ export default function Login() {
 
         <p className="text-center text-xs text-gray-400 mt-6">
           © {new Date().getFullYear()} {BRAND.name} — Sistema de Gestão de Facilities
+          {" · "}
+          <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" className="hover:underline">
+            Política de Privacidade
+          </a>
         </p>
       </div>
     </div>

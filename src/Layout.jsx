@@ -24,6 +24,7 @@ import AccessDeniedPage from "./pages/AccessDeniedPage";
 import CnpjSwitcher from "./components/common/CnpjSwitcher";
 import ThemeToggle from "./components/common/ThemeToggle";
 import { lookupCnpj } from "@/functions/lookupCnpj";
+import { PRIVACY_POLICY_VERSION } from "./pages/PrivacyPolicy";
 
 const navItems = [
   { type: "link", title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
@@ -115,6 +116,7 @@ const navItems = [
       { title: "Marketing", url: createPageUrl("Marketing"), icon: LineChart },
       { title: "Perfis de Usuário", url: createPageUrl("UserProfiles"), icon: Users },
       { title: "Configurações da Empresa", url: "/company-settings", icon: Settings },
+      { title: "Privacidade e LGPD", url: "/privacidade-lgpd", icon: ShieldCheck },
     ],
   },
 
@@ -259,6 +261,47 @@ function CnpjSetupScreen({ user, onSaved }) {
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-4">Logado como {user?.email}</p>
+      </div>
+    </div>
+  );
+}
+
+function PrivacyConsentScreen({ user, onAccepted }) {
+  const [saving, setSaving] = React.useState(false);
+
+  const handleAccept = async () => {
+    setSaving(true);
+    try {
+      await User.update(user.id, {
+        privacy_policy_accepted_at: new Date().toISOString(),
+        privacy_policy_version: PRIVACY_POLICY_VERSION,
+      });
+      onAccepted();
+    } catch (err) {
+      console.error(err);
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="w-screen h-screen flex items-center justify-center bg-background p-4">
+      <div className="max-w-md w-full bg-card border border-border rounded-2xl shadow-2xl p-8">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">🔒</span>
+          </div>
+          <h2 className="text-2xl font-bold text-foreground">Privacidade dos seus dados</h2>
+          <p className="text-muted-foreground mt-2 text-sm">
+            Atualizamos nossa <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Política de Privacidade</a>, em conformidade com a LGPD (Lei nº 13.709/2018). Para continuar, é necessário ler e aceitar os termos.
+          </p>
+        </div>
+        <button
+          onClick={handleAccept}
+          disabled={saving}
+          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground px-4 py-3 rounded-lg font-medium text-sm transition-colors"
+        >
+          {saving ? 'Salvando...' : 'Li e aceito a Política de Privacidade'}
+        </button>
       </div>
     </div>
   );
@@ -545,6 +588,11 @@ export default function Layout({ children, currentPageName }) {
   // Bloqueia caso o usuário não tenha CNPJ configurado — mostra formulário inline
   if (user && !user.cnpj) {
     return <CnpjSetupScreen user={user} onSaved={() => loadUser()} />;
+  }
+
+  // Bloqueia até o aceite da Política de Privacidade (LGPD)
+  if (user && !user.privacy_policy_accepted_at) {
+    return <PrivacyConsentScreen user={user} onAccepted={() => loadUser()} />;
   }
 
   // Verificação de permissão de acesso à página

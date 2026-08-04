@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { UserInvite } from "@/entities/UserInvite";
+import { DataSubjectRequest } from "@/entities/DataSubjectRequest";
 import { TeamMember } from "@/entities/TeamMember";
 import { Contract } from "@/entities/Contract";
 import { Employee } from "@/entities/Employee";
@@ -53,6 +54,8 @@ export default function ProfilePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isExportingData, setIsExportingData] = useState(false);
+  const [isRequestingDeletion, setIsRequestingDeletion] = useState(false);
   const [teamMembers, setTeamMembers] = useState([]);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -401,6 +404,61 @@ Esta ação irá:
     setIsSaving(false);
   };
 
+  // LGPD — direito de acesso/portabilidade: exporta os dados pessoais do
+  // próprio usuário em JSON e registra a solicitação como já atendida.
+  const handleExportMyData = async () => {
+    setIsExportingData(true);
+    try {
+      const exportData = { ...user, exported_at: new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `meus-dados_${user.email}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      await DataSubjectRequest.create({
+        cnpj: user.cnpj,
+        subject_name: user.full_name || user.email,
+        subject_email: user.email,
+        request_type: 'exportacao',
+        description: 'Autoexportação de dados via Perfil.',
+        status: 'concluido',
+        resolved_by: user.email,
+        resolved_at: new Date().toISOString(),
+      });
+    } catch (error) {
+      alert("Erro ao exportar seus dados.");
+    }
+    setIsExportingData(false);
+  };
+
+  // LGPD — direito de exclusão: registra o pedido para análise de um
+  // administrador (a exclusão da conta não é automática por segurança).
+  const handleRequestDeletion = async () => {
+    if (!window.confirm("Confirma a solicitação de exclusão da sua conta e dados pessoais? Um administrador irá analisar o pedido.")) {
+      return;
+    }
+    setIsRequestingDeletion(true);
+    try {
+      await DataSubjectRequest.create({
+        cnpj: user.cnpj,
+        subject_name: user.full_name || user.email,
+        subject_email: user.email,
+        request_type: 'exclusao',
+        description: 'Solicitação de exclusão da própria conta via Perfil.',
+        status: 'pendente',
+      });
+      alert("Solicitação registrada. Um administrador irá analisar e retornar em breve.");
+    } catch (error) {
+      alert("Erro ao registrar a solicitação.");
+    }
+    setIsRequestingDeletion(false);
+  };
+
   const getPlanInfo = () => {
     const plans = {
       essencial: { name: "Essencial", price: "R$ 997/mês", limits: { contracts: 10, users: 5 }, color: "bg-green-100 text-green-800" },
@@ -693,7 +751,36 @@ Esta ação irá:
           </form>
         </CardContent>
       </Card>
-      
+
+      {/* Meus Dados (LGPD) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <ShieldCheck className="w-6 h-6 mr-3 text-blue-600" />
+            Meus Dados (LGPD)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Nos termos da LGPD (Lei nº 13.709/2018), você pode exportar uma cópia dos seus dados pessoais
+            ou solicitar a exclusão da sua conta. Consulte também a{" "}
+            <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              Política de Privacidade
+            </a>.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" onClick={handleExportMyData} disabled={isExportingData} className="gap-2">
+              <DownloadCloud className="w-4 h-4" />
+              {isExportingData ? "Exportando..." : "Exportar meus dados"}
+            </Button>
+            <Button variant="outline" onClick={handleRequestDeletion} disabled={isRequestingDeletion} className="gap-2 text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950/30">
+              <Trash2 className="w-4 h-4" />
+              {isRequestingDeletion ? "Enviando..." : "Solicitar exclusão da minha conta"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* User Management Card (apenas para admins) */}
       {user.department === 'admin' && (
         <Card>

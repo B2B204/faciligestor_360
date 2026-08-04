@@ -21,6 +21,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { canEditPage } from '@/components/permissions';
 import { generateEmployeeTasks } from '@/lib/hrOnboarding';
+import { logDataAccess } from '@/lib/lgpdAudit';
 
 const planLimits = {
   essencial: { contracts: 10, users: 5 },
@@ -249,7 +250,8 @@ export default function EmployeesPage() {
         ...formData,
         cnpj: user.cnpj,
         created_by: selectedEmployee ? undefined : user.email,
-        updated_by: selectedEmployee ? user.email : undefined
+        updated_by: selectedEmployee ? user.email : undefined,
+        lgpd_consent_by: formData.lgpd_consent_at ? user.email : undefined,
       };
 
       console.log("🔄 Salvando funcionário:", dataToSave);
@@ -258,6 +260,7 @@ export default function EmployeesPage() {
       if (selectedEmployee) {
         savedEmployee = await Employee.update(selectedEmployee.id, dataToSave);
         console.log("✅ Funcionário atualizado:", savedEmployee);
+        await logDataAccess({ user, action: 'edicao', resourceType: 'employee', resourceId: savedEmployee.id, resourceLabel: savedEmployee.name });
 
         const becameInactive = selectedEmployee.status !== 'inativo' && dataToSave.status === 'inativo';
         if (becameInactive) {
@@ -271,6 +274,7 @@ export default function EmployeesPage() {
       } else {
         savedEmployee = await Employee.create(dataToSave);
         console.log("✅ Funcionário criado:", savedEmployee);
+        await logDataAccess({ user, action: 'criacao', resourceType: 'employee', resourceId: savedEmployee.id, resourceLabel: savedEmployee.name });
 
         await generateEmployeeTasks({
           employeeId: savedEmployee.id,

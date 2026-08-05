@@ -6,9 +6,11 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ExternalLink, Save, CheckCircle, PlusCircle } from "lucide-react"; // Added PlusCircle icon for notes
+import { ExternalLink, Save, CheckCircle, PlusCircle, ClipboardCheck } from "lucide-react"; // Added PlusCircle icon for notes
 import RepactuacaoSection from "./RepactuacaoSection";
 import CnpjLookupInput from "@/components/common/CnpjLookupInput";
+import { TaskTemplate } from "@/entities/TaskTemplate";
+import { User } from "@/entities/User";
 
 export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
   const [formData, setFormData] = useState({
@@ -30,11 +32,25 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
     client_type: "pj",
     status: "ativo",
     observations: "",
-    notes: [] // New field for contract notes/messages
+    notes: [], // New field for contract notes/messages
+    task_template_id: null // Modelo de Tarefas a instanciar automaticamente
   });
 
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [newNoteText, setNewNoteText] = useState(""); // State to manage the input for new notes
+  const [taskTemplates, setTaskTemplates] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const currentUser = await User.me();
+        const templates = await TaskTemplate.filter({ cnpj: currentUser.cnpj, is_active: true });
+        setTaskTemplates(templates);
+      } catch (e) {
+        console.error("Erro ao carregar modelos de tarefas:", e);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (contract) {
@@ -57,7 +73,8 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
         client_type: contract.client_type || 'pj',
         status: contract.status || 'ativo',
         observations: contract.observations || "",
-        notes: contract.notes || [] // Populate notes from existing contract
+        notes: contract.notes || [], // Populate notes from existing contract
+        task_template_id: contract.task_template_id || null
       });
     } else {
       // Reset form for new contract
@@ -80,7 +97,8 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
         client_type: "pj",
         status: "ativo",
         observations: "",
-        notes: [] // Reset notes for new contract
+        notes: [], // Reset notes for new contract
+        task_template_id: null
       });
       setSaveSuccess(false);
     }
@@ -215,7 +233,8 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
             client_type: "pj",
             status: "ativo",
             observations: "",
-            notes: [] // Reset notes on new contract creation success
+            notes: [], // Reset notes on new contract creation success
+            task_template_id: null
           });
           setSaveSuccess(false);
         }, 2000);
@@ -369,6 +388,31 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
           <Label htmlFor="observations">Observações</Label>
           <Textarea id="observations" name="observations" value={formData.observations} onChange={handleChange} placeholder="Detalhes importantes sobre o contrato..." />
         </div>
+      </div>
+
+      {/* Bloco 4: Modelo de Tarefas */}
+      <div className="bg-indigo-50 p-6 rounded-lg">
+        <h3 className="font-semibold text-indigo-900 mb-4 flex items-center gap-2">
+          <ClipboardCheck className="w-4 h-4" /> Modelo de Tarefas
+        </h3>
+        <Label>Modelo a ser aplicado {!contract && "(opcional)"}</Label>
+        <Select
+          value={formData.task_template_id || "none"}
+          onValueChange={(v) => handleSelectChange("task_template_id", v === "none" ? null : v)}
+        >
+          <SelectTrigger><SelectValue placeholder="Nenhum modelo" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Nenhum modelo</SelectItem>
+            {taskTemplates.map((t) => (
+              <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-gray-500 mt-1">
+          {contract
+            ? "Alterar o modelo aqui não recria as tarefas já geradas para este contrato."
+            : "Ao salvar, todas as tarefas do modelo escolhido serão criadas automaticamente para este contrato."}
+        </p>
       </div>
 
       {/* Mural de Recados - only visible in edit mode */}

@@ -28,6 +28,17 @@ import { PRIVACY_POLICY_VERSION } from "./pages/PrivacyPolicy";
 
 const navItems = [
   { type: "link", title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
+  {
+    type: "group",
+    title: "Tarefas",
+    icon: ClipboardCheck,
+    subItems: [
+      { title: "Tarefas", url: createPageUrl("Tasks"), icon: ClipboardCheck },
+      { title: "Modelos de Tarefas", url: createPageUrl("TaskTemplates"), icon: ClipboardCheck },
+      { title: "Automações", url: createPageUrl("TaskAutomations"), icon: SlidersHorizontal },
+      { title: "Relatórios de Tarefas", url: createPageUrl("TaskReports"), icon: BarChart3 },
+    ],
+  },
   { type: "link", title: "Reconhecimentos", url: createPageUrl("Recognitions"), icon: Award },
 
   {

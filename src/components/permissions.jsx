@@ -30,7 +30,7 @@ export const hasPageAccess = (role, pageName) => {
   const permissions = PERMISSIONS[userRole] || PERMISSIONS['comercial'];
   if (!permissions) return false;
   if (permissions.pages.includes('all')) return true;
-  const systemPages = ['Dashboard','Contracts','ReajusteContratual','Employees','Financial','Reports','Profile','Measurements','Uniforms','Patrimony','Supplies','IndirectCosts','Marketplace','AccessDeniedPage','SegurosLaudos','AccountsReceivable','Oficios','AllowanceReceipts','Recognitions','CRM','Alerts','Marketing','Support'];
+  const systemPages = ['Dashboard','Contracts','ReajusteContratual','Employees','Financial','Reports','Profile','Measurements','Uniforms','Patrimony','Supplies','IndirectCosts','Marketplace','AccessDeniedPage','SegurosLaudos','AccountsReceivable','Oficios','AllowanceReceipts','Recognitions','CRM','Alerts','Marketing','Support','Tasks','TaskTemplates','TaskAutomations','TaskReports'];
   if (systemPages.includes(pageName)) {
     return permissions.pages.includes(pageName);
   }

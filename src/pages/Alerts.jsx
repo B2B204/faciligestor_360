@@ -1,8 +1,10 @@
 
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Alert as AlertEntity } from "@/entities/Alert";
 import { User } from "@/entities/User";
 import { generateOperationalAlerts } from "@/lib/alertsGenerator";
+import { createPageUrl } from "@/utils";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Filter, RefreshCw } from "lucide-react";
 
 export default function AlertsPage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [typeFilter, setTypeFilter] = useState("all");
@@ -40,10 +43,13 @@ export default function AlertsPage() {
     load();
   };
 
+  const canSeeAllRecipients = user?.department === "admin" || user?.department === "gestor";
+
   const filtered = alerts.filter(a=>{
     const t = typeFilter==="all" || a.type===typeFilter;
     const s = statusFilter==="all" || a.status===statusFilter;
-    return t && s;
+    const visible = !a.recipients?.length || canSeeAllRecipients || a.recipients.includes(user?.email);
+    return t && s && visible;
   });
 
   const typeLabel = {
@@ -52,7 +58,12 @@ export default function AlertsPage() {
     employee_probation:"Período de experiência",
     insurance_expiry:"Seguro a vencer",
     laudo_expiry:"Laudo a vencer",
-    custom:"Personalizado"
+    custom:"Personalizado",
+    task_due_soon:"Tarefa a vencer",
+    task_overdue:"Tarefa atrasada",
+    task_assigned:"Tarefa atribuída a você",
+    task_commented:"Menção em comentário",
+    task_automation:"Automação de tarefa",
   };
 
   const severityColor = {
@@ -117,7 +128,11 @@ export default function AlertsPage() {
               </TableHeader>
               <TableBody>
                 {filtered.map(a=>(
-                  <TableRow key={a.id} className="border-border hover:bg-muted/50 transition-colors">
+                  <TableRow
+                    key={a.id}
+                    className={`border-border hover:bg-muted/50 transition-colors ${a.entity_type === "Task" ? "cursor-pointer" : ""}`}
+                    onClick={() => a.entity_type === "Task" && navigate(`${createPageUrl("Tasks")}?openTask=${a.entity_id}`)}
+                  >
                     <TableCell>{typeLabel[a.type]||a.type}</TableCell>
                     <TableCell>{a.message}</TableCell>
                     <TableCell>
@@ -135,7 +150,7 @@ export default function AlertsPage() {
                     </TableCell>
                     <TableCell>
                       {a.status==="pending" && (
-                        <Button size="sm" onClick={()=>markRead(a)}>Marcar como lido</Button>
+                        <Button size="sm" onClick={(e)=>{ e.stopPropagation(); markRead(a); }}>Marcar como lido</Button>
                       )}
                     </TableCell>
                   </TableRow>

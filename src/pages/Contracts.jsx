@@ -28,6 +28,7 @@ import { User } from "@/entities/User";
 import { canEditPage } from "@/components/permissions";
 import { recordContractVersion } from "@/lib/contractVersioning";
 import ContractHistoryDialog from "@/components/contracts/ContractHistoryDialog";
+import { instantiateTemplateForContract } from "@/lib/taskTemplateEngine";
 
 const planLimits = {
   essencial: { contracts: 10, users: 5 },
@@ -119,6 +120,21 @@ export default function ContractsPage() {
           after: created,
           isCreation: true,
         });
+
+        if (created.task_template_id) {
+          try {
+            await instantiateTemplateForContract({
+              contractId: created.id,
+              templateId: created.task_template_id,
+              contractStartDate: created.start_date,
+              cnpj: user.cnpj,
+              actorEmail: user.email,
+            });
+          } catch (templateError) {
+            console.error("Erro ao criar tarefas a partir do modelo:", templateError);
+          }
+        }
+
         setSaveMessage("Contrato cadastrado com sucesso!");
       }
 

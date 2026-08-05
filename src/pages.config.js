@@ -73,6 +73,10 @@ import Reports from './pages/Reports';
 import SegurosLaudos from './pages/SegurosLaudos';
 import Supplies from './pages/Supplies';
 import Support from './pages/Support';
+import Tasks from './pages/Tasks';
+import TaskTemplates from './pages/TaskTemplates';
+import TaskAutomations from './pages/TaskAutomations';
+import TaskReports from './pages/TaskReports';
 import Uniforms from './pages/Uniforms';
 import UserProfiles from './pages/UserProfiles';
 import __Layout from './Layout.jsx';
@@ -105,6 +109,10 @@ export const PAGES = {
     "SegurosLaudos": SegurosLaudos,
     "Supplies": Supplies,
     "Support": Support,
+    "Tasks": Tasks,
+    "TaskTemplates": TaskTemplates,
+    "TaskAutomations": TaskAutomations,
+    "TaskReports": TaskReports,
     "Uniforms": Uniforms,
     "UserProfiles": UserProfiles,
 }

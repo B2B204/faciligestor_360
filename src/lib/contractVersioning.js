@@ -22,8 +22,19 @@ export const FIELD_LABELS = {
   start_date: 'Data de Início',
   end_date: 'Data de Término',
   service_type: 'Tipo de Serviço',
+  client_type: 'Tipo de Cliente',
   status: 'Status',
   observations: 'Observações',
+  description: 'Descrição',
+  address: 'Endereço',
+  city: 'Cidade',
+  state: 'Estado',
+  responsible: 'Responsável',
+  task_template_id: 'Modelo de Tarefas',
+  notes: 'Mural de Recados',
+  created_by: 'Criado por',
+  updated_by: 'Atualizado por',
+  is_sample: 'Dados de exemplo',
 };
 
 function normalize(value) {

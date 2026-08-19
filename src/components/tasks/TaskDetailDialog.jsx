@@ -46,6 +46,20 @@ export default function TaskDetailDialog({
 
   const isEditing = !!task?.id;
 
+  // Colunas DATE/TIMESTAMP e FKs rejeitam string vazia no Postgres; converte
+  // os "" vindos do formulário em null para não falhar ao salvar.
+  const sanitize = (data) => {
+    const clean = { ...data };
+    if (clean.start_date === "") clean.start_date = null;
+    if (clean.due_date === "") clean.due_date = null;
+    if (clean.contract_id === "") clean.contract_id = null;
+    if (clean.assignee_email === "") clean.assignee_email = null;
+    if (clean.approver_email === "") clean.approver_email = null;
+    if (clean.department === "") clean.department = null;
+    if (clean.parent_task_id === "") clean.parent_task_id = null;
+    return clean;
+  };
+
   const loadRelated = useCallback(async () => {
     if (!isEditing) return;
     try {
@@ -85,13 +99,13 @@ export default function TaskDetailDialog({
     setIsSaving(true);
     try {
       if (isEditing) {
+        const patch = sanitize(formData);
         const changes = [];
-        if (task.status !== formData.status) changes.push(["status", task.status, formData.status, "status_changed"]);
-        if (task.due_date !== formData.due_date) changes.push(["due_date", task.due_date, formData.due_date, "due_date_changed"]);
-        if (task.assignee_email !== formData.assignee_email) changes.push(["assignee_email", task.assignee_email, formData.assignee_email, "assignee_changed"]);
+        if (task.status !== patch.status) changes.push(["status", task.status, patch.status, "status_changed"]);
+        if ((task.due_date || null) !== patch.due_date) changes.push(["due_date", task.due_date, patch.due_date, "due_date_changed"]);
+        if ((task.assignee_email || null) !== patch.assignee_email) changes.push(["assignee_email", task.assignee_email, patch.assignee_email, "assignee_changed"]);
 
-        const patch = { ...formData };
-        if (formData.status === "concluida" && task.status !== "concluida") {
+        if (patch.status === "concluida" && task.status !== "concluida") {
           patch.completed_at = new Date().toISOString();
         }
 
@@ -104,15 +118,15 @@ export default function TaskDetailDialog({
           await logTaskActivity({ cnpj: user.cnpj, taskId: task.id, action: "updated", actorEmail: user.email });
         }
 
-        if (task.status !== formData.status) {
-          await runStatusChangeAutomations({ cnpj: user.cnpj, task: { ...task, ...patch }, newStatus: formData.status, actorEmail: user.email });
+        if (task.status !== patch.status) {
+          await runStatusChangeAutomations({ cnpj: user.cnpj, task: { ...task, ...patch }, newStatus: patch.status, actorEmail: user.email });
         }
-        if (task.assignee_email !== formData.assignee_email && formData.assignee_email) {
-          await notifyAssigneeChanged({ cnpj: user.cnpj, task: { ...task, ...patch }, newAssigneeEmail: formData.assignee_email, actorEmail: user.email });
+        if ((task.assignee_email || null) !== patch.assignee_email && patch.assignee_email) {
+          await notifyAssigneeChanged({ cnpj: user.cnpj, task: { ...task, ...patch }, newAssigneeEmail: patch.assignee_email, actorEmail: user.email });
         }
       } else {
         const created = await Task.create({
-          ...formData,
+          ...sanitize(formData),
           cnpj: user.cnpj,
           parent_task_id: parentTaskId || null,
         });

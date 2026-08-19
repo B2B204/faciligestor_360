@@ -27,7 +27,7 @@ export default function TaskForm({ task, contracts, teamMembers, onChange }) {
 
   useEffect(() => {
     if (task) {
-      setFormData({
+      const initial = {
         title: task.title || "",
         description: task.description || "",
         status: task.status || "a_fazer",
@@ -40,9 +40,12 @@ export default function TaskForm({ task, contracts, teamMembers, onChange }) {
         approver_email: task.approver_email || "",
         start_date: task.start_date || "",
         due_date: task.due_date || "",
-      });
+      };
+      setFormData(initial);
+      onChange(initial);
     } else {
       setFormData(emptyTask);
+      onChange(emptyTask);
     }
   }, [task]);
 

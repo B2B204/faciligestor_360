@@ -15,9 +15,12 @@ import { canPerformAction } from '@/components/permissions';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import DeleteConfirmation from "@/components/common/DeleteConfirmation";
+import { useToast } from "@/components/ui/use-toast";
+import { logDataAccess } from '@/lib/lgpdAudit';
 
 export default function EmployeeList({ employees, contracts, onEdit, onDataChange, user, isLoading }) {
   const [itemToDelete, setItemToDelete] = useState(null);
+  const { toast } = useToast();
 
   const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 
@@ -40,18 +43,23 @@ export default function EmployeeList({ employees, contracts, onEdit, onDataChang
 
   const handleDelete = async (employee) => {
     try {
-      // CORREÇÃO: Soft delete com informações de auditoria
+      // Soft delete com informações de auditoria
       await Employee.update(employee.id, {
         deleted_at: new Date().toISOString(),
         deleted_by: user?.email || 'unknown_user',
         status: 'inativo'
       });
+      await logDataAccess({ user, action: 'exclusao', resourceType: 'employee', resourceId: employee.id, resourceLabel: employee.name });
 
       onDataChange();
-      alert(`Funcionário "${employee.name}" foi excluído com sucesso.`);
+      toast({ title: 'Funcionário excluído', description: `"${employee.name}" foi excluído com sucesso.` });
     } catch (error) {
-      console.error("❌ Erro ao excluir funcionário:", error);
-      alert(`❌ Erro ao excluir funcionário: ${error.message || 'Tente novamente.'}`);
+      console.error("Erro ao excluir funcionário:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao excluir funcionário',
+        description: error.message || 'Tente novamente.',
+      });
     }
   };
 
@@ -60,10 +68,10 @@ export default function EmployeeList({ employees, contracts, onEdit, onDataChang
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="bg-card border-border">
         <CardContent className="p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando funcionários...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando funcionários...</p>
         </CardContent>
       </Card>
     );
@@ -71,12 +79,12 @@ export default function EmployeeList({ employees, contracts, onEdit, onDataChang
 
   return (
     <>
-      <Card>
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between text-foreground">
             <span>Lista de Funcionários ({activeEmployees.length})</span>
             {activeEmployees.length > 0 && (
-              <span className="text-sm font-normal text-gray-500">
+              <span className="text-sm font-normal text-muted-foreground">
                 {activeEmployees.filter(emp => emp.status === 'ativo').length} ativos
               </span>
             )}
@@ -84,9 +92,9 @@ export default function EmployeeList({ employees, contracts, onEdit, onDataChang
         </CardHeader>
         <CardContent>
           {activeEmployees.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-lg font-medium mb-2">Nenhum funcionário encontrado</p>
+            <div className="text-center py-8 text-muted-foreground">
+              <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+              <p className="text-lg font-medium mb-2 text-foreground">Nenhum funcionário encontrado</p>
               <p>Os funcionários cadastrados aparecerão aqui.</p>
             </div>
           ) : (
@@ -106,46 +114,46 @@ export default function EmployeeList({ employees, contracts, onEdit, onDataChang
                 </TableHeader>
                 <TableBody>
                   {activeEmployees.map((employee) => (
-                    <TableRow key={employee.id} className="hover:bg-gray-50">
+                    <TableRow key={employee.id} className="hover:bg-muted/40">
                       <TableCell>
                         <div className="flex items-center space-x-3">
                           <Avatar className="w-10 h-10">
                             <AvatarImage src={employee.photo_url} />
-                            <AvatarFallback className="bg-blue-100 text-blue-700">
+                            <AvatarFallback className="bg-primary/10 text-primary">
                               {employee.name?.charAt(0)?.toUpperCase() || 'F'}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-gray-900">{employee.name}</p>
-                            <p className="text-sm text-gray-500">{employee.role}</p>
+                            <p className="font-medium text-foreground">{employee.name}</p>
+                            <p className="text-sm text-muted-foreground">{employee.role}</p>
                             {employee.email && (
-                              <p className="text-xs text-gray-400">{employee.email}</p>
+                              <p className="text-xs text-muted-foreground/70">{employee.email}</p>
                             )}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="font-mono text-sm">
+                        <span className="font-mono text-sm text-foreground">
                           {employee.cpf || 'N/A'}
                         </span>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-foreground">
                             {getContractName(employee.contract_id, contracts)}
                           </p>
-                          <p className="text-gray-500">
+                          <p className="text-muted-foreground">
                             Admissão: {formatDate(employee.admission_date)}
                           </p>
                           {employee.dismissal_date && (
-                            <p className="text-red-500">
+                            <p className="text-red-500 dark:text-red-400">
                               Demissão: {formatDate(employee.dismissal_date)}
                             </p>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-muted-foreground">
                           {employee.unidade || 'N/A'}
                         </span>
                       </TableCell>
@@ -155,12 +163,12 @@ export default function EmployeeList({ employees, contracts, onEdit, onDataChang
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className="font-medium text-red-600">
+                        <span className="font-medium text-red-600 dark:text-red-400">
                           {formatCurrency(employee.total_cost)}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Badge className={`${employee.status === 'ativo' ? 'bg-green-100 text-green-800' : employee.status === 'ferias' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                        <Badge className={`${employee.status === 'ativo' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : employee.status === 'ferias' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'}`}>
                           {employee.status ? employee.status.charAt(0).toUpperCase() + employee.status.slice(1) : '-'}
                         </Badge>
                       </TableCell>

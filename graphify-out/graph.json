@@ -2575,7 +2575,7 @@
       "label": "EmployeeList()",
       "file_type": "code",
       "source_file": "src/components/employees/EmployeeList.jsx",
-      "source_location": "L19",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "src_components_employees_employeelist_employeelist",
       "community": 15,
@@ -2608,7 +2608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators",
-      "community": 51,
+      "community": 36,
       "norm_label": "hrindicators.jsx"
     },
     {
@@ -2618,7 +2618,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_formatcurrencybrl",
-      "community": 51,
+      "community": 36,
       "norm_label": "formatcurrencybrl()"
     },
     {
@@ -2628,7 +2628,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_monthkey",
-      "community": 51,
+      "community": 36,
       "norm_label": "monthkey()"
     },
     {
@@ -2638,7 +2638,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_todatesafe",
-      "community": 51,
+      "community": 36,
       "norm_label": "todatesafe()"
     },
     {
@@ -2648,7 +2648,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_hrindicators",
-      "community": 51,
+      "community": 36,
       "norm_label": "hrindicators()"
     },
     {
@@ -9838,7 +9838,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_crm",
-      "community": 3,
+      "community": 221,
       "norm_label": "crm.jsx"
     },
     {
@@ -9848,7 +9848,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_pages_crm_crmpage",
-      "community": 3,
+      "community": 221,
       "norm_label": "crmpage()"
     },
     {
@@ -9985,7 +9985,7 @@
       "label": "CompanySettings()",
       "file_type": "code",
       "source_file": "src/pages/CompanySettings.jsx",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "src_pages_companysettings_companysettings",
       "community": 6,
@@ -10078,7 +10078,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_dre",
-      "community": 6,
+      "community": 220,
       "norm_label": "dre.jsx"
     },
     {
@@ -10088,7 +10088,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_pages_dre_monthstr",
-      "community": 6,
+      "community": 220,
       "norm_label": "monthstr()"
     },
     {
@@ -10098,7 +10098,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "src_pages_dre_dre",
-      "community": 6,
+      "community": 220,
       "norm_label": "dre()"
     },
     {
@@ -10128,7 +10128,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding",
-      "community": 6,
+      "community": 102,
       "norm_label": "employeeonboarding.jsx"
     },
     {
@@ -10138,7 +10138,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_type_labels",
-      "community": 6,
+      "community": 102,
       "norm_label": "type_labels"
     },
     {
@@ -10148,7 +10148,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_templatemanager",
-      "community": 6,
+      "community": 102,
       "norm_label": "templatemanager()"
     },
     {
@@ -10158,7 +10158,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_employeeprocesscard",
-      "community": 6,
+      "community": 102,
       "norm_label": "employeeprocesscard()"
     },
     {
@@ -10168,7 +10168,7 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_employeeonboardingpage",
-      "community": 6,
+      "community": 102,
       "norm_label": "employeeonboardingpage()"
     },
     {
@@ -10182,20 +10182,10 @@
       "norm_label": "employees.jsx"
     },
     {
-      "label": "planLimits",
-      "file_type": "code",
-      "source_file": "src/pages/Employees.jsx",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "src_pages_employees_planlimits",
-      "community": 15,
-      "norm_label": "planlimits"
-    },
-    {
       "label": "EmployeesPage()",
       "file_type": "code",
       "source_file": "src/pages/Employees.jsx",
-      "source_location": "L32",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "src_pages_employees_employeespage",
       "community": 15,
@@ -10728,7 +10718,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_oficios",
-      "community": 6,
+      "community": 3,
       "norm_label": "oficios.jsx"
     },
     {
@@ -10738,7 +10728,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "src_pages_oficios_oficiospage",
-      "community": 6,
+      "community": 3,
       "norm_label": "oficiospage()"
     },
     {
@@ -10878,7 +10868,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_privacy",
-      "community": 6,
+      "community": 43,
       "norm_label": "privacy.jsx"
     },
     {
@@ -10888,7 +10878,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "src_pages_privacy_request_type_labels",
-      "community": 6,
+      "community": 43,
       "norm_label": "request_type_labels"
     },
     {
@@ -10898,7 +10888,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "src_pages_privacy_status_labels",
-      "community": 6,
+      "community": 43,
       "norm_label": "status_labels"
     },
     {
@@ -10908,7 +10898,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "src_pages_privacy_status_colors",
-      "community": 6,
+      "community": 43,
       "norm_label": "status_colors"
     },
     {
@@ -10918,7 +10908,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "src_pages_privacy_action_labels",
-      "community": 6,
+      "community": 43,
       "norm_label": "action_labels"
     },
     {
@@ -10928,7 +10918,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "src_pages_privacy_privacypage",
-      "community": 6,
+      "community": 43,
       "norm_label": "privacypage()"
     },
     {
@@ -10958,7 +10948,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_profile",
-      "community": 3,
+      "community": 222,
       "norm_label": "profile.jsx"
     },
     {
@@ -10968,7 +10958,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "src_pages_profile_profilepage",
-      "community": 3,
+      "community": 222,
       "norm_label": "profilepage()"
     },
     {
@@ -11168,7 +11158,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_taskautomations",
-      "community": 43,
+      "community": 1,
       "norm_label": "taskautomations.jsx"
     },
     {
@@ -11178,7 +11168,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_pages_taskautomations_emptyrule",
-      "community": 43,
+      "community": 1,
       "norm_label": "emptyrule"
     },
     {
@@ -11188,7 +11178,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "src_pages_taskautomations_trigger_labels",
-      "community": 43,
+      "community": 1,
       "norm_label": "trigger_labels"
     },
     {
@@ -11198,7 +11188,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "src_pages_taskautomations_action_labels",
-      "community": 43,
+      "community": 1,
       "norm_label": "action_labels"
     },
     {
@@ -11208,7 +11198,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "src_pages_taskautomations_taskautomationspage",
-      "community": 43,
+      "community": 1,
       "norm_label": "taskautomationspage()"
     },
     {
@@ -11218,7 +11208,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_taskreports",
-      "community": 3,
+      "community": 11,
       "norm_label": "taskreports.jsx"
     },
     {
@@ -11228,7 +11218,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "src_pages_taskreports_colors",
-      "community": 3,
+      "community": 11,
       "norm_label": "colors"
     },
     {
@@ -11238,7 +11228,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "src_pages_taskreports_taskreportspage",
-      "community": 3,
+      "community": 11,
       "norm_label": "taskreportspage()"
     },
     {
@@ -16218,7 +16208,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/employees/EmployeeList.jsx",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "src_components_employees_employeelist",
       "target": "src_components_employees_employeelist_employeelist",
@@ -21611,7 +21601,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/pages/CompanySettings.jsx",
-      "source_location": "L25",
+      "source_location": "L28",
       "weight": 1.0,
       "source": "src_pages_companysettings_companysettings",
       "target": "src_entities_user_user"
@@ -21677,7 +21667,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/pages/Employees.jsx",
-      "source_location": "L195",
+      "source_location": "L191",
       "weight": 1.0,
       "source": "src_pages_employees_employeespage",
       "target": "src_entities_user_user"
@@ -24876,7 +24866,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/CompanySettings.jsx",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "src_pages_companysettings",
       "target": "src_pages_companysettings_companysettings",
@@ -25049,20 +25039,10 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/Employees.jsx",
-      "source_location": "L32",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "src_pages_employees",
       "target": "src_pages_employees_employeespage",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/pages/Employees.jsx",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "src_pages_employees",
-      "target": "src_pages_employees_planlimits",
       "confidence_score": 1.0
     },
     {
@@ -26503,5 +26483,5 @@
       "source_file": "index.html"
     }
   ],
-  "built_at_commit": "79890ba0620d790370eef4d01c45f9bd5de3118c"
+  "built_at_commit": "059873cfbf21bb6cc02ed6a3e688e6a49ef95cba"
 }

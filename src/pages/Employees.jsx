@@ -22,14 +22,10 @@ import { createPageUrl } from "@/utils";
 import { canEditPage } from '@/components/permissions';
 import { generateEmployeeTasks } from '@/lib/hrOnboarding';
 import { logDataAccess } from '@/lib/lgpdAudit';
-
-const planLimits = {
-  essencial: { contracts: 10, users: 5 },
-  avancado: { contracts: 20, users: 10 },
-  pro: { contracts: Infinity, users: Infinity }
-};
+import { useToast } from '@/components/ui/use-toast';
 
 export default function EmployeesPage() {
+  const { toast } = useToast();
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [contracts, setContracts] = useState([]);
@@ -254,12 +250,9 @@ export default function EmployeesPage() {
         lgpd_consent_by: formData.lgpd_consent_at ? user.email : undefined,
       };
 
-      console.log("🔄 Salvando funcionário:", dataToSave);
-
       let savedEmployee;
       if (selectedEmployee) {
         savedEmployee = await Employee.update(selectedEmployee.id, dataToSave);
-        console.log("✅ Funcionário atualizado:", savedEmployee);
         await logDataAccess({ user, action: 'edicao', resourceType: 'employee', resourceId: savedEmployee.id, resourceLabel: savedEmployee.name });
 
         const becameInactive = selectedEmployee.status !== 'inativo' && dataToSave.status === 'inativo';
@@ -273,7 +266,6 @@ export default function EmployeesPage() {
         }
       } else {
         savedEmployee = await Employee.create(dataToSave);
-        console.log("✅ Funcionário criado:", savedEmployee);
         await logDataAccess({ user, action: 'criacao', resourceType: 'employee', resourceId: savedEmployee.id, resourceLabel: savedEmployee.name });
 
         await generateEmployeeTasks({
@@ -284,34 +276,36 @@ export default function EmployeesPage() {
         });
       }
 
-      console.log("🔄 Recarregando lista de funcionários...");
       handleSuccess();
-
-      const successMessage = selectedEmployee ? 'Funcionário atualizado com sucesso!' : 'Funcionário cadastrado com sucesso!';
-      alert(successMessage);
-      console.log("✅", successMessage);
+      toast({
+        title: selectedEmployee ? 'Funcionário atualizado' : 'Funcionário cadastrado',
+        description: selectedEmployee ? 'As alterações foram salvas com sucesso.' : 'O novo funcionário foi cadastrado com sucesso.',
+      });
 
     } catch (error) {
-      console.error("❌ Erro ao salvar funcionário:", error);
-      alert(`Erro ao salvar funcionário: ${error.message || 'Verifique os dados e tente novamente.'}`);
+      console.error("Erro ao salvar funcionário:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao salvar funcionário',
+        description: error.message || 'Verifique os dados e tente novamente.',
+      });
     }
     setIsSaving(false);
   };
 
   const handleEdit = (employee) => {
-    console.log("✏️ Abrindo formulário de edição para:", employee.name);
     setSelectedEmployee(employee);
     setIsFormOpen(true);
   };
 
   const handleImportSuccess = () => {
     handleSuccess();
-    alert('Funcionários importados com sucesso!');
+    toast({ title: 'Importação concluída', description: 'Funcionários importados com sucesso.' });
   };
 
   const handleBulkUpdateSuccess = () => {
     handleSuccess();
-    alert('Funcionários atualizados em massa com sucesso!');
+    toast({ title: 'Atualização em massa concluída', description: 'Funcionários atualizados com sucesso.' });
   };
 
   const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
@@ -322,7 +316,8 @@ export default function EmployeesPage() {
   // Paginação derivada
   const totalEmployeesCount = filteredEmployees.length;
   const empTotalPages = Math.max(1, Math.ceil(totalEmployeesCount / empPageSize));
-  const empStartIdx = (empPage - 1) * empPageSize;
+  const empCurrentPage = Math.min(empPage, empTotalPages);
+  const empStartIdx = (empCurrentPage - 1) * empPageSize;
   const displayedEmployees = filteredEmployees.slice(empStartIdx, empStartIdx + empPageSize);
 
   const vacationCount = employees.filter(e => e.status === 'ferias').length;
@@ -514,9 +509,9 @@ export default function EmployeesPage() {
               <SelectItem value="50">50</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" disabled={empPage === 1} onClick={() => setEmpPage(p => Math.max(1, p - 1))}>Anterior</Button>
-          <span className="px-2 text-sm text-foreground">{empPage} / {empTotalPages}</span>
-          <Button variant="outline" disabled={empPage === empTotalPages} onClick={() => setEmpPage(p => Math.min(empTotalPages, p + 1))}>Próxima</Button>
+          <Button variant="outline" disabled={empCurrentPage === 1} onClick={() => setEmpPage(p => Math.max(1, p - 1))}>Anterior</Button>
+          <span className="px-2 text-sm text-foreground">{empCurrentPage} / {empTotalPages}</span>
+          <Button variant="outline" disabled={empCurrentPage === empTotalPages} onClick={() => setEmpPage(p => Math.min(empTotalPages, p + 1))}>Próxima</Button>
         </div>
       </div>
     </div>

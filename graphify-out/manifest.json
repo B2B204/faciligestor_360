@@ -390,9 +390,9 @@
     "semantic_hash": "0072bba929f780d9ec66385f10009e32"
   },
   "src/components/employees/EmployeeList.jsx": {
-    "mtime": 1783111732.241895,
-    "ast_hash": "6fb06a388af4af85bbf671c88cf3c03d",
-    "semantic_hash": "6fb06a388af4af85bbf671c88cf3c03d"
+    "mtime": 1788208387.9609551,
+    "ast_hash": "393169c635543aa696c626db67e201af",
+    "semantic_hash": ""
   },
   "src/components/employees/EmployeeTaskChecklist.jsx": {
     "mtime": 1783019624.8364642,
@@ -1455,8 +1455,8 @@
     "semantic_hash": "e609903d9f69eca2a5264303dbd64f5c"
   },
   "src/pages/CompanySettings.jsx": {
-    "mtime": 1788192880.377568,
-    "ast_hash": "83583117223a9c650d66563298a70521",
+    "mtime": 1788208716.283073,
+    "ast_hash": "38b46ba2be4ffedb95d5d552ea7ff736",
     "semantic_hash": ""
   },
   "src/pages/Contracts.jsx": {
@@ -1485,9 +1485,9 @@
     "semantic_hash": "6deea04e188cd3eb8af7ad552a18eb9c"
   },
   "src/pages/Employees.jsx": {
-    "mtime": 1785877263.2372115,
-    "ast_hash": "f3001748d14ae79d12ea8ecbd3480e0a",
-    "semantic_hash": "f3001748d14ae79d12ea8ecbd3480e0a"
+    "mtime": 1788208333.3869376,
+    "ast_hash": "0de20ad2e47412b02c396b9829bfb3c1",
+    "semantic_hash": ""
   },
   "src/pages/Exports.jsx": {
     "mtime": 1783111815.8881235,

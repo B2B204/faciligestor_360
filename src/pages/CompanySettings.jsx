@@ -12,12 +12,15 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2, Plus, Building2, ShieldAlert, Loader2, Check, X, KeyRound } from "lucide-react";
 import CnpjLookupInput from "@/components/common/CnpjLookupInput";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function CompanySettings() {
+  const { toast } = useToast();
   const [user, setUser] = useState(null);
   const [items, setItems] = useState([]);
   const [accessRequests, setAccessRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
 
   useEffect(() => {
@@ -88,17 +91,34 @@ export default function CompanySettings() {
 
   const handleAdd = async () => {
     const cnpj = form.cnpj.replace(/\D/g, '');
-    await CompanyCnpj.create({ ...form, cnpj });
-    // Sem isso o admin que cadastra o CNPJ não consegue trocar para ele no
-    // CnpjSwitcher, pois a listagem lá depende de uma linha em
-    // user_cnpj_access — que só um admin pode inserir (RLS), então ele
-    // precisa se auto-conceder o acesso ao criar o CNPJ.
-    const existing = await UserCnpjAccess.filter({ user_email: user.email, cnpj });
-    if (!existing || existing.length === 0) {
-      await UserCnpjAccess.create({ user_email: user.email, cnpj });
+    if (cnpj.length !== 14) {
+      toast({ variant: 'destructive', title: 'CNPJ inválido', description: 'Informe os 14 dígitos do CNPJ.' });
+      return;
     }
-    setForm({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
-    await load();
+    if (items.some((it) => it.cnpj === cnpj)) {
+      toast({ variant: 'destructive', title: 'CNPJ já cadastrado', description: 'Este CNPJ já está na lista abaixo.' });
+      return;
+    }
+    setSaving(true);
+    try {
+      await CompanyCnpj.create({ ...form, cnpj });
+      // Sem isso o admin que cadastra o CNPJ não consegue trocar para ele no
+      // CnpjSwitcher, pois a listagem lá depende de uma linha em
+      // user_cnpj_access — que só um admin pode inserir (RLS), então ele
+      // precisa se auto-conceder o acesso ao criar o CNPJ.
+      const existing = await UserCnpjAccess.filter({ user_email: user.email, cnpj });
+      if (!existing || existing.length === 0) {
+        await UserCnpjAccess.create({ user_email: user.email, cnpj });
+      }
+      setForm({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
+      await load();
+      toast({ title: 'CNPJ cadastrado', description: 'O CNPJ foi adicionado e já está disponível no seletor.' });
+    } catch (error) {
+      console.error('Erro ao cadastrar CNPJ:', error);
+      toast({ variant: 'destructive', title: 'Erro ao cadastrar CNPJ', description: error.message || 'Tente novamente.' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleToggle = async (id, field, value) => {
@@ -162,11 +182,11 @@ export default function CompanySettings() {
             </div>
             <Button
               onClick={handleAdd}
-              disabled={!form.cnpj}
+              disabled={!form.cnpj || saving}
               className="gap-2 w-full sm:w-auto"
             >
-              <Plus className="w-4 h-4" />
-              Adicionar CNPJ
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              {saving ? "Adicionando..." : "Adicionar CNPJ"}
             </Button>
           </div>
         </CardContent>

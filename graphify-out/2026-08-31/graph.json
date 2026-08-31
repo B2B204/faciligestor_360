@@ -1008,7 +1008,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "package_dependencies_react",
-      "community": 43,
+      "community": 11,
       "norm_label": "react"
     },
     {
@@ -1448,7 +1448,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "src_layout_cnpjsetupscreen",
-      "community": 16,
+      "community": 11,
       "norm_label": "cnpjsetupscreen()"
     },
     {
@@ -1458,7 +1458,7 @@
       "source_location": "L280",
       "_origin": "ast",
       "id": "src_layout_privacyconsentscreen",
-      "community": 43,
+      "community": 11,
       "norm_label": "privacyconsentscreen()"
     },
     {
@@ -1498,7 +1498,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_accessblocked",
-      "community": 70,
+      "community": 16,
       "norm_label": "accessblocked.jsx"
     },
     {
@@ -1508,7 +1508,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "src_components_accessblocked_accessblocked",
-      "community": 70,
+      "community": 16,
       "norm_label": "accessblocked()"
     },
     {
@@ -1518,7 +1518,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_paymentstatuschecker",
-      "community": 70,
+      "community": 16,
       "norm_label": "paymentstatuschecker.jsx"
     },
     {
@@ -1528,7 +1528,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_components_paymentstatuschecker_paymentstatuschecker",
-      "community": 70,
+      "community": 16,
       "norm_label": "paymentstatuschecker()"
     },
     {
@@ -2105,7 +2105,7 @@
       "label": "CURRENCY_FIELDS",
       "file_type": "code",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L7",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "src_components_contracts_contracthistorydialog_currency_fields",
       "community": 45,
@@ -2115,7 +2115,7 @@
       "label": "DATE_FIELDS",
       "file_type": "code",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L8",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "src_components_contracts_contracthistorydialog_date_fields",
       "community": 45,
@@ -2125,37 +2125,97 @@
       "label": "PERCENT_FIELDS",
       "file_type": "code",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L9",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "src_components_contracts_contracthistorydialog_percent_fields",
       "community": 45,
       "norm_label": "percent_fields"
     },
     {
+      "label": "SKIP_SNAPSHOT_FIELDS",
+      "file_type": "code",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "src_components_contracts_contracthistorydialog_skip_snapshot_fields",
+      "community": 45,
+      "norm_label": "skip_snapshot_fields"
+    },
+    {
+      "label": "FIELD_ORDER",
+      "file_type": "code",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "src_components_contracts_contracthistorydialog_field_order",
+      "community": 45,
+      "norm_label": "field_order"
+    },
+    {
       "label": "formatValue()",
       "file_type": "code",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L11",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "src_components_contracts_contracthistorydialog_formatvalue",
       "community": 45,
       "norm_label": "formatvalue()"
     },
     {
+      "label": "formatSnapshotValue()",
+      "file_type": "code",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "src_components_contracts_contracthistorydialog_formatsnapshotvalue",
+      "community": 45,
+      "norm_label": "formatsnapshotvalue()"
+    },
+    {
       "label": "fmtDateTime()",
       "file_type": "code",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L27",
+      "source_location": "L67",
       "_origin": "ast",
       "id": "src_components_contracts_contracthistorydialog_fmtdatetime",
       "community": 45,
       "norm_label": "fmtdatetime()"
     },
     {
+      "label": "VersionChange()",
+      "file_type": "code",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "src_components_contracts_contracthistorydialog_versionchange",
+      "community": 45,
+      "norm_label": "versionchange()"
+    },
+    {
+      "label": "SnapshotView()",
+      "file_type": "code",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "src_components_contracts_contracthistorydialog_snapshotview",
+      "community": 45,
+      "norm_label": "snapshotview()"
+    },
+    {
+      "label": "LongText()",
+      "file_type": "code",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L142",
+      "_origin": "ast",
+      "id": "src_components_contracts_contracthistorydialog_longtext",
+      "community": 45,
+      "norm_label": "longtext()"
+    },
+    {
       "label": "ContractHistoryDialog()",
       "file_type": "code",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L32",
+      "source_location": "L172",
       "_origin": "ast",
       "id": "src_components_contracts_contracthistorydialog_contracthistorydialog",
       "community": 45,
@@ -2515,7 +2575,7 @@
       "label": "EmployeeList()",
       "file_type": "code",
       "source_file": "src/components/employees/EmployeeList.jsx",
-      "source_location": "L19",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "src_components_employees_employeelist_employeelist",
       "community": 15,
@@ -2548,7 +2608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators",
-      "community": 64,
+      "community": 36,
       "norm_label": "hrindicators.jsx"
     },
     {
@@ -2558,7 +2618,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_formatcurrencybrl",
-      "community": 64,
+      "community": 36,
       "norm_label": "formatcurrencybrl()"
     },
     {
@@ -2568,7 +2628,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_monthkey",
-      "community": 64,
+      "community": 36,
       "norm_label": "monthkey()"
     },
     {
@@ -2578,7 +2638,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_todatesafe",
-      "community": 64,
+      "community": 36,
       "norm_label": "todatesafe()"
     },
     {
@@ -2588,7 +2648,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "src_components_employees_hrindicators_hrindicators",
-      "community": 64,
+      "community": 36,
       "norm_label": "hrindicators()"
     },
     {
@@ -4298,7 +4358,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "src_components_ui_chart_usechart",
-      "community": 43,
+      "community": 36,
       "norm_label": "usechart()"
     },
     {
@@ -4868,7 +4928,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "src_components_ui_form_useformfield",
-      "community": 43,
+      "community": 28,
       "norm_label": "useformfield()"
     },
     {
@@ -5718,7 +5778,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "src_components_ui_sidebar_usesidebar",
-      "community": 43,
+      "community": 4,
       "norm_label": "usesidebar()"
     },
     {
@@ -8258,7 +8318,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_hooks_use_mobile",
-      "community": 43,
+      "community": 11,
       "norm_label": "use-mobile.jsx"
     },
     {
@@ -8268,7 +8328,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_hooks_use_mobile_useismobile",
-      "community": 43,
+      "community": 11,
       "norm_label": "useismobile()"
     },
     {
@@ -8665,7 +8725,7 @@
       "label": "normalize()",
       "file_type": "code",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L29",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "src_lib_contractversioning_normalize",
       "community": 57,
@@ -8675,7 +8735,7 @@
       "label": "diffContract()",
       "file_type": "code",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L38",
+      "source_location": "L49",
       "_origin": "ast",
       "id": "src_lib_contractversioning_diffcontract",
       "community": 57,
@@ -8685,7 +8745,7 @@
       "label": "recordContractVersion()",
       "file_type": "code",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L62",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "src_lib_contractversioning_recordcontractversion",
       "community": 57,
@@ -9498,7 +9558,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_accountsreceivable",
-      "community": 220,
+      "community": 3,
       "norm_label": "accountsreceivable.jsx"
     },
     {
@@ -9508,7 +9568,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "src_pages_accountsreceivable_accountsreceivablepage",
-      "community": 220,
+      "community": 3,
       "norm_label": "accountsreceivablepage()"
     },
     {
@@ -9538,7 +9598,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_allowancereceipts",
-      "community": 221,
+      "community": 3,
       "norm_label": "allowancereceipts.jsx"
     },
     {
@@ -9548,7 +9608,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "src_pages_allowancereceipts_allowancereceiptspage",
-      "community": 221,
+      "community": 3,
       "norm_label": "allowancereceiptspage()"
     },
     {
@@ -9778,7 +9838,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_crm",
-      "community": 222,
+      "community": 221,
       "norm_label": "crm.jsx"
     },
     {
@@ -9788,7 +9848,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_pages_crm_crmpage",
-      "community": 222,
+      "community": 221,
       "norm_label": "crmpage()"
     },
     {
@@ -10018,7 +10078,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_dre",
-      "community": 99,
+      "community": 220,
       "norm_label": "dre.jsx"
     },
     {
@@ -10028,7 +10088,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_pages_dre_monthstr",
-      "community": 99,
+      "community": 220,
       "norm_label": "monthstr()"
     },
     {
@@ -10038,7 +10098,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "src_pages_dre_dre",
-      "community": 99,
+      "community": 220,
       "norm_label": "dre()"
     },
     {
@@ -10068,7 +10128,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding",
-      "community": 67,
+      "community": 102,
       "norm_label": "employeeonboarding.jsx"
     },
     {
@@ -10078,7 +10138,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_type_labels",
-      "community": 67,
+      "community": 102,
       "norm_label": "type_labels"
     },
     {
@@ -10088,7 +10148,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_templatemanager",
-      "community": 67,
+      "community": 102,
       "norm_label": "templatemanager()"
     },
     {
@@ -10098,7 +10158,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_employeeprocesscard",
-      "community": 67,
+      "community": 102,
       "norm_label": "employeeprocesscard()"
     },
     {
@@ -10108,7 +10168,7 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "src_pages_employeeonboarding_employeeonboardingpage",
-      "community": 67,
+      "community": 102,
       "norm_label": "employeeonboardingpage()"
     },
     {
@@ -10122,20 +10182,10 @@
       "norm_label": "employees.jsx"
     },
     {
-      "label": "planLimits",
-      "file_type": "code",
-      "source_file": "src/pages/Employees.jsx",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "src_pages_employees_planlimits",
-      "community": 15,
-      "norm_label": "planlimits"
-    },
-    {
       "label": "EmployeesPage()",
       "file_type": "code",
       "source_file": "src/pages/Employees.jsx",
-      "source_location": "L32",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "src_pages_employees_employeespage",
       "community": 15,
@@ -10238,7 +10288,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_financial",
-      "community": 100,
+      "community": 11,
       "norm_label": "financial.jsx"
     },
     {
@@ -10248,7 +10298,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "src_pages_financial_planlimits",
-      "community": 100,
+      "community": 11,
       "norm_label": "planlimits"
     },
     {
@@ -10258,7 +10308,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "src_pages_financial_financialpage",
-      "community": 100,
+      "community": 11,
       "norm_label": "financialpage()"
     },
     {
@@ -10648,7 +10698,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_os",
-      "community": 224,
+      "community": 3,
       "norm_label": "os.jsx"
     },
     {
@@ -10658,7 +10708,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_pages_os_ospage",
-      "community": 224,
+      "community": 3,
       "norm_label": "ospage()"
     },
     {
@@ -10668,7 +10718,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_oficios",
-      "community": 223,
+      "community": 3,
       "norm_label": "oficios.jsx"
     },
     {
@@ -10678,7 +10728,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "src_pages_oficios_oficiospage",
-      "community": 223,
+      "community": 3,
       "norm_label": "oficiospage()"
     },
     {
@@ -10818,7 +10868,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_privacy",
-      "community": 60,
+      "community": 43,
       "norm_label": "privacy.jsx"
     },
     {
@@ -10828,7 +10878,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "src_pages_privacy_request_type_labels",
-      "community": 60,
+      "community": 43,
       "norm_label": "request_type_labels"
     },
     {
@@ -10838,7 +10888,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "src_pages_privacy_status_labels",
-      "community": 60,
+      "community": 43,
       "norm_label": "status_labels"
     },
     {
@@ -10848,7 +10898,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "src_pages_privacy_status_colors",
-      "community": 60,
+      "community": 43,
       "norm_label": "status_colors"
     },
     {
@@ -10858,7 +10908,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "src_pages_privacy_action_labels",
-      "community": 60,
+      "community": 43,
       "norm_label": "action_labels"
     },
     {
@@ -10868,7 +10918,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "src_pages_privacy_privacypage",
-      "community": 60,
+      "community": 43,
       "norm_label": "privacypage()"
     },
     {
@@ -10898,7 +10948,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_profile",
-      "community": 11,
+      "community": 222,
       "norm_label": "profile.jsx"
     },
     {
@@ -10908,7 +10958,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "src_pages_profile_profilepage",
-      "community": 11,
+      "community": 222,
       "norm_label": "profilepage()"
     },
     {
@@ -11058,7 +11108,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_supplies",
-      "community": 101,
+      "community": 11,
       "norm_label": "supplies.jsx"
     },
     {
@@ -11068,7 +11118,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "src_pages_supplies_suppliespage",
-      "community": 101,
+      "community": 11,
       "norm_label": "suppliespage()"
     },
     {
@@ -11078,7 +11128,7 @@
       "source_location": "L376",
       "_origin": "ast",
       "id": "src_pages_supplies_rationale_376",
-      "community": 101,
+      "community": 11,
       "norm_label": "important: generated_by must be company, not current user"
     },
     {
@@ -11158,7 +11208,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_taskreports",
-      "community": 102,
+      "community": 11,
       "norm_label": "taskreports.jsx"
     },
     {
@@ -11168,7 +11218,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "src_pages_taskreports_colors",
-      "community": 102,
+      "community": 11,
       "norm_label": "colors"
     },
     {
@@ -11178,7 +11228,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "src_pages_taskreports_taskreportspage",
-      "community": 102,
+      "community": 11,
       "norm_label": "taskreportspage()"
     },
     {
@@ -11228,7 +11278,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_pages_tasks",
-      "community": 11,
+      "community": 3,
       "norm_label": "tasks.jsx"
     },
     {
@@ -11238,7 +11288,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "src_pages_tasks_taskspage",
-      "community": 11,
+      "community": 3,
       "norm_label": "taskspage()"
     },
     {
@@ -11610,6 +11660,76 @@
       "id": "vite_config",
       "community": 312,
       "norm_label": "vite.config.js"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme",
+      "community": 14,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "FaciliGestor360",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme_faciligestor360",
+      "community": 14,
+      "norm_label": "faciligestor360"
+    },
+    {
+      "label": "Requisitos",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "readme_requisitos",
+      "community": 14,
+      "norm_label": "requisitos"
+    },
+    {
+      "label": "Instala\u00e7\u00e3o",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "readme_instala\u00e7\u00e3o",
+      "community": 14,
+      "norm_label": "instalacao"
+    },
+    {
+      "label": "Vari\u00e1veis de ambiente",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "readme_vari\u00e1veis_de_ambiente",
+      "community": 14,
+      "norm_label": "variaveis de ambiente"
+    },
+    {
+      "label": "Executar localmente",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "readme_executar_localmente",
+      "community": 14,
+      "norm_label": "executar localmente"
+    },
+    {
+      "label": "Build de produ\u00e7\u00e3o",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "readme_build_de_produ\u00e7\u00e3o",
+      "community": 14,
+      "norm_label": "build de producao"
     },
     {
       "label": "AISuggestion",
@@ -12402,19 +12522,6 @@
       "norm_label": "userinvite"
     },
     {
-      "label": "FaciliGestor360",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "readme_faciligestor360",
-      "community": 14,
-      "norm_label": "faciligestor360"
-    },
-    {
       "label": "React",
       "file_type": "concept",
       "source_file": "README.md",
@@ -12423,9 +12530,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_react",
       "community": 14,
-      "norm_label": "react"
+      "norm_label": "react",
+      "id": "readme_react"
     },
     {
       "label": "Vite",
@@ -12436,9 +12543,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_vite",
       "community": 14,
-      "norm_label": "vite"
+      "norm_label": "vite",
+      "id": "readme_vite"
     },
     {
       "label": "Supabase",
@@ -12449,9 +12556,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_supabase",
-      "community": 14,
-      "norm_label": "supabase"
+      "community": 99,
+      "norm_label": "supabase",
+      "id": "readme_supabase"
     },
     {
       "label": ".env.local environment file",
@@ -12462,9 +12569,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_env_local",
-      "community": 14,
-      "norm_label": ".env.local environment file"
+      "community": 60,
+      "norm_label": ".env.local environment file",
+      "id": "readme_env_local"
     },
     {
       "label": "VITE_SUPABASE_URL",
@@ -12475,9 +12582,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_vite_supabase_url",
-      "community": 14,
-      "norm_label": "vite_supabase_url"
+      "community": 101,
+      "norm_label": "vite_supabase_url",
+      "id": "readme_vite_supabase_url"
     },
     {
       "label": "VITE_SUPABASE_ANON_KEY",
@@ -12488,9 +12595,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_vite_supabase_anon_key",
-      "community": 14,
-      "norm_label": "vite_supabase_anon_key"
+      "community": 100,
+      "norm_label": "vite_supabase_anon_key",
+      "id": "readme_vite_supabase_anon_key"
     },
     {
       "label": "npm install command",
@@ -12501,9 +12608,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_npm_install",
-      "community": 14,
-      "norm_label": "npm install command"
+      "community": 64,
+      "norm_label": "npm install command",
+      "id": "readme_npm_install"
     },
     {
       "label": "npm run dev command",
@@ -12514,9 +12621,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_npm_run_dev",
-      "community": 14,
-      "norm_label": "npm run dev command"
+      "community": 70,
+      "norm_label": "npm run dev command",
+      "id": "readme_npm_run_dev"
     },
     {
       "label": "npm run build command",
@@ -12527,9 +12634,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_npm_run_build",
-      "community": 14,
-      "norm_label": "npm run build command"
+      "community": 67,
+      "norm_label": "npm run build command",
+      "id": "readme_npm_run_build"
     },
     {
       "label": "index.html entry document",
@@ -12540,9 +12647,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "index_html_document",
       "community": 14,
-      "norm_label": "index.html entry document"
+      "norm_label": "index.html entry document",
+      "id": "index_html_document"
     },
     {
       "label": "#root mount div",
@@ -12553,9 +12660,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "index_html_root_div",
       "community": 14,
-      "norm_label": "#root mount div"
+      "norm_label": "#root mount div",
+      "id": "index_html_root_div"
     },
     {
       "label": "src/main.jsx entry script",
@@ -12566,9 +12673,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "src_main_jsx",
       "community": 14,
-      "norm_label": "src/main.jsx entry script"
+      "norm_label": "src/main.jsx entry script",
+      "id": "src_main_jsx"
     },
     {
       "label": "manifest.json web app manifest",
@@ -12579,9 +12686,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "index_html_manifest_json",
       "community": 14,
-      "norm_label": "manifest.json web app manifest"
+      "norm_label": "manifest.json web app manifest",
+      "id": "index_html_manifest_json"
     }
   ],
   "links": [
@@ -15460,7 +15567,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L32",
+      "source_location": "L172",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog",
       "target": "src_components_contracts_contracthistorydialog_contracthistorydialog",
@@ -15470,7 +15577,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L7",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog",
       "target": "src_components_contracts_contracthistorydialog_currency_fields",
@@ -15480,7 +15587,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L8",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog",
       "target": "src_components_contracts_contracthistorydialog_date_fields",
@@ -15490,7 +15597,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L27",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_field_order",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L67",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog",
       "target": "src_components_contracts_contracthistorydialog_fmtdatetime",
@@ -15500,7 +15617,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L11",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_formatsnapshotvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog",
       "target": "src_components_contracts_contracthistorydialog_formatvalue",
@@ -15510,10 +15637,50 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L9",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_longtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog",
       "target": "src_components_contracts_contracthistorydialog_percent_fields",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_skip_snapshot_fields",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_snapshotview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L72",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_versionchange",
       "confidence_score": 1.0
     },
     {
@@ -15522,7 +15689,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L13",
+      "source_location": "L35",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog_formatvalue",
       "target": "src_components_contracts_contracthistorydialog_currency_fields"
@@ -15533,7 +15700,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L19",
+      "source_location": "L41",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog_formatvalue",
       "target": "src_components_contracts_contracthistorydialog_date_fields"
@@ -15544,19 +15711,52 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L16",
+      "source_location": "L38",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog_formatvalue",
       "target": "src_components_contracts_contracthistorydialog_percent_fields"
+    },
+    {
+      "relation": "references",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L282",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_skip_snapshot_fields"
+    },
+    {
+      "relation": "references",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog_snapshotview",
+      "target": "src_components_contracts_contracthistorydialog_skip_snapshot_fields"
+    },
+    {
+      "relation": "references",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog_snapshotview",
+      "target": "src_components_contracts_contracthistorydialog_field_order"
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L74",
+      "source_location": "L64",
       "weight": 1.0,
-      "source": "src_components_contracts_contracthistorydialog_contracthistorydialog",
+      "source": "src_components_contracts_contracthistorydialog_formatsnapshotvalue",
       "target": "src_components_contracts_contracthistorydialog_formatvalue",
       "confidence_score": 1.0
     },
@@ -15565,7 +15765,40 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
-      "source_location": "L67",
+      "source_location": "L79",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog_versionchange",
+      "target": "src_components_contracts_contracthistorydialog_formatvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L282",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog_contracthistorydialog",
+      "target": "src_components_contracts_contracthistorydialog_formatsnapshotvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "src_components_contracts_contracthistorydialog_snapshotview",
+      "target": "src_components_contracts_contracthistorydialog_formatsnapshotvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/contracts/ContractHistoryDialog.jsx",
+      "source_location": "L222",
       "weight": 1.0,
       "source": "src_components_contracts_contracthistorydialog_contracthistorydialog",
       "target": "src_components_contracts_contracthistorydialog_fmtdatetime",
@@ -15975,7 +16208,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/employees/EmployeeList.jsx",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "src_components_employees_employeelist",
       "target": "src_components_employees_employeelist_employeelist",
@@ -17085,7 +17318,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/tasks/TaskDetailDialog.jsx",
-      "source_location": "L239",
+      "source_location": "L253",
       "weight": 1.0,
       "source": "src_components_tasks_taskdetaildialog_taskdetaildialog",
       "target": "src_components_tasks_taskconstants_getprioritymeta"
@@ -17096,7 +17329,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/tasks/TaskDetailDialog.jsx",
-      "source_location": "L238",
+      "source_location": "L252",
       "weight": 1.0,
       "source": "src_components_tasks_taskdetaildialog_taskdetaildialog",
       "target": "src_components_tasks_taskconstants_getstatusmeta"
@@ -21324,7 +21557,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/pages/AllowanceReceipts.jsx",
-      "source_location": "L42",
+      "source_location": "L45",
       "weight": 1.0,
       "source": "src_pages_allowancereceipts_allowancereceiptspage",
       "target": "src_entities_user_user"
@@ -21434,7 +21667,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/pages/Employees.jsx",
-      "source_location": "L195",
+      "source_location": "L191",
       "weight": 1.0,
       "source": "src_pages_employees_employeespage",
       "target": "src_entities_user_user"
@@ -22247,7 +22480,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L38",
+      "source_location": "L49",
       "weight": 1.0,
       "source": "src_lib_contractversioning",
       "target": "src_lib_contractversioning_diffcontract",
@@ -22277,7 +22510,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L29",
+      "source_location": "L40",
       "weight": 1.0,
       "source": "src_lib_contractversioning",
       "target": "src_lib_contractversioning_normalize",
@@ -22287,7 +22520,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L62",
+      "source_location": "L73",
       "weight": 1.0,
       "source": "src_lib_contractversioning",
       "target": "src_lib_contractversioning_recordcontractversion",
@@ -22299,7 +22532,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L42",
+      "source_location": "L53",
       "weight": 1.0,
       "source": "src_lib_contractversioning_diffcontract",
       "target": "src_lib_contractversioning_ignored_fields"
@@ -22310,7 +22543,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L65",
+      "source_location": "L76",
       "weight": 1.0,
       "source": "src_lib_contractversioning_recordcontractversion",
       "target": "src_lib_contractversioning_ignored_fields"
@@ -22320,7 +22553,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L43",
+      "source_location": "L54",
       "weight": 1.0,
       "source": "src_lib_contractversioning_diffcontract",
       "target": "src_lib_contractversioning_normalize",
@@ -22331,7 +22564,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/contractVersioning.js",
-      "source_location": "L67",
+      "source_location": "L78",
       "weight": 1.0,
       "source": "src_lib_contractversioning_recordcontractversion",
       "target": "src_lib_contractversioning_diffcontract",
@@ -24806,20 +25039,10 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/Employees.jsx",
-      "source_location": "L32",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "src_pages_employees",
       "target": "src_pages_employees_employeespage",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/pages/Employees.jsx",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "src_pages_employees",
-      "target": "src_pages_employees_planlimits",
       "confidence_score": 1.0
     },
     {
@@ -26113,6 +26336,16 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "readme_faciligestor360",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -26123,34 +26356,54 @@
       "target": "readme_faciligestor360"
     },
     {
-      "relation": "conceptually_related_to",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": null,
+      "source_location": "L31",
       "weight": 1.0,
       "source": "readme_faciligestor360",
-      "target": "readme_react"
+      "target": "readme_build_de_produ\u00e7\u00e3o",
+      "confidence_score": 1.0
     },
     {
-      "relation": "conceptually_related_to",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": null,
+      "source_location": "L25",
       "weight": 1.0,
       "source": "readme_faciligestor360",
-      "target": "readme_supabase"
+      "target": "readme_executar_localmente",
+      "confidence_score": 1.0
     },
     {
-      "relation": "conceptually_related_to",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": null,
+      "source_location": "L10",
       "weight": 1.0,
       "source": "readme_faciligestor360",
-      "target": "readme_vite"
+      "target": "readme_instala\u00e7\u00e3o",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "readme_faciligestor360",
+      "target": "readme_requisitos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "readme_faciligestor360",
+      "target": "readme_vari\u00e1veis_de_ambiente",
+      "confidence_score": 1.0
     },
     {
       "relation": "conceptually_related_to",
@@ -26165,82 +26418,12 @@
     {
       "relation": "conceptually_related_to",
       "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_npm_run_build",
-      "target": "readme_vite"
-    },
-    {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_npm_run_dev",
-      "target": "readme_vite"
-    },
-    {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
       "confidence_score": 0.75,
       "source_file": "index.html",
       "source_location": null,
       "weight": 1.0,
       "source": "src_main_jsx",
       "target": "readme_vite"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_vite_supabase_anon_key",
-      "target": "readme_supabase"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_vite_supabase_url",
-      "target": "readme_supabase"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_env_local",
-      "target": "readme_vite_supabase_anon_key"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_env_local",
-      "target": "readme_vite_supabase_url"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_npm_install",
-      "target": "readme_npm_run_dev"
     },
     {
       "relation": "references",
@@ -26300,5 +26483,5 @@
       "source_file": "index.html"
     }
   ],
-  "built_at_commit": "462a03cb96b4f530b421474bf349de1f231b9a16"
+  "built_at_commit": "059873cfbf21bb6cc02ed6a3e688e6a49ef95cba"
 }

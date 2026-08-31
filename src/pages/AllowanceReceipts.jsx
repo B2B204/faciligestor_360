@@ -32,7 +32,7 @@ export default function AllowanceReceiptsPage() {
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
 
-  const [rows, setRows] = useState({}); // { [employeeId]: { va_days, va_daily_rate, vt_days, vt_daily_rate, reembolso, discounts } }
+  const [rows, setRows] = useState({}); // { [employeeId]: { days, va_daily_rate, vt_daily_rate, reembolso, discounts } }
   const [existingReceipts, setExistingReceipts] = useState({}); // { [employeeId]: AllowanceReceipt }
   const [isBatchGenerating, setIsBatchGenerating] = useState(false);
   const [rowGenerating, setRowGenerating] = useState({}); // { [employeeId]: boolean }
@@ -76,9 +76,8 @@ export default function AllowanceReceiptsPage() {
         const initRows = {};
         employeesData.forEach(e => {
           initRows[e.id] = {
-            va_days: 22,
+            days: 22,
             va_daily_rate: Number(e.meal_allowance || 0),
-            vt_days: 22,
             vt_daily_rate: Number(e.transport_allowance || 0),
             reembolso: 0,
             discounts: 0
@@ -104,8 +103,9 @@ export default function AllowanceReceiptsPage() {
   };
 
   const computeRowTotals = (row) => {
-    const va = (row.va_days || 0) * (row.va_daily_rate || 0);
-    const vt = (row.vt_days || 0) * (row.vt_daily_rate || 0);
+    const days = row.days || 0;
+    const va = days * (row.va_daily_rate || 0);
+    const vt = days * (row.vt_daily_rate || 0);
     const total = va + vt + (row.reembolso || 0) - (row.discounts || 0);
     return { va_total: va, vt_total: vt, final_total: total };
   };
@@ -142,10 +142,10 @@ export default function AllowanceReceiptsPage() {
       competence_month: competence,
       period_start: periodMode === 'periodo' && isCustomPeriodValid ? periodStart : null,
       period_end: periodMode === 'periodo' && isCustomPeriodValid ? periodEnd : null,
-      va_days: row.va_days || 0,
+      va_days: row.days || 0,
       va_daily_rate: row.va_daily_rate || 0,
       va_total: totals.va_total,
-      vt_days: row.vt_days || 0,
+      vt_days: row.days || 0,
       vt_daily_rate: row.vt_daily_rate || 0,
       vt_total: totals.vt_total,
       reembolso: row.reembolso || 0,
@@ -187,8 +187,8 @@ export default function AllowanceReceiptsPage() {
 
     const monthFormatted = getPeriodLabel();
     const benefitLines = [
-      receiptType !== 'vt' ? `- VA - Dias: ${row.va_days || 0} | Valor Diário: ${formatCurrency(row.va_daily_rate)} | Total: ${formatCurrency(calculatedValues.va_total)}` : '',
-      receiptType !== 'va' ? `- VT - Dias: ${row.vt_days || 0} | Valor Diário: ${formatCurrency(row.vt_daily_rate)} | Total: ${formatCurrency(calculatedValues.vt_total)}` : '',
+      receiptType !== 'vt' ? `- VA - Dias: ${row.days || 0} | Valor Diário: ${formatCurrency(row.va_daily_rate)} | Total: ${formatCurrency(calculatedValues.va_total)}` : '',
+      receiptType !== 'va' ? `- VT - Dias: ${row.days || 0} | Valor Diário: ${formatCurrency(row.vt_daily_rate)} | Total: ${formatCurrency(calculatedValues.vt_total)}` : '',
       (row.reembolso || 0) > 0 ? `- Reembolso: ${formatCurrency(row.reembolso)}` : '',
     ].filter(Boolean).join('\n');
 
@@ -282,14 +282,14 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
       type !== 'vt' ? `
               <tr>
                 <td>Vale Alimentação (VA)</td>
-                <td>${row.va_days || 0}</td>
+                <td>${row.days || 0}</td>
                 <td>${formattedVaDailyRate}</td>
                 <td>${formattedVaTotal}</td>
               </tr>` : '',
       type !== 'va' ? `
               <tr>
                 <td>Vale Transporte (VT)</td>
-                <td>${row.vt_days || 0}</td>
+                <td>${row.days || 0}</td>
                 <td>${formattedVtDailyRate}</td>
                 <td>${formattedVtTotal}</td>
               </tr>` : '',
@@ -505,7 +505,7 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
       alert("Nenhum funcionário para exportar.");
       return;
     }
-    const headers = ["Funcionario","CPF","Contrato","Competencia","VA_Dias","VA_Valor_Diario","VA_Total","VT_Dias","VT_Valor_Diario","VT_Total","Reembolso","Descontos","Total_Final"];
+    const headers = ["Funcionario","CPF","Contrato","Competencia","Dias","VA_Valor_Diario","VA_Total","VT_Valor_Diario","VT_Total","Reembolso","Descontos","Total_Final"];
     const contractName = contracts.find(c => c.id === selectedContract)?.name || "";
     const rowsCsv = employees.map(emp => {
       const r = rows[emp.id] || {};
@@ -515,10 +515,9 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
         `"${emp.cpf || ''}"`,
         `"${contractName}"`,
         `"${competence}"`,
-        r.va_days || 0,
+        r.days || 0,
         (r.va_daily_rate || 0).toFixed(2).replace('.', ','),
         calc.va_total.toFixed(2).replace('.', ','),
-        r.vt_days || 0,
         (r.vt_daily_rate || 0).toFixed(2).replace('.', ','),
         calc.vt_total.toFixed(2).replace('.', ','),
         (r.reembolso || 0).toFixed(2).replace('.', ','),
@@ -643,10 +642,9 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
                   <TableHeader>
                     <TableRow>
                       <TableHead>Funcionário</TableHead>
+                      <TableHead>Dias</TableHead>
                       <TableHead className="min-w-[120px]">VA (R$)</TableHead>
-                      <TableHead>Dias (VA)</TableHead>
                       <TableHead className="min-w-[120px]">VT (R$)</TableHead>
-                      <TableHead>Dias (VT)</TableHead>
                       <TableHead className="min-w-[120px]">Reembolso</TableHead>
                       <TableHead className="min-w-[120px]">Descontos</TableHead>
                       <TableHead className="min-w-[140px]">Total</TableHead>
@@ -668,6 +666,13 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
                           <TableCell>
                             <Input
                               type="number"
+                              value={r.days ?? 0}
+                              onChange={e => handleRowChange(emp.id, 'days', e.target.value)}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
                               step="0.01"
                               value={r.va_daily_rate ?? 0}
                               onChange={e => handleRowChange(emp.id, 'va_daily_rate', e.target.value)}
@@ -676,23 +681,9 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
                           <TableCell>
                             <Input
                               type="number"
-                              value={r.va_days ?? 0}
-                              onChange={e => handleRowChange(emp.id, 'va_days', e.target.value)}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
                               step="0.01"
                               value={r.vt_daily_rate ?? 0}
                               onChange={e => handleRowChange(emp.id, 'vt_daily_rate', e.target.value)}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              value={r.vt_days ?? 0}
-                              onChange={e => handleRowChange(emp.id, 'vt_days', e.target.value)}
                             />
                           </TableCell>
                           <TableCell>

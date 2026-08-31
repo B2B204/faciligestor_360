@@ -305,9 +305,9 @@
     "semantic_hash": "586d52f90ff4426df49e6218f8b36e15"
   },
   "src/components/contracts/ContractHistoryDialog.jsx": {
-    "mtime": 1787163748.3752048,
-    "ast_hash": "fe36e55019603ce0ac2f562d9636a177",
-    "semantic_hash": ""
+    "mtime": 1783007456.656273,
+    "ast_hash": "77a28c54e8942e9a3bd997dc57ef3c67",
+    "semantic_hash": "77a28c54e8942e9a3bd997dc57ef3c67"
   },
   "src/components/contracts/RepactuacaoSection.jsx": {
     "mtime": 1783109885.4622378,
@@ -545,14 +545,14 @@
     "semantic_hash": "703d5995ed7b37ed6f67eba3fc542269"
   },
   "src/components/tasks/TaskDetailDialog.jsx": {
-    "mtime": 1787164027.89185,
-    "ast_hash": "e2aa5ac91ab8252a60587770da20d506",
-    "semantic_hash": ""
+    "mtime": 1785939896.3393326,
+    "ast_hash": "3081351ce3636726e94291996314bf6c",
+    "semantic_hash": "3081351ce3636726e94291996314bf6c"
   },
   "src/components/tasks/TaskForm.jsx": {
-    "mtime": 1787164002.740584,
-    "ast_hash": "683092269e7ff5952b03f139ae1b4830",
-    "semantic_hash": ""
+    "mtime": 1785938526.2480268,
+    "ast_hash": "9ddca1bc13ffa8f96d4924234f40cd53",
+    "semantic_hash": "9ddca1bc13ffa8f96d4924234f40cd53"
   },
   "src/components/tasks/TaskGanttView.jsx": {
     "mtime": 1785939289.614858,
@@ -1315,9 +1315,9 @@
     "semantic_hash": "b4313c8e2c52b58217c0691439c9fd54"
   },
   "src/lib/contractVersioning.js": {
-    "mtime": 1787163698.4849002,
-    "ast_hash": "6956ba5fd2da97bbf77bd25d9b835457",
-    "semantic_hash": ""
+    "mtime": 1783007383.3926501,
+    "ast_hash": "f975addee6b1facf11015bcf29485141",
+    "semantic_hash": "f975addee6b1facf11015bcf29485141"
   },
   "src/lib/depreciationEngine.js": {
     "mtime": 1783008017.7286,
@@ -1425,9 +1425,9 @@
     "semantic_hash": "97e8a10114d95ba50a695227207d05ef"
   },
   "src/pages/AllowanceReceipts.jsx": {
-    "mtime": 1788192593.6251595,
-    "ast_hash": "11b9567f4f6f9766ee95ea291146c165",
-    "semantic_hash": ""
+    "mtime": 1785875790.5217302,
+    "ast_hash": "4a1bc826c0744227fab30f9383e2a2be",
+    "semantic_hash": "4a1bc826c0744227fab30f9383e2a2be"
   },
   "src/pages/BankAccounts.jsx": {
     "mtime": 1783109885.509838,
@@ -1455,9 +1455,9 @@
     "semantic_hash": "e609903d9f69eca2a5264303dbd64f5c"
   },
   "src/pages/CompanySettings.jsx": {
-    "mtime": 1788192880.377568,
-    "ast_hash": "83583117223a9c650d66563298a70521",
-    "semantic_hash": ""
+    "mtime": 1783430884.6343477,
+    "ast_hash": "2be8ff2a82cbcf740b09b50aafd0a368",
+    "semantic_hash": "2be8ff2a82cbcf740b09b50aafd0a368"
   },
   "src/pages/Contracts.jsx": {
     "mtime": 1785938484.4217615,
@@ -1703,10 +1703,5 @@
     "mtime": 1782516695.6088483,
     "ast_hash": "e9668149218afa1b453676302b2e1a9a",
     "semantic_hash": "e9668149218afa1b453676302b2e1a9a"
-  },
-  "migration-add-periodo-recibo-va-vt.sql": {
-    "mtime": 1788191943.2095602,
-    "ast_hash": "8782825e726093497b7b21f7ddacfa13",
-    "semantic_hash": ""
   }
 }

@@ -1,18 +1,13 @@
-# Graph Report - facilitagestor360-main  (2026-08-31)
+# Graph Report - .  (2026-08-05)
 
 ## Corpus Check
-- 341 files · ~210,140 words
+- 341 files · ~208,830 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1264 nodes · 1332 edges · 307 communities (105 shown, 202 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 10 edges (avg confidence: 0.76)
-- Token cost: 0 input · 0 output
-
-## Graph Freshness
-- Built from commit: `79890ba0`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
+- 1252 nodes · 1324 edges · 313 communities (107 shown, 206 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 12 edges (avg confidence: 0.77)
+- Token cost: 48,943 input · 0 output
 
 ## Community Hubs (Navigation)
 - Third-Party Dependencies
@@ -113,6 +108,7 @@
 - DRE Report
 - Financial Page & Plan Limits
 - Supplies Page
+- Task Reports Page
 - Supabase Client
 - Branding Constants
 - Checkbox UI Component
@@ -206,6 +202,11 @@
 - UserInvite Entity Wrapper
 - app-params.js & appParams
 - query-client.js & queryClientInstance
+- AccountsReceivable.jsx & AccountsReceivablePage()
+- AllowanceReceipts.jsx & AllowanceReceiptsPage()
+- CRM.jsx & CRMPage()
+- Oficios.jsx & OficiosPage()
+- OS.jsx & OSPage()
 - Vercel Rewrites Config
 - AccountsPayable Concept
 - AccountsReceivable Concept
@@ -302,14 +303,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `useCarousel()` --references--> `react`  [EXTRACTED]
   src/components/ui/carousel.jsx → package.json
-- `useChart()` --references--> `react`  [EXTRACTED]
-  src/components/ui/chart.jsx → package.json
-- `useFormField()` --references--> `react`  [EXTRACTED]
-  src/components/ui/form.jsx → package.json
-- `useSidebar()` --references--> `react`  [EXTRACTED]
-  src/components/ui/sidebar.jsx → package.json
 - `index.html entry document` --conceptually_related_to--> `React`  [INFERRED]
   index.html → README.md
+- `Exports()` --references--> `jspdf`  [EXTRACTED]
+  src/pages/Exports.jsx → package.json
+- `HRIndicators()` --references--> `react`  [EXTRACTED]
+  src/components/employees/HRIndicators.jsx → package.json
+- `useChart()` --references--> `react`  [EXTRACTED]
+  src/components/ui/chart.jsx → package.json
 
 ## Import Cycles
 - None detected.
@@ -317,35 +318,35 @@
 ## Hyperedges (group relationships)
 - **FaciliGestor360 app bootstrap stack (Vite + React entry + Supabase config)** — readme_vite, readme_react, index_html_document, src_main_jsx, readme_supabase [INFERRED 0.85]
 
-## Communities (307 total, 202 thin omitted)
+## Communities (313 total, 206 thin omitted)
 
 ### Community 0 - "Third-Party Dependencies"
 Cohesion: 0.03
 Nodes (61): dependencies, canvas-confetti, class-variance-authority, clsx, cmdk, date-fns, embla-carousel-react, framer-motion (+53 more)
 
 ### Community 1 - "Task Calendar & Timeline Views"
-Cohesion: 0.11
-Nodes (30): getBarPosition(), getDateRange(), totalDays(), GROUP_META, GROUP_ORDER, groupKeyFor(), priorityOrder, TaskAgendaView() (+22 more)
+Cohesion: 0.09
+Nodes (34): getBarPosition(), getDateRange(), totalDays(), GROUP_META, GROUP_ORDER, groupKeyFor(), priorityOrder, TaskAgendaView() (+26 more)
 
 ### Community 2 - "Build & Lint Tooling Config"
 Cohesion: 0.07
 Nodes (29): devDependencies, autoprefixer, baseline-browser-mapping, eslint, @eslint/js, eslint-plugin-react, eslint-plugin-react-hooks, eslint-plugin-react-refresh (+21 more)
 
 ### Community 3 - "Alerts & Dashboard Pages"
-Cohesion: 0.07
-Nodes (22): AccountsReceivablePage(), AlertsPage(), AllowanceReceiptsPage(), PAGES, CRMPage(), Dashboard(), HomePage(), IndirectCostsPage() (+14 more)
+Cohesion: 0.11
+Nodes (14): AlertsPage(), PAGES, Dashboard(), HomePage(), IndirectCostsPage(), LogoutSuccessPage(), MarketingPage(), MarketplacePage() (+6 more)
 
 ### Community 4 - "Sidebar UI Component"
-Cohesion: 0.07
-Nodes (26): Sidebar, SidebarContent, SidebarContext, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel (+18 more)
+Cohesion: 0.08
+Nodes (25): Sidebar, SidebarContent, SidebarContext, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel (+17 more)
 
 ### Community 5 - "Alert Banner & Operational Alerts"
 Cohesion: 0.14
 Nodes (19): Alert, AlertDescription, AlertTitle, alertVariants, EXPIRY_TIERS, generateOperationalAlerts(), getContractEndDate(), OPEN_READJUSTMENT_STATUSES (+11 more)
 
 ### Community 6 - "App Routing & Layout"
-Cohesion: 0.07
-Nodes (19): PageNotFound(), AcceptInvite(), DEPT_LABELS, BankAccounts(), CompanySettings(), pagesConfig, DRE(), monthStr() (+11 more)
+Cohesion: 0.13
+Nodes (9): PageNotFound(), AcceptInvite(), DEPT_LABELS, BankAccounts(), CompanySettings(), pagesConfig, FiscalSettings(), Login() (+1 more)
 
 ### Community 7 - "Accounts Payable Module"
 Cohesion: 0.14
@@ -364,8 +365,8 @@ Cohesion: 0.13
 Nodes (14): ALL_ACTIONS, ALL_PAGES, BUILTIN_META, COLOR_BADGE_BG, COLOR_BORDER, COLOR_DOT, COLOR_OPTIONS, getActionLabel() (+6 more)
 
 ### Community 11 - "Service Order Sub-Managers"
-Cohesion: 0.09
-Nodes (14): react, AISuggester(), ChecklistManager(), MaterialsManager(), TimeLogManager(), WebhookTestingPanel(), User, useIsMobile() (+6 more)
+Cohesion: 0.12
+Nodes (8): AISuggester(), ChecklistManager(), MaterialsManager(), TimeLogManager(), WebhookTestingPanel(), User, ProfilePage(), TasksPage()
 
 ### Community 12 - "Patrimony Depreciation & Asset Lookup"
 Cohesion: 0.17
@@ -376,16 +377,16 @@ Cohesion: 0.12
 Nodes (10): Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarLabel, MenubarRadioItem, MenubarSeparator, MenubarSubContent (+2 more)
 
 ### Community 14 - "App Bootstrap (Vite/Supabase)"
-Cohesion: 0.17
-Nodes (12): index.html entry document, manifest.json web app manifest, #root mount div, Build de produção, Executar localmente, FaciliGestor360, Instalação, React (+4 more)
+Cohesion: 0.19
+Nodes (14): index.html entry document, manifest.json web app manifest, #root mount div, .env.local environment file, FaciliGestor360, npm install command, npm run build command, npm run dev command (+6 more)
 
 ### Community 15 - "Employee Bulk Update & CSV Import"
 Cohesion: 0.20
 Nodes (8): BulkUpdateForm(), CSVImport(), EmployeeFilters(), EMPTY_FILTERS, EmployeeForm(), EmployeeList(), EmployeesPage(), planLimits
 
 ### Community 16 - "CNPJ Switching & Theme Toggle"
-Cohesion: 0.19
-Nodes (8): AccessBlocked(), CnpjSwitcher(), RequestCnpjDialog(), ThemeToggle(), PaymentStatusChecker(), Layout(), navItems, AccessDeniedPage()
+Cohesion: 0.23
+Nodes (7): CnpjSwitcher(), RequestCnpjDialog(), ThemeToggle(), CnpjSetupScreen(), Layout(), navItems, AccessDeniedPage()
 
 ### Community 17 - "Toast Hook State"
 Cohesion: 0.27
@@ -432,8 +433,8 @@ Cohesion: 0.22
 Nodes (6): AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogOverlay, AlertDialogTitle
 
 ### Community 28 - "Form Field UI Component"
-Cohesion: 0.20
-Nodes (8): FormControl, FormDescription, FormFieldContext, FormItem, FormItemContext, FormLabel, FormMessage, useFormField()
+Cohesion: 0.22
+Nodes (7): FormControl, FormDescription, FormFieldContext, FormItem, FormItemContext, FormLabel, FormMessage
 
 ### Community 29 - "Table UI Component"
 Cohesion: 0.22
@@ -460,8 +461,8 @@ Cohesion: 0.25
 Nodes (7): Carousel, CarouselContent, CarouselContext, CarouselItem, CarouselNext, CarouselPrevious, useCarousel()
 
 ### Community 36 - "Chart UI Component"
-Cohesion: 0.22
-Nodes (6): ChartContainer, ChartContext, ChartLegendContent, ChartTooltipContent, THEMES, useChart()
+Cohesion: 0.25
+Nodes (5): ChartContainer, ChartContext, ChartLegendContent, ChartTooltipContent, THEMES
 
 ### Community 37 - "Drawer UI Component"
 Cohesion: 0.25
@@ -484,16 +485,16 @@ Cohesion: 0.39
 Nodes (7): Budget(), BudgetDialog(), CATEGORY_LABELS, EMPTY_FORM, fmt(), monthLabel(), shiftMonth()
 
 ### Community 43 - "Sidebar/Chart Hooks"
-Cohesion: 0.40
-Nodes (4): ACTION_LABELS, emptyRule, TaskAutomationsPage(), TRIGGER_LABELS
+Cohesion: 0.29
+Nodes (6): react, useChart(), useFormField(), useSidebar(), useIsMobile(), PrivacyConsentScreen()
 
 ### Community 44 - "Contract Form & Repactuação"
 Cohesion: 0.38
 Nodes (4): ContractForm(), RepactuacaoSection(), ContractsPage(), planLimits
 
 ### Community 45 - "Contract History Diff"
-Cohesion: 0.29
-Nodes (11): ContractHistoryDialog(), CURRENCY_FIELDS, DATE_FIELDS, FIELD_ORDER, fmtDateTime(), formatSnapshotValue(), formatValue(), PERCENT_FIELDS (+3 more)
+Cohesion: 0.52
+Nodes (6): ContractHistoryDialog(), CURRENCY_FIELDS, DATE_FIELDS, fmtDateTime(), formatValue(), PERCENT_FIELDS
 
 ### Community 46 - "Service Execution Panel & Signature"
 Cohesion: 0.43
@@ -512,8 +513,8 @@ Cohesion: 0.62
 Nodes (6): addMonthKey(), computeMonthlyDepreciation(), generateDueDepreciationEntries(), monthKey(), monthsBetweenInclusive(), NON_DEPRECIABLE_STATUSES
 
 ### Community 51 - "Technician Planning"
-Cohesion: 0.23
-Nodes (8): HRIndicators(), monthKey(), toDateSafe(), osActiveOnDay(), osRange(), safeParse(), STATUS_COLORS, TechnicianPlanning()
+Cohesion: 0.43
+Nodes (5): osActiveOnDay(), osRange(), safeParse(), STATUS_COLORS, TechnicianPlanning()
 
 ### Community 52 - "Input OTP UI Component"
 Cohesion: 0.33
@@ -547,6 +548,10 @@ Nodes (5): addMonthKey(), dueDateFor(), generateDueRecurringEntries(), monthKey(
 Cohesion: 0.33
 Nodes (4): CLIENT_TYPE_OPTIONS, EMPTY_FORM, FiscalPositions(), SERVICE_TYPE_OPTIONS
 
+### Community 60 - "Privacy/LGPD Page"
+Cohesion: 0.33
+Nodes (5): ACTION_LABELS, PrivacyPage(), REQUEST_TYPE_LABELS, STATUS_COLORS, STATUS_LABELS
+
 ### Community 61 - "Recurring Templates"
 Cohesion: 0.40
 Nodes (4): CATEGORY_OPTIONS, EMPTY_FORM, fmt(), RecurringTemplates()
@@ -554,6 +559,10 @@ Nodes (4): CATEGORY_OPTIONS, EMPTY_FORM, fmt(), RecurringTemplates()
 ### Community 62 - "Receivable Dashboard"
 Cohesion: 0.50
 Nodes (3): COLORS, formatCurrency(), ReceivableDashboard()
+
+### Community 64 - "HR Indicators"
+Cohesion: 0.60
+Nodes (3): HRIndicators(), monthKey(), toDateSafe()
 
 ### Community 65 - "Service Order Form"
 Cohesion: 0.40
@@ -596,24 +605,24 @@ Cohesion: 0.67
 Nodes (3): CATEGORIES, emptyTemplate, TaskTemplatesPage()
 
 ## Knowledge Gaps
-- **548 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+543 more)
+- **536 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+531 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **202 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **206 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `Service Order Sub-Managers` to `Third-Party Dependencies`, `Carousel UI Component`, `Chart UI Component`, `Sidebar UI Component`, `Technician Planning`, `Form Field UI Component`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
-- **Why does `User` connect `Service Order Sub-Managers` to `Alerts & Dashboard Pages`, `App Routing & Layout`, `Accounts Payable Module`, `User Profiles & Permissions Admin`, `Patrimony Depreciation & Asset Lookup`, `Employee Bulk Update & CSV Import`, `CNPJ Switching & Theme Toggle`, `Bank Reconciliation`, `Uniform Delivery Module`, `Performance Review Cycles`, `Leave Calendar Module`, `Budget Management`, `Sidebar/Chart Hooks`, `Contract Form & Repactuação`, `Service Execution Panel & Signature`, `Technician Planning`, `Backup Manager & Edge Function`, `Measurement Form`, `Fiscal Positions`, `Recurring Templates`, `Service Order Form`, `Cost Centers`, `Finance Dashboard`, `Invoice XML Parsing`, `Task Templates Page`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `Third-Party Dependencies` to `Build & Lint Tooling Config`, `Service Order Sub-Managers`, `Input OTP UI Component`, `Sonner Toast Wrapper`, `Export & Accounting Backup`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Why does `react` connect `Sidebar/Chart Hooks` to `Third-Party Dependencies`, `HR Indicators`, `Carousel UI Component`, `Supplies Page`, `CNPJ Switching & Theme Toggle`?**
+  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+- **Why does `User` connect `Service Order Sub-Managers` to `Task Calendar & Timeline Views`, `Alerts & Dashboard Pages`, `App Routing & Layout`, `Accounts Payable Module`, `User Profiles & Permissions Admin`, `Patrimony Depreciation & Asset Lookup`, `Employee Bulk Update & CSV Import`, `CNPJ Switching & Theme Toggle`, `Bank Reconciliation`, `Uniform Delivery Module`, `Performance Review Cycles`, `Leave Calendar Module`, `Budget Management`, `Sidebar/Chart Hooks`, `Contract Form & Repactuação`, `Service Execution Panel & Signature`, `Technician Planning`, `Backup Manager & Edge Function`, `Measurement Form`, `Fiscal Positions`, `Privacy/LGPD Page`, `Recurring Templates`, `Service Order Form`, `Cost Centers`, `Employee Onboarding`, `Finance Dashboard`, `Invoice XML Parsing`, `Task Templates Page`, `AccountsReceivable.jsx & AccountsReceivablePage()`, `AllowanceReceipts.jsx & AllowanceReceiptsPage()`, `CRM.jsx & CRMPage()`, `Oficios.jsx & OficiosPage()`, `OS.jsx & OSPage()`, `Financial Page & Plan Limits`, `Supplies Page`, `Task Reports Page`?**
+  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **Why does `dependencies` connect `Third-Party Dependencies` to `Build & Lint Tooling Config`, `Sidebar/Chart Hooks`, `Input OTP UI Component`, `Sonner Toast Wrapper`, `Export & Accounting Backup`?**
+  _High betweenness centrality (0.048) - this node is a cross-community bridge._
 - **What connects `$schema`, `style`, `rsc` to the rest of the system?**
-  _549 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _537 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Third-Party Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.03278688524590164 - nodes in this community are weakly interconnected._
 - **Should `Task Calendar & Timeline Views` be split into smaller, more focused modules?**
-  _Cohesion score 0.11074197120708748 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09308510638297872 - nodes in this community are weakly interconnected._
 - **Should `Build & Lint Tooling Config` be split into smaller, more focused modules?**
   _Cohesion score 0.06666666666666667 - nodes in this community are weakly interconnected._

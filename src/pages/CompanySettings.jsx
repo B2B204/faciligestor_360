@@ -87,7 +87,16 @@ export default function CompanySettings() {
   }
 
   const handleAdd = async () => {
-    await CompanyCnpj.create({ ...form, cnpj: form.cnpj.replace(/\D/g, '') });
+    const cnpj = form.cnpj.replace(/\D/g, '');
+    await CompanyCnpj.create({ ...form, cnpj });
+    // Sem isso o admin que cadastra o CNPJ não consegue trocar para ele no
+    // CnpjSwitcher, pois a listagem lá depende de uma linha em
+    // user_cnpj_access — que só um admin pode inserir (RLS), então ele
+    // precisa se auto-conceder o acesso ao criar o CNPJ.
+    const existing = await UserCnpjAccess.filter({ user_email: user.email, cnpj });
+    if (!existing || existing.length === 0) {
+      await UserCnpjAccess.create({ user_email: user.email, cnpj });
+    }
     setForm({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
     await load();
   };

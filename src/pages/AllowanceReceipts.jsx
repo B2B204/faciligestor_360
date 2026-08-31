@@ -28,6 +28,9 @@ export default function AllowanceReceiptsPage() {
   const [selectedContract, setSelectedContract] = useState('');
   const [competence, setCompetence] = useState(format(new Date(), 'yyyy-MM'));
   const [receiptType, setReceiptType] = useState('ambos'); // 'va' | 'vt' | 'ambos'
+  const [periodMode, setPeriodMode] = useState('mes'); // 'mes' | 'periodo'
+  const [periodStart, setPeriodStart] = useState('');
+  const [periodEnd, setPeriodEnd] = useState('');
 
   const [rows, setRows] = useState({}); // { [employeeId]: { va_days, va_daily_rate, vt_days, vt_daily_rate, reembolso, discounts } }
   const [existingReceipts, setExistingReceipts] = useState({}); // { [employeeId]: AllowanceReceipt }
@@ -116,15 +119,29 @@ export default function AllowanceReceiptsPage() {
 
   const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 
+  // Quando o período é customizado (ex.: 21/07 a 20/08), o rótulo do
+  // recibo mostra o intervalo de datas em vez do mês de competência,
+  // pois muitos contratos pagam VA/VT em ciclos que não são o mês civil.
+  const isCustomPeriodValid = periodMode === 'periodo' && periodStart && periodEnd && periodStart <= periodEnd;
+
+  const getPeriodLabel = () => {
+    if (periodMode === 'periodo' && isCustomPeriodValid) {
+      return `${format(new Date(periodStart + 'T00:00:00'), 'dd/MM/yyyy')} a ${format(new Date(periodEnd + 'T00:00:00'), 'dd/MM/yyyy')}`;
+    }
+    return format(new Date(competence + '-01'), 'MMMM yyyy');
+  };
+
   const saveReceiptRecord = async (employee, row, totals) => {
     if (!user || !selectedContract || !competence) {
       console.error("Missing data to save receipt record.");
       return;
     }
-    await AllowanceReceipt.create({
+    const payload = {
       contract_id: selectedContract,
       employee_id: employee.id,
       competence_month: competence,
+      period_start: periodMode === 'periodo' && isCustomPeriodValid ? periodStart : null,
+      period_end: periodMode === 'periodo' && isCustomPeriodValid ? periodEnd : null,
       va_days: row.va_days || 0,
       va_daily_rate: row.va_daily_rate || 0,
       va_total: totals.va_total,
@@ -137,17 +154,18 @@ export default function AllowanceReceiptsPage() {
       receipt_type: receiptType,
       cnpj: user.cnpj,
       status: "gerado"
-    });
+    };
+
+    // Regenerar um recibo já existente para o mesmo funcionário/competência
+    // deve atualizar o registro, não duplicar linhas no banco.
+    const existing = existingReceipts[employee.id];
+    const saved = existing?.id
+      ? await AllowanceReceipt.update(existing.id, payload)
+      : await AllowanceReceipt.create(payload);
+
     setExistingReceipts(prev => ({
       ...prev,
-      [employee.id]: {
-        ...(prev[employee.id] || {}),
-        employee_id: employee.id,
-        contract_id: selectedContract,
-        competence_month: competence,
-        total_value: totals.final_total,
-        status: "gerado"
-      }
+      [employee.id]: saved
     }));
   };
 
@@ -167,7 +185,7 @@ export default function AllowanceReceiptsPage() {
 
     setRowGenerating(prev => ({ ...prev, [employee.id]: true }));
 
-    const monthFormatted = format(new Date(competence + '-01'), 'MMMM yyyy');
+    const monthFormatted = getPeriodLabel();
     const benefitLines = [
       receiptType !== 'vt' ? `- VA - Dias: ${row.va_days || 0} | Valor Diário: ${formatCurrency(row.va_daily_rate)} | Total: ${formatCurrency(calculatedValues.va_total)}` : '',
       receiptType !== 'va' ? `- VT - Dias: ${row.vt_days || 0} | Valor Diário: ${formatCurrency(row.vt_daily_rate)} | Total: ${formatCurrency(calculatedValues.vt_total)}` : '',
@@ -247,7 +265,8 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
     const companyCnpj = user?.cnpj || '';
     const companyAddress = user?.company_address || '';
     const logoUrl = user?.company_logo_url || '';
-    const monthFormatted = format(new Date(competence + '-01'), 'MMMM yyyy');
+    const monthFormatted = getPeriodLabel();
+    const periodLabelPrefix = periodMode === 'periodo' && isCustomPeriodValid ? 'Período' : 'Competência';
 
     const formattedVaDailyRate = formatCurrency(row.va_daily_rate);
     const formattedVaTotal = formatCurrency(totals.va_total);
@@ -337,7 +356,7 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
       </div>
 
       <div class="title">${receiptTypeLabels[type] || receiptTypeLabels.ambos}</div>
-      <div class="subtitle">Competência: ${monthFormatted}</div>
+      <div class="subtitle">${periodLabelPrefix}: ${monthFormatted}</div>
 
       <div class="grid2">
         <div class="card">
@@ -388,7 +407,7 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
       </div>
 
       <div class="declaration">
-        Declaro para os devidos fins que recebi os benefícios descritos acima, referentes à competência ${monthFormatted}, 
+        Declaro para os devidos fins que recebi os benefícios descritos acima, referentes ${periodLabelPrefix === 'Período' ? 'ao período de' : 'à competência'} ${monthFormatted},
         estando ciente dos valores e descontos aplicados.
       </div>
 
@@ -420,6 +439,10 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
         alert("Dados insuficientes para gerar o recibo.");
         return;
     }
+    if (periodMode === 'periodo' && !isCustomPeriodValid) {
+        alert("Informe um período válido (data inicial não pode ser depois da data final).");
+        return;
+    }
     const html = buildReceiptA4HTML(employee, row, totals, false, type);
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
@@ -442,6 +465,10 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
         alert("Dados insuficientes para gerar o recibo.");
         return;
     }
+    if (periodMode === 'periodo' && !isCustomPeriodValid) {
+        alert("Informe um período válido (data inicial não pode ser depois da data final).");
+        return;
+    }
     const html = buildReceiptA4HTML(employee, row, totals, true, type);
     const w = window.open('', '_blank');
     if (!w) {
@@ -455,20 +482,19 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
   };
 
   const handleGenerateBatch = async () => {
-    if (!user?.company_logo_url) {
-      alert("Logo da empresa não encontrada. Adicione uma logo no seu Perfil antes de gerar os recibos.");
-      return;
-    }
     if (!selectedContract || !competence) {
       alert("Selecione um contrato e a competência antes de gerar em lote.");
       return;
     }
+    if (periodMode === 'periodo' && !isCustomPeriodValid) {
+      alert("Informe um período válido (data inicial não pode ser depois da data final).");
+      return;
+    }
     setIsBatchGenerating(true);
     for (const emp of employees) {
-      // The current handleGenerateBatch uses the LLM method by default
-      // If A4 batch generation is desired, this would need to be changed
-      // to call downloadReceiptHTMLA4(emp); or printReceiptA4(emp);
-      await handleGenerateForEmployee(emp);
+      // Geração local (sem LLM): mais rápida e determinística para lotes,
+      // e não depende de disponibilidade/custo do provedor de IA.
+      await downloadReceiptHTMLA4(emp);
     }
     setIsBatchGenerating(false);
     alert("Geração em lote concluída.");
@@ -541,6 +567,7 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
             <div>
               <Label>Competência</Label>
               <Input type="month" value={competence} onChange={e => setCompetence(e.target.value)} />
+              <p className="text-xs text-muted-foreground mt-1">Usada para agrupar e localizar os recibos.</p>
             </div>
             <div>
               <Label>Tipo de Recibo</Label>
@@ -562,6 +589,37 @@ IMPORTANTE: Retorne no formato JSON com a chave html_content contendo o HTML com
                 Gerar em Lote
               </Button>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2 border-t border-border">
+            <div>
+              <Label>Período do Recibo</Label>
+              <Select value={periodMode} onValueChange={setPeriodMode}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mes">Mês de competência</SelectItem>
+                  <SelectItem value="periodo">Período customizado</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">Use período customizado quando o ciclo de VA/VT não coincide com o mês civil (ex.: 21/07 a 20/08).</p>
+            </div>
+            {periodMode === 'periodo' && (
+              <>
+                <div>
+                  <Label>Data Inicial</Label>
+                  <Input type="date" value={periodStart} onChange={e => setPeriodStart(e.target.value)} />
+                </div>
+                <div>
+                  <Label>Data Final</Label>
+                  <Input type="date" value={periodEnd} onChange={e => setPeriodEnd(e.target.value)} />
+                </div>
+                {periodStart && periodEnd && !isCustomPeriodValid && (
+                  <div className="flex items-end">
+                    <p className="text-xs text-red-600">A data inicial deve ser anterior ou igual à data final.</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </CardContent>
       </Card>

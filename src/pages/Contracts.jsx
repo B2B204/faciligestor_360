@@ -148,7 +148,8 @@ export default function ContractsPage() {
 
     } catch (error) {
       console.error("Erro ao salvar contrato:", error);
-      alert("Erro ao salvar contrato. Verifique se todos os campos obrigatórios foram preenchidos corretamente.");
+      const detail = error?.message || error?.error_description || error?.details;
+      alert(detail ? `Erro ao salvar contrato: ${detail}` : "Erro ao salvar contrato. Verifique se todos os campos obrigatórios foram preenchidos corretamente.");
     }
     setIsSaving(false);
   };

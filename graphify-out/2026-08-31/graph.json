@@ -2015,7 +2015,7 @@
       "label": "RequestCnpjDialog()",
       "file_type": "code",
       "source_file": "src/components/common/RequestCnpjDialog.jsx",
-      "source_location": "L8",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "src_components_common_requestcnpjdialog_requestcnpjdialog",
       "community": 16,
@@ -10955,7 +10955,7 @@
       "label": "ProfilePage()",
       "file_type": "code",
       "source_file": "src/pages/Profile.jsx",
-      "source_location": "L38",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "src_pages_profile_profilepage",
       "community": 222,
@@ -15321,7 +15321,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/common/CnpjSwitcher.jsx",
-      "source_location": "L38",
+      "source_location": "L44",
       "weight": 1.0,
       "source": "src_components_common_cnpjswitcher_cnpjswitcher",
       "target": "src_entities_user_user"
@@ -15462,7 +15462,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/common/RequestCnpjDialog.jsx",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0,
       "source": "src_components_common_requestcnpjdialog",
       "target": "src_components_common_requestcnpjdialog_requestcnpjdialog",
@@ -21832,7 +21832,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/pages/Profile.jsx",
-      "source_location": "L72",
+      "source_location": "L76",
       "weight": 1.0,
       "source": "src_pages_profile_profilepage",
       "target": "src_entities_user_user"
@@ -25720,7 +25720,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/Profile.jsx",
-      "source_location": "L38",
+      "source_location": "L40",
       "weight": 1.0,
       "source": "src_pages_profile",
       "target": "src_pages_profile_profilepage",
@@ -26483,5 +26483,5 @@
       "source_file": "index.html"
     }
   ],
-  "built_at_commit": "059873cfbf21bb6cc02ed6a3e688e6a49ef95cba"
+  "built_at_commit": "2e9a4944a595c935f75685197ee3c09c831dde5f"
 }

@@ -10,13 +10,13 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [cnpj, setCnpj] = useState("");
-  const [companyName, setCompanyName] = useState("");
+  const [rfInfo, setRfInfo] = useState(null);
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
 
   const resetForm = () => {
     setCnpj("");
-    setCompanyName("");
+    setRfInfo(null);
     setReason("");
   };
 
@@ -28,6 +28,14 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
     }
     setLoading(true);
     try {
+      const alreadyRequested = await CnpjAccessRequest.filter({ requester_email: user.email, cnpj: digits });
+      const pending = (alreadyRequested || []).find((r) => !r.status || r.status === 'pendente');
+      if (pending) {
+        toast({ title: 'Você já solicitou este CNPJ', description: 'Aguarde a aprovação de um administrador — não é preciso enviar de novo.' });
+        setOpen(false);
+        resetForm();
+        return;
+      }
       await CnpjAccessRequest.create({ requester_email: user.email, cnpj: digits, reason, status: "pendente" });
       setOpen(false);
       resetForm();
@@ -58,11 +66,15 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
             placeholder="00.000.000/0001-00"
             name="cnpj"
             value={cnpj}
-            onChange={(e) => setCnpj(e.target.value)}
-            onFound={(data) => setCompanyName(data.nome || "")}
+            onChange={(e) => { setCnpj(e.target.value); setRfInfo(null); }}
+            onFound={(data) => setRfInfo(data)}
           />
-          {companyName && (
-            <p className="text-xs text-green-700 dark:text-green-400">Empresa encontrada: {companyName}</p>
+          {rfInfo && (
+            <div className="p-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded text-xs text-green-700 dark:text-green-400 space-y-0.5">
+              <p className="font-medium">{rfInfo.razaoSocial || rfInfo.nome}</p>
+              {rfInfo.endereco && <p>{rfInfo.endereco}</p>}
+              {rfInfo.situacao && <p>Situação: {rfInfo.situacao}{rfInfo.abertura ? ` · Desde ${rfInfo.abertura}` : ''}</p>}
+            </div>
           )}
           <Textarea placeholder="Justificativa (opcional)" value={reason} onChange={(e) => setReason(e.target.value)} />
           <div className="flex justify-end gap-2">

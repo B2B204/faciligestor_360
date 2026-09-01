@@ -1,7 +1,7 @@
 # Graph Report - facilitagestor360-main  (2026-08-31)
 
 ## Corpus Check
-- 342 files · ~210,861 words
+- 343 files · ~211,479 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2e9a4944`
+- Built from commit: `8065ccf3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

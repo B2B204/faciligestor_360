@@ -21601,7 +21601,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/pages/CompanySettings.jsx",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "src_pages_companysettings_companysettings",
       "target": "src_entities_user_user"
@@ -26483,5 +26483,5 @@
       "source_file": "index.html"
     }
   ],
-  "built_at_commit": "2e9a4944a595c935f75685197ee3c09c831dde5f"
+  "built_at_commit": "8065ccf39c7ddd303a61cdf7c1988009d4652acd"
 }

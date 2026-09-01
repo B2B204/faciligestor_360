@@ -22,6 +22,7 @@ export default function CompanySettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
+  const [rfInfo, setRfInfo] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -42,22 +43,64 @@ export default function CompanySettings() {
   };
 
   const handleApproveRequest = async (req) => {
-    await UserCnpjAccess.create({ user_email: req.requester_email, cnpj: req.cnpj });
-    await CnpjAccessRequest.update(req.id, {
-      status: 'aprovado',
-      decided_by: user.email,
-      decided_at: new Date().toISOString(),
-    });
-    await load();
+    try {
+      const existing = await UserCnpjAccess.filter({ user_email: req.requester_email, cnpj: req.cnpj });
+      if (!existing || existing.length === 0) {
+        await UserCnpjAccess.create({ user_email: req.requester_email, cnpj: req.cnpj });
+      }
+      // Resolve de uma vez todas as solicitações duplicadas do mesmo
+      // solicitante para o mesmo CNPJ — sem isso, cada tentativa de reenvio
+      // (ex.: cliques repetidos enquanto o formulário não dava feedback)
+      // fica pendente para sempre, poluindo a lista.
+      const duplicates = accessRequests.filter((r) =>
+        r.id !== req.id &&
+        r.requester_email === req.requester_email &&
+        r.cnpj === req.cnpj &&
+        (!r.status || r.status === 'pendente')
+      );
+      await Promise.all([
+        CnpjAccessRequest.update(req.id, {
+          status: 'aprovado',
+          decided_by: user.email,
+          decided_at: new Date().toISOString(),
+        }),
+        ...duplicates.map((r) => CnpjAccessRequest.update(r.id, {
+          status: 'aprovado',
+          decided_by: user.email,
+          decided_at: new Date().toISOString(),
+        })),
+      ]);
+      await load();
+      toast({ title: 'Acesso concedido', description: `${req.requester_email} agora pode acessar o CNPJ ${req.cnpj}.` });
+    } catch (error) {
+      console.error('Erro ao aprovar solicitação:', error);
+      toast({ variant: 'destructive', title: 'Erro ao aprovar', description: error.message || 'Tente novamente.' });
+    }
   };
 
   const handleRejectRequest = async (req) => {
-    await CnpjAccessRequest.update(req.id, {
-      status: 'rejeitado',
-      decided_by: user.email,
-      decided_at: new Date().toISOString(),
-    });
-    await load();
+    try {
+      await CnpjAccessRequest.update(req.id, {
+        status: 'rejeitado',
+        decided_by: user.email,
+        decided_at: new Date().toISOString(),
+      });
+      await load();
+    } catch (error) {
+      console.error('Erro ao rejeitar solicitação:', error);
+      toast({ variant: 'destructive', title: 'Erro ao rejeitar', description: error.message || 'Tente novamente.' });
+    }
+  };
+
+  const handleDeleteRequest = async (req) => {
+    if (!confirm('Remover esta solicitação da lista?')) return;
+    try {
+      await CnpjAccessRequest.delete(req.id);
+      await load();
+    } catch (error) {
+      console.error('Erro ao remover solicitação:', error);
+      toast({ variant: 'destructive', title: 'Erro ao remover', description: error.message || 'Tente novamente.' });
+    }
   };
 
   if (loading) {
@@ -111,6 +154,7 @@ export default function CompanySettings() {
         await UserCnpjAccess.create({ user_email: user.email, cnpj });
       }
       setForm({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
+      setRfInfo(null);
       await load();
       toast({ title: 'CNPJ cadastrado', description: 'O CNPJ foi adicionado e já está disponível no seletor.' });
     } catch (error) {
@@ -158,7 +202,7 @@ export default function CompanySettings() {
             Insira um novo CNPJ para vinculá-lo ao sistema.
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
             <div className="space-y-1">
               <Label className="text-sm font-medium text-foreground">CNPJ</Label>
@@ -167,8 +211,11 @@ export default function CompanySettings() {
                 placeholder="00.000.000/0001-00"
                 name="cnpj"
                 value={form.cnpj}
-                onChange={(e) => setForm((f) => ({ ...f, cnpj: e.target.value }))}
-                onFound={(data) => setForm((f) => ({ ...f, display_name: f.display_name || data.nome || f.display_name }))}
+                onChange={(e) => { setForm((f) => ({ ...f, cnpj: e.target.value })); setRfInfo(null); }}
+                onFound={(data) => {
+                  setRfInfo(data);
+                  setForm((f) => ({ ...f, display_name: f.display_name || data.nome || f.display_name }));
+                }}
               />
             </div>
             <div className="space-y-1">
@@ -189,6 +236,14 @@ export default function CompanySettings() {
               {saving ? "Adicionando..." : "Adicionar CNPJ"}
             </Button>
           </div>
+          {rfInfo && (
+            <div className="p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg text-sm text-green-700 dark:text-green-400 space-y-0.5">
+              <p className="font-medium">{rfInfo.razaoSocial || rfInfo.nome}</p>
+              {rfInfo.endereco && <p>{rfInfo.endereco}</p>}
+              {rfInfo.situacao && <p>Situação: {rfInfo.situacao}{rfInfo.abertura ? ` · Desde ${rfInfo.abertura}` : ''}</p>}
+              {rfInfo.atividade && <p>{rfInfo.atividade}</p>}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -236,30 +291,43 @@ export default function CompanySettings() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {(!req.status || req.status === 'pendente') ? (
-                          <div className="flex justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleApproveRequest(req)}
-                              className="text-muted-foreground hover:text-green-600 hover:bg-green-50"
-                            >
-                              <Check className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleRejectRequest(req)}
-                              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">
-                            {req.decided_by ? `por ${req.decided_by}` : '—'}
-                          </span>
-                        )}
+                        <div className="flex justify-end items-center gap-1">
+                          {(!req.status || req.status === 'pendente') ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleApproveRequest(req)}
+                                title="Aprovar"
+                                className="text-muted-foreground hover:text-green-600 hover:bg-green-50"
+                              >
+                                <Check className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleRejectRequest(req)}
+                                title="Rejeitar"
+                                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <span className="text-xs text-muted-foreground mr-1">
+                              {req.decided_by ? `por ${req.decided_by}` : '—'}
+                            </span>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteRequest(req)}
+                            title="Excluir da lista"
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

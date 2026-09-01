@@ -285,8 +285,8 @@
     "semantic_hash": "692713c5ff01e03bb40d1c4cefc5d5ff"
   },
   "src/components/common/RequestCnpjDialog.jsx": {
-    "mtime": 1788222021.5583718,
-    "ast_hash": "c445baf517ed2f577cc389e7ffe1f428",
+    "mtime": 1788222398.9268749,
+    "ast_hash": "d1f3f249bbd100325f63f9ae0e77f453",
     "semantic_hash": ""
   },
   "src/components/common/ThemeToggle.jsx": {
@@ -1455,8 +1455,8 @@
     "semantic_hash": "e609903d9f69eca2a5264303dbd64f5c"
   },
   "src/pages/CompanySettings.jsx": {
-    "mtime": 1788208716.283073,
-    "ast_hash": "38b46ba2be4ffedb95d5d552ea7ff736",
+    "mtime": 1788222426.6911907,
+    "ast_hash": "606a11c1b71111f395f245fdb31e6a31",
     "semantic_hash": ""
   },
   "src/pages/Contracts.jsx": {
@@ -1712,6 +1712,11 @@
   "migration-fix-rls-cnpj-access-auth-users.sql": {
     "mtime": 1788212811.818834,
     "ast_hash": "26f21564d074c409c0a498388b9ae422",
+    "semantic_hash": ""
+  },
+  "migration-fix-rls-cnpj-access-remove-legacy-permissive.sql": {
+    "mtime": 1788222380.2510357,
+    "ast_hash": "f126afa014ab15c12a2388fdb42ee612",
     "semantic_hash": ""
   }
 }

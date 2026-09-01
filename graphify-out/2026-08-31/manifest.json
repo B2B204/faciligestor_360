@@ -260,9 +260,9 @@
     "semantic_hash": "e2fc7a72087aa06cd56425ca7b8733ca"
   },
   "src/components/common/CnpjSwitcher.jsx": {
-    "mtime": 1783435788.3629556,
-    "ast_hash": "a6bb3c19390890549a349cf9a7e3d72f",
-    "semantic_hash": "a6bb3c19390890549a349cf9a7e3d72f"
+    "mtime": 1788213192.1138656,
+    "ast_hash": "a973038afdda6b00d9632c86851470f5",
+    "semantic_hash": ""
   },
   "src/components/common/DataRecovery.jsx": {
     "mtime": 1781884223.0,
@@ -285,9 +285,9 @@
     "semantic_hash": "692713c5ff01e03bb40d1c4cefc5d5ff"
   },
   "src/components/common/RequestCnpjDialog.jsx": {
-    "mtime": 1783430870.5967166,
-    "ast_hash": "b57889007f46537ebfe353731b5b66f5",
-    "semantic_hash": "b57889007f46537ebfe353731b5b66f5"
+    "mtime": 1788222021.5583718,
+    "ast_hash": "c445baf517ed2f577cc389e7ffe1f428",
+    "semantic_hash": ""
   },
   "src/components/common/ThemeToggle.jsx": {
     "mtime": 1781884223.0,
@@ -1590,9 +1590,9 @@
     "semantic_hash": "a6f6f6a74a6eddc7e09de6ac31ddf267"
   },
   "src/pages/Profile.jsx": {
-    "mtime": 1785877428.2116387,
-    "ast_hash": "d5e425bbf7d79bcecdf53275ac6a5c92",
-    "semantic_hash": "d5e425bbf7d79bcecdf53275ac6a5c92"
+    "mtime": 1788213222.617832,
+    "ast_hash": "3cb6726878abb96aad2180cdc1fe5bc7",
+    "semantic_hash": ""
   },
   "src/pages/ReajusteContratual.jsx": {
     "mtime": 1783007325.745695,
@@ -1707,6 +1707,11 @@
   "migration-add-periodo-recibo-va-vt.sql": {
     "mtime": 1788191943.2095602,
     "ast_hash": "8782825e726093497b7b21f7ddacfa13",
+    "semantic_hash": ""
+  },
+  "migration-fix-rls-cnpj-access-auth-users.sql": {
+    "mtime": 1788212811.818834,
+    "ast_hash": "26f21564d074c409c0a498388b9ae422",
     "semantic_hash": ""
   }
 }

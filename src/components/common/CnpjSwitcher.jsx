@@ -15,10 +15,16 @@ export default function CnpjSwitcher({ user, onChanged }) {
     // Segurança: só entram na lista CNPJs efetivamente aprovados para este usuário
     // (user_cnpj_access) mais o CNPJ atual do próprio perfil — nunca todos os CNPJs
     // ativos do sistema, para não permitir troca livre para dados de outra empresa.
-    const rows = await UserCnpjAccess.filter({ user_email: user.email });
-    const cnpjs = Array.from(new Set([...(rows || []).map(r => r.cnpj), user?.cnpj || ""].filter(Boolean)));
-    setList(cnpjs);
-    setValue(user?.cnpj || cnpjs[0] || "");
+    try {
+      const rows = await UserCnpjAccess.filter({ user_email: user.email });
+      const cnpjs = Array.from(new Set([...(rows || []).map(r => r.cnpj), user?.cnpj || ""].filter(Boolean)));
+      setList(cnpjs);
+      setValue(user?.cnpj || cnpjs[0] || "");
+    } catch (error) {
+      console.error('Erro ao carregar CNPJs disponíveis:', error);
+      setList(user?.cnpj ? [user.cnpj] : []);
+      setValue(user?.cnpj || "");
+    }
   };
 
   useEffect(() => {

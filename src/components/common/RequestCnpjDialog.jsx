@@ -4,21 +4,38 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function RequestCnpjDialog({ user, onSubmitted }) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [cnpj, setCnpj] = useState("");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    const digits = cnpj.replace(/\D/g, '');
+    if (digits.length !== 14) {
+      toast({ variant: 'destructive', title: 'CNPJ inválido', description: 'Informe os 14 dígitos do CNPJ.' });
+      return;
+    }
     setLoading(true);
-    await CnpjAccessRequest.create({ requester_email: user.email, cnpj: cnpj.replace(/\D/g, ''), reason, status: "pendente" });
-    setLoading(false);
-    setOpen(false);
-    setCnpj("");
-    setReason("");
-    onSubmitted?.();
+    try {
+      await CnpjAccessRequest.create({ requester_email: user.email, cnpj: digits, reason, status: "pendente" });
+      setOpen(false);
+      setCnpj("");
+      setReason("");
+      onSubmitted?.();
+      toast({
+        title: 'Solicitação enviada',
+        description: 'Um administrador precisa aprovar em Configurações da Empresa antes que o CNPJ apareça no seletor.',
+      });
+    } catch (error) {
+      console.error('Erro ao solicitar acesso a CNPJ:', error);
+      toast({ variant: 'destructive', title: 'Erro ao enviar solicitação', description: error.message || 'Tente novamente.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

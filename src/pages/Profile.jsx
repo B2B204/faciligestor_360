@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { UserInvite } from "@/entities/UserInvite";
 import { DataSubjectRequest } from "@/entities/DataSubjectRequest";
+import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
+import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
 import { TeamMember } from "@/entities/TeamMember";
 import { Contract } from "@/entities/Contract";
 import { Employee } from "@/entities/Employee";
@@ -61,6 +63,8 @@ export default function ProfilePage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [effectivePlan, setEffectivePlan] = useState('none');
   const [loadError, setLoadError] = useState(false);
+  const [myCnpjRequests, setMyCnpjRequests] = useState([]);
+  const [myCnpjAccess, setMyCnpjAccess] = useState([]);
 
   useEffect(() => {
     loadAllData();
@@ -98,7 +102,8 @@ export default function ProfilePage() {
           await Promise.all([
               loadTeamMembers(currentUser),
               loadPendingInvites(currentUser),
-              loadStats(currentUser)
+              loadStats(currentUser),
+              loadCnpjAccess(currentUser)
           ]);
       }
     } catch (error) {
@@ -135,6 +140,19 @@ export default function ProfilePage() {
         employees: employees.length, // Funcionários (não contam para o plano)
         actualUsers: actualSystemUsers // Usuários reais (contam para o plano)
       });
+  };
+
+  const loadCnpjAccess = async (currentUser) => {
+    try {
+      const [requests, access] = await Promise.all([
+        CnpjAccessRequest.filter({ requester_email: currentUser.email }, '-created_at'),
+        UserCnpjAccess.filter({ user_email: currentUser.email }),
+      ]);
+      setMyCnpjRequests(requests || []);
+      setMyCnpjAccess(access || []);
+    } catch (error) {
+      console.error("Erro ao carregar acessos de CNPJ:", error);
+    }
   };
 
   const loadPendingInvites = async (currentUser) => {
@@ -780,6 +798,52 @@ Esta ação irá:
           </div>
         </CardContent>
       </Card>
+
+      {/* Outros CNPJs (solicitações e acessos concedidos) */}
+      {(myCnpjRequests.length > 0 || myCnpjAccess.length > 0) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <ShieldCheck className="w-6 h-6 mr-3 text-blue-600" />
+              Outros CNPJs
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {myCnpjAccess.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Acessos concedidos</h4>
+                <div className="flex flex-wrap gap-2">
+                  {myCnpjAccess.map((a) => (
+                    <Badge key={a.id} className="bg-green-100 text-green-800">{a.cnpj}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {myCnpjRequests.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Minhas solicitações</h4>
+                <div className="space-y-2">
+                  {myCnpjRequests.map((req) => (
+                    <div key={req.id} className="flex items-center justify-between p-2 border rounded-lg text-sm">
+                      <span className="text-foreground">{req.cnpj}</span>
+                      <Badge className={
+                        req.status === 'aprovado' ? 'bg-green-100 text-green-800' :
+                        req.status === 'rejeitado' ? 'bg-red-100 text-red-800' :
+                        'bg-amber-100 text-amber-800'
+                      }>
+                        {req.status || 'pendente'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Solicitações pendentes precisam ser aprovadas por um administrador em Configurações da Empresa.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* User Management Card (apenas para admins) */}
       {user.department === 'admin' && (

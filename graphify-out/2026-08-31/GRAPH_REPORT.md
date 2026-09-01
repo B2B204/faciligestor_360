@@ -1,7 +1,7 @@
 # Graph Report - facilitagestor360-main  (2026-08-31)
 
 ## Corpus Check
-- 341 files · ~210,187 words
+- 341 files · ~210,311 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

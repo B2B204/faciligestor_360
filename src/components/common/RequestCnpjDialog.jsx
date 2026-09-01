@@ -2,16 +2,23 @@ import React, { useState } from "react";
 import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import CnpjLookupInput from "@/components/common/CnpjLookupInput";
 
 export default function RequestCnpjDialog({ user, onSubmitted }) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [cnpj, setCnpj] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const resetForm = () => {
+    setCnpj("");
+    setCompanyName("");
+    setReason("");
+  };
 
   const handleSubmit = async () => {
     const digits = cnpj.replace(/\D/g, '');
@@ -23,8 +30,7 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
     try {
       await CnpjAccessRequest.create({ requester_email: user.email, cnpj: digits, reason, status: "pendente" });
       setOpen(false);
-      setCnpj("");
-      setReason("");
+      resetForm();
       onSubmitted?.();
       toast({
         title: 'Solicitação enviada',
@@ -39,7 +45,7 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">Solicitar CNPJ</Button>
       </DialogTrigger>
@@ -48,7 +54,16 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
           <DialogTitle>Solicitar acesso a CNPJ</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          <Input placeholder="CNPJ (somente números)" value={cnpj} onChange={(e) => setCnpj(e.target.value)} />
+          <CnpjLookupInput
+            placeholder="00.000.000/0001-00"
+            name="cnpj"
+            value={cnpj}
+            onChange={(e) => setCnpj(e.target.value)}
+            onFound={(data) => setCompanyName(data.nome || "")}
+          />
+          {companyName && (
+            <p className="text-xs text-green-700 dark:text-green-400">Empresa encontrada: {companyName}</p>
+          )}
           <Textarea placeholder="Justificativa (opcional)" value={reason} onChange={(e) => setReason(e.target.value)} />
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>

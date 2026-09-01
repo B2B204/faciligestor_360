@@ -166,6 +166,27 @@ export default function ProfilePage() {
     }
   };
 
+  // Admin já tem autoridade pra aprovar qualquer solicitação em
+  // Configurações da Empresa — evita ter que sair do Perfil pra liberar um
+  // pedido próprio ou de outro usuário.
+  const handleApproveCnpjRequest = async (req) => {
+    try {
+      const existingAccess = await UserCnpjAccess.filter({ user_email: req.requester_email, cnpj: req.cnpj });
+      if (!existingAccess || existingAccess.length === 0) {
+        await UserCnpjAccess.create({ user_email: req.requester_email, cnpj: req.cnpj });
+      }
+      await CnpjAccessRequest.update(req.id, {
+        status: 'aprovado',
+        decided_by: user.email,
+        decided_at: new Date().toISOString(),
+      });
+      await loadCnpjAccess(user);
+    } catch (error) {
+      console.error("Erro ao aprovar solicitação de CNPJ:", error);
+      alert("Não foi possível aprovar a solicitação.");
+    }
+  };
+
   const loadPendingInvites = async (currentUser) => {
     if(currentUser.department === 'admin') {
       try {
@@ -845,6 +866,17 @@ Esta ação irá:
                         }>
                           {req.status || 'pendente'}
                         </Badge>
+                        {user.department === 'admin' && (!req.status || req.status === 'pendente') && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Aprovar"
+                            onClick={() => handleApproveCnpjRequest(req)}
+                            className="h-7 w-7 text-muted-foreground hover:text-green-600 hover:bg-green-50"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
                         <Button
                           size="icon"
                           variant="ghost"

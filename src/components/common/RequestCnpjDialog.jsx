@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
+import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,11 +37,32 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
         resetForm();
         return;
       }
-      await CnpjAccessRequest.create({ requester_email: user.email, cnpj: digits, reason, status: "pendente" });
+
+      // Admin já tem autoridade para aprovar qualquer solicitação em
+      // Configurações da Empresa — pedir para si mesmo e depois ter que ir
+      // aprovar manualmente é só fricção, então o acesso já sai liberado.
+      const isAdmin = user.department === 'admin';
+      const now = new Date().toISOString();
+      await CnpjAccessRequest.create({
+        requester_email: user.email,
+        cnpj: digits,
+        reason,
+        status: isAdmin ? 'aprovado' : 'pendente',
+        ...(isAdmin ? { decided_by: user.email, decided_at: now } : {}),
+      });
+      if (isAdmin) {
+        const existingAccess = await UserCnpjAccess.filter({ user_email: user.email, cnpj: digits });
+        if (!existingAccess || existingAccess.length === 0) {
+          await UserCnpjAccess.create({ user_email: user.email, cnpj: digits });
+        }
+      }
       setOpen(false);
       resetForm();
       onSubmitted?.();
-      toast({
+      toast(isAdmin ? {
+        title: 'Acesso liberado',
+        description: 'Você é administrador, então o CNPJ já está disponível no seletor.',
+      } : {
         title: 'Solicitação enviada',
         description: 'Um administrador precisa aprovar em Configurações da Empresa antes que o CNPJ apareça no seletor.',
       });

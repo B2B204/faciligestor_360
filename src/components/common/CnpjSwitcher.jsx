@@ -49,8 +49,18 @@ export default function CnpjSwitcher({ user, onChanged }) {
   const displayList = value && !list.includes(value) ? [...list, value] : list;
 
   const handleChange = async (cnpj) => {
+    if (cnpj === value) return;
     setValue(cnpj);
     const me = await User.me();
+    // O CNPJ atual só existe como profile.cnpj (nem sempre tem uma linha
+    // própria em user_cnpj_access) — sem guardar um acesso pra ele antes de
+    // trocar, ele simplesmente some da lista ao virar o "de antes".
+    if (me.cnpj && me.cnpj !== cnpj) {
+      const existing = await UserCnpjAccess.filter({ user_email: me.email, cnpj: me.cnpj });
+      if (!existing || existing.length === 0) {
+        await UserCnpjAccess.create({ user_email: me.email, cnpj: me.cnpj });
+      }
+    }
     await User.update(me.id, { cnpj });
     onChanged?.();
     window.location.reload();

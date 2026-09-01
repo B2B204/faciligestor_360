@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS contracts (
   city            TEXT,
   state           TEXT,
   responsible     TEXT,
-  notes           TEXT,
+  notes           JSONB DEFAULT '[]'::jsonb,
   deleted_at      TIMESTAMPTZ,
   deleted_by      TEXT,
   created_by      TEXT,

@@ -8,9 +8,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ExternalLink, Save, CheckCircle, PlusCircle, ClipboardCheck } from "lucide-react"; // Added PlusCircle icon for notes
 import RepactuacaoSection from "./RepactuacaoSection";
-import CnpjLookupInput from "@/components/common/CnpjLookupInput";
+import CnpjLookupInput, { formatCnpj } from "@/components/common/CnpjLookupInput";
 import { TaskTemplate } from "@/entities/TaskTemplate";
 import { User } from "@/entities/User";
+import { CompanyCnpj } from "@/entities/CompanyCnpj";
 
 export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
   const [formData, setFormData] = useState({
@@ -39,6 +40,7 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [newNoteText, setNewNoteText] = useState(""); // State to manage the input for new notes
   const [taskTemplates, setTaskTemplates] = useState([]);
+  const [companyCnpjs, setCompanyCnpjs] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -48,6 +50,17 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
         setTaskTemplates(templates);
       } catch (e) {
         console.error("Erro ao carregar modelos de tarefas:", e);
+      }
+    })();
+    (async () => {
+      try {
+        // Os funcionários de um contrato ficam vinculados ao CNPJ contratado,
+        // então só faz sentido oferecer os CNPJs já cadastrados e liberados
+        // em Configurações da Empresa — não um texto livre.
+        const rows = await CompanyCnpj.filter({ is_active: true });
+        setCompanyCnpjs(rows || []);
+      } catch (e) {
+        console.error("Erro ao carregar CNPJs cadastrados:", e);
       }
     })();
   }, []);
@@ -288,13 +301,28 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
           </div>
           <div>
             <Label htmlFor="contractor_cnpj">CNPJ da Empresa Contratada (opcional)</Label>
-            <CnpjLookupInput
-              id="contractor_cnpj"
-              name="contractor_cnpj"
-              value={formData.contractor_cnpj}
-              onChange={handleChange}
-              placeholder="00.000.000/0001-00"
-            />
+            <Select
+              value={formData.contractor_cnpj || ""}
+              onValueChange={(v) => setFormData((prev) => ({ ...prev, contractor_cnpj: v }))}
+            >
+              <SelectTrigger id="contractor_cnpj">
+                <SelectValue placeholder="Selecione o CNPJ cadastrado" />
+              </SelectTrigger>
+              <SelectContent>
+                {companyCnpjs.map((c) => (
+                  <SelectItem key={c.cnpj} value={c.cnpj}>
+                    {formatCnpj(c.cnpj)}{c.display_name ? ` — ${c.display_name}` : ''}
+                  </SelectItem>
+                ))}
+                {/* Garante que um valor já salvo apareça mesmo se não estiver mais na lista de ativos */}
+                {formData.contractor_cnpj && !companyCnpjs.some((c) => c.cnpj === formData.contractor_cnpj) && (
+                  <SelectItem value={formData.contractor_cnpj}>{formatCnpj(formData.contractor_cnpj)}</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1">
+              Os funcionários deste contrato ficam vinculados a este CNPJ. Cadastre novos CNPJs em Configurações da Empresa.
+            </p>
           </div>
           <div className="md:col-span-2"> {/* Useful link now within the grid and spans 2 columns */}
             <Label htmlFor="useful_link">Link Útil do Cliente (Portal)</Label>

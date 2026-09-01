@@ -15321,7 +15321,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/common/CnpjSwitcher.jsx",
-      "source_location": "L53",
+      "source_location": "L54",
       "weight": 1.0,
       "source": "src_components_common_cnpjswitcher_cnpjswitcher",
       "target": "src_entities_user_user"
@@ -26483,5 +26483,5 @@
       "source_file": "index.html"
     }
   ],
-  "built_at_commit": "2d16269bbf367b5b5d9737a6cbf9aeb6ddb1388a"
+  "built_at_commit": "af6085fe6899fc61beb97d8288691f0a09b29d24"
 }

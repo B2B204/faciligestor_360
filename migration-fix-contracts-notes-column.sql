@@ -28,3 +28,16 @@ BEGIN
     ALTER TABLE contracts ALTER COLUMN notes SET DEFAULT '[]'::jsonb;
   END IF;
 END $$;
+
+-- ============================================================
+-- CORREÇÃO 2: a tabela contracts foi migrada do base44 e usa as colunas
+-- "created_date"/"updated_date" (não "created_at"/"updated_at"). O
+-- app (src/lib/entity.js, createEntity com legacyTimestamps:true) já
+-- seta "updated_date" manualmente a cada update. Porém o trigger
+-- "contracts_updated_at" (criado em supabase-schema.sql) tenta setar
+-- NEW.updated_at, coluna que não existe na tabela ao vivo, causando:
+--   record "new" has no field "updated_at"
+-- em toda atualização de contrato. Como o app já cuida do timestamp,
+-- o trigger é redundante aqui e pode ser removido com segurança.
+-- ============================================================
+DROP TRIGGER IF EXISTS contracts_updated_at ON contracts;

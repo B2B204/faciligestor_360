@@ -155,6 +155,17 @@ export default function ProfilePage() {
     }
   };
 
+  const handleCancelCnpjRequest = async (req) => {
+    if (!window.confirm(`Cancelar a solicitação de acesso ao CNPJ ${req.cnpj}?`)) return;
+    try {
+      await CnpjAccessRequest.delete(req.id);
+      await loadCnpjAccess(user);
+    } catch (error) {
+      console.error("Erro ao cancelar solicitação de CNPJ:", error);
+      alert("Não foi possível cancelar a solicitação.");
+    }
+  };
+
   const loadPendingInvites = async (currentUser) => {
     if(currentUser.department === 'admin') {
       try {
@@ -826,13 +837,24 @@ Esta ação irá:
                   {myCnpjRequests.map((req) => (
                     <div key={req.id} className="flex items-center justify-between p-2 border rounded-lg text-sm">
                       <span className="text-foreground">{req.cnpj}</span>
-                      <Badge className={
-                        req.status === 'aprovado' ? 'bg-green-100 text-green-800' :
-                        req.status === 'rejeitado' ? 'bg-red-100 text-red-800' :
-                        'bg-amber-100 text-amber-800'
-                      }>
-                        {req.status || 'pendente'}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className={
+                          req.status === 'aprovado' ? 'bg-green-100 text-green-800' :
+                          req.status === 'rejeitado' ? 'bg-red-100 text-red-800' :
+                          'bg-amber-100 text-amber-800'
+                        }>
+                          {req.status || 'pendente'}
+                        </Badge>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          title="Cancelar solicitação"
+                          onClick={() => handleCancelCnpjRequest(req)}
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>

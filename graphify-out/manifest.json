@@ -300,8 +300,8 @@
     "semantic_hash": "1ac40e7082032ceaf24c3991f4ad0739"
   },
   "src/components/contracts/ContractForm.jsx": {
-    "mtime": 1788224858.9638164,
-    "ast_hash": "e2d2f72a23205f8ad15a4ad755c295d4",
+    "mtime": 1788225351.5928705,
+    "ast_hash": "7fb2996b56a4c193a17857478eca28b9",
     "semantic_hash": ""
   },
   "src/components/contracts/ContractHistoryDialog.jsx": {

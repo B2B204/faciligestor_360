@@ -12,6 +12,7 @@ import CnpjLookupInput, { formatCnpj } from "@/components/common/CnpjLookupInput
 import { TaskTemplate } from "@/entities/TaskTemplate";
 import { User } from "@/entities/User";
 import { CompanyCnpj } from "@/entities/CompanyCnpj";
+import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
 
 export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
   const [formData, setFormData] = useState({
@@ -55,10 +56,23 @@ export default function ContractForm({ contract, onSave, onCancel, isSaving }) {
     (async () => {
       try {
         // Os funcionários de um contrato ficam vinculados ao CNPJ contratado,
-        // então só faz sentido oferecer os CNPJs já cadastrados e liberados
-        // em Configurações da Empresa — não um texto livre.
-        const rows = await CompanyCnpj.filter({ is_active: true });
-        setCompanyCnpjs(rows || []);
+        // então só faz sentido oferecer os CNPJs já liberados pra este
+        // usuário — os mesmos que aparecem no seletor do topo (CnpjSwitcher):
+        // union de user_cnpj_access + o CNPJ atual do perfil. Usar só a
+        // tabela de cadastro (company_cnpjs) deixa de fora CNPJs liberados
+        // via "Solicitar CNPJ" que nunca passaram por lá.
+        const currentUser = await User.me();
+        const [registered, access] = await Promise.all([
+          CompanyCnpj.filter({ is_active: true }),
+          UserCnpjAccess.filter({ user_email: currentUser.email }),
+        ]);
+        const nameByCnpj = new Map((registered || []).map((c) => [c.cnpj, c.display_name]));
+        const allCnpjs = Array.from(new Set([
+          ...(registered || []).map((c) => c.cnpj),
+          ...(access || []).map((a) => a.cnpj),
+          currentUser.cnpj || "",
+        ].filter(Boolean)));
+        setCompanyCnpjs(allCnpjs.map((cnpj) => ({ cnpj, display_name: nameByCnpj.get(cnpj) })));
       } catch (e) {
         console.error("Erro ao carregar CNPJs cadastrados:", e);
       }

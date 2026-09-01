@@ -285,8 +285,8 @@
     "semantic_hash": "692713c5ff01e03bb40d1c4cefc5d5ff"
   },
   "src/components/common/RequestCnpjDialog.jsx": {
-    "mtime": 1788222398.9268749,
-    "ast_hash": "d1f3f249bbd100325f63f9ae0e77f453",
+    "mtime": 1788222942.8866923,
+    "ast_hash": "4d95b994cfac52489c205e4e8f5aa809",
     "semantic_hash": ""
   },
   "src/components/common/ThemeToggle.jsx": {
@@ -1590,8 +1590,8 @@
     "semantic_hash": "a6f6f6a74a6eddc7e09de6ac31ddf267"
   },
   "src/pages/Profile.jsx": {
-    "mtime": 1788222749.834775,
-    "ast_hash": "1ab91b79ec44a5c65f2c976b12395489",
+    "mtime": 1788223189.5586138,
+    "ast_hash": "ad07a88732a4631506e40a689ba63736",
     "semantic_hash": ""
   },
   "src/pages/ReajusteContratual.jsx": {

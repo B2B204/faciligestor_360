@@ -180,6 +180,11 @@ export default function ProfilePage() {
         decided_by: user.email,
         decided_at: new Date().toISOString(),
       });
+      // O seletor de CNPJ no topo (CnpjSwitcher) vive no Layout, fora desta
+      // página — avisa ele para recarregar a lista de acessos.
+      if (req.requester_email === user.email) {
+        window.dispatchEvent(new Event('cnpj-access-changed'));
+      }
       await loadCnpjAccess(user);
     } catch (error) {
       console.error("Erro ao aprovar solicitação de CNPJ:", error);

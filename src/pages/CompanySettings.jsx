@@ -70,6 +70,11 @@ export default function CompanySettings() {
           decided_at: new Date().toISOString(),
         })),
       ]);
+      // O seletor de CNPJ no topo (CnpjSwitcher) vive no Layout, fora desta
+      // página — avisa ele para recarregar a lista de acessos.
+      if (req.requester_email === user.email) {
+        window.dispatchEvent(new Event('cnpj-access-changed'));
+      }
       await load();
       toast({ title: 'Acesso concedido', description: `${req.requester_email} agora pode acessar o CNPJ ${req.cnpj}.` });
     } catch (error) {
@@ -153,6 +158,9 @@ export default function CompanySettings() {
       if (!existing || existing.length === 0) {
         await UserCnpjAccess.create({ user_email: user.email, cnpj });
       }
+      // O seletor de CNPJ no topo (CnpjSwitcher) vive no Layout, fora desta
+      // página — avisa ele para recarregar a lista de acessos.
+      window.dispatchEvent(new Event('cnpj-access-changed'));
       setForm({ cnpj: "", display_name: "", is_active: true, notify_accounting: true });
       setRfInfo(null);
       await load();

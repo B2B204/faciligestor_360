@@ -260,8 +260,8 @@
     "semantic_hash": "e2fc7a72087aa06cd56425ca7b8733ca"
   },
   "src/components/common/CnpjSwitcher.jsx": {
-    "mtime": 1788213192.1138656,
-    "ast_hash": "a973038afdda6b00d9632c86851470f5",
+    "mtime": 1788223471.5795968,
+    "ast_hash": "fcf108bb3a7ca9766a7f6c81103a0e4b",
     "semantic_hash": ""
   },
   "src/components/common/DataRecovery.jsx": {
@@ -285,8 +285,8 @@
     "semantic_hash": "692713c5ff01e03bb40d1c4cefc5d5ff"
   },
   "src/components/common/RequestCnpjDialog.jsx": {
-    "mtime": 1788222942.8866923,
-    "ast_hash": "4d95b994cfac52489c205e4e8f5aa809",
+    "mtime": 1788223502.1456127,
+    "ast_hash": "f5feec5391ff98866597cb1c82b1b8ef",
     "semantic_hash": ""
   },
   "src/components/common/ThemeToggle.jsx": {
@@ -1455,8 +1455,8 @@
     "semantic_hash": "e609903d9f69eca2a5264303dbd64f5c"
   },
   "src/pages/CompanySettings.jsx": {
-    "mtime": 1788222426.6911907,
-    "ast_hash": "606a11c1b71111f395f245fdb31e6a31",
+    "mtime": 1788223493.3125691,
+    "ast_hash": "18099687054b91bfeab807b725f40d78",
     "semantic_hash": ""
   },
   "src/pages/Contracts.jsx": {
@@ -1590,8 +1590,8 @@
     "semantic_hash": "a6f6f6a74a6eddc7e09de6ac31ddf267"
   },
   "src/pages/Profile.jsx": {
-    "mtime": 1788223189.5586138,
-    "ast_hash": "ad07a88732a4631506e40a689ba63736",
+    "mtime": 1788223478.1496222,
+    "ast_hash": "ca7c4cd2f083868c618815a3dd31400d",
     "semantic_hash": ""
   },
   "src/pages/ReajusteContratual.jsx": {

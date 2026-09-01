@@ -59,6 +59,7 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
       setOpen(false);
       resetForm();
       onSubmitted?.();
+      if (isAdmin) window.dispatchEvent(new Event('cnpj-access-changed'));
       toast(isAdmin ? {
         title: 'Acesso liberado',
         description: 'Você é administrador, então o CNPJ já está disponível no seletor.',

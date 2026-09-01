@@ -33,6 +33,15 @@ export default function CnpjSwitcher({ user, onChanged }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.email]);
 
+  useEffect(() => {
+    // O CnpjSwitcher vive no Layout, fora das páginas onde o acesso a um
+    // CNPJ é concedido (Perfil, Configurações da Empresa) — sem esse
+    // evento, a lista só atualizaria depois de um F5 manual.
+    window.addEventListener('cnpj-access-changed', load);
+    return () => window.removeEventListener('cnpj-access-changed', load);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email]);
+
   // Garante que o cnpj selecionado sempre tenha um SelectItem correspondente
   // já renderizado, mesmo no primeiro paint (antes de load() resolver) —
   // sem isso o Radix Select define o valor mas não acha o item para exibir

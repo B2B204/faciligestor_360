@@ -277,6 +277,8 @@ export default function EmployeeForm({ employee, contracts, onSave, onCancel, is
 
     const dataWithConsent = {
       ...formData,
+      // Campos de data opcionais não podem ir como string vazia para o Postgres.
+      dismissal_date: formData.dismissal_date || null,
       // Só grava a data/autor do consentimento na primeira vez — edições
       // seguintes não devem sobrescrever quando/quem obteve o consentimento original.
       ...(employee?.lgpd_consent_at ? {} : { lgpd_consent_at: new Date().toISOString() }),

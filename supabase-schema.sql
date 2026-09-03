@@ -994,6 +994,18 @@ BEGIN
       RETURN NEW;
     END IF;
 
+    -- Fundar uma empresa nova: só quando o usuário ainda não tinha cnpj e
+    -- o cnpj novo não pertence a ninguém (nem outro profile, nem já
+    -- registrado em company_cnpjs) — ver
+    -- migration-fix-profile-cnpj-onboarding-approval.sql.
+    IF OLD.cnpj IS NULL
+       AND NEW.department IS NOT DISTINCT FROM OLD.department
+       AND NOT EXISTS (SELECT 1 FROM profiles WHERE cnpj = NEW.cnpj)
+       AND NOT EXISTS (SELECT 1 FROM company_cnpjs WHERE cnpj = NEW.cnpj)
+    THEN
+      RETURN NEW;
+    END IF;
+
     IF NEW.department IS DISTINCT FROM OLD.department THEN
       RAISE EXCEPTION 'Alteração de department não permitida fora do fluxo de convite';
     END IF;

@@ -4,6 +4,7 @@ import { UserInvite } from "@/entities/UserInvite";
 import { DataSubjectRequest } from "@/entities/DataSubjectRequest";
 import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
 import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
+import { CompanyCnpj } from "@/entities/CompanyCnpj";
 import { TeamMember } from "@/entities/TeamMember";
 import { Contract } from "@/entities/Contract";
 import { Employee } from "@/entities/Employee";
@@ -449,12 +450,58 @@ Esta ação irá:
       // empresa (Entity.filter faz igualdade exata) — precisa ir sem
       // máscara, senão o usuário deixa de ver os dados dos colegas e
       // vice-versa.
-      await User.update(user.id, { ...formData, cnpj: formData.cnpj.replace(/\D/g, '') });
+      const cnpjDigits = formData.cnpj.replace(/\D/g, '');
+      const cnpjChanged = cnpjDigits !== (user.cnpj || '');
+
+      if (cnpjChanged) {
+        if (user.cnpj) {
+          // Já tem empresa vinculada: trocar de CNPJ aqui pularia o fluxo de
+          // aprovação. Para acessar outra empresa é "Trocar de CNPJ"
+          // (acesso já aprovado) ou "Solicitar CNPJ" no topo da tela.
+          alert('Para vincular sua conta a outro CNPJ, use "Trocar de CNPJ" ou "Solicitar CNPJ" no topo da tela — este campo só define o CNPJ da sua empresa no primeiro acesso.');
+          setIsSaving(false);
+          return;
+        }
+
+        // Primeiro acesso: um CNPJ novo aqui não pode ser assumido direto —
+        // se já existe uma empresa cadastrada com esse número, isso é
+        // "entrar" numa empresa já existente, e precisa da aprovação de um
+        // administrador dela, não do salvamento direto deste formulário
+        // (era isso que permitia qualquer conta recém-criada virar admin
+        // instantâneo de qualquer CNPJ só de digitar o número, sem nunca
+        // aparecer para o admin real aprovar).
+        const existingCompany = await CompanyCnpj.filter({ cnpj: cnpjDigits });
+        if (existingCompany && existingCompany.length > 0) {
+          const already = (myCnpjRequests || []).some(r => r.cnpj === cnpjDigits && (!r.status || r.status === 'pendente'));
+          if (!already) {
+            await CnpjAccessRequest.create({
+              requester_email: user.email,
+              cnpj: cnpjDigits,
+              reason: 'Solicitado ao completar o perfil.',
+              status: 'pendente',
+            });
+          }
+          await loadCnpjAccess(user);
+          alert('Esse CNPJ já está cadastrado no sistema. Enviamos uma solicitação de acesso — um administrador da empresa precisa aprovar antes que você tenha acesso aos dados dela.');
+          setIsSaving(false);
+          return;
+        }
+
+        // CNPJ inédito: completar o perfil também registra a empresa (mesmo
+        // efeito de Configurações da Empresa), e este usuário vira o admin
+        // fundador dela.
+        await User.update(user.id, { ...formData, cnpj: cnpjDigits });
+        await CompanyCnpj.create({ cnpj: cnpjDigits, display_name: formData.company_name });
+      } else {
+        await User.update(user.id, formData);
+      }
+
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       loadAllData();
     } catch (error) {
-      alert("Erro ao atualizar perfil.");
+      console.error('Erro ao atualizar perfil:', error);
+      alert(error.message || "Erro ao atualizar perfil.");
     }
     setIsSaving(false);
   };

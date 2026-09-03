@@ -31,7 +31,7 @@ export default function FiscalSettings() {
   useEffect(() => { load().finally(() => setLoading(false)); }, []);
 
   const uploadPfx = async (file, which) => {
-    const { file_uri } = await UploadPrivateFile({ file });
+    const { file_uri } = await UploadPrivateFile({ file, cnpj: user?.cnpj });
     const now = new Date().toISOString();
     const update = which === 'prod' ? { prod_pfx_uri: file_uri, prod_pfx_uploaded_at: now } : { hml_pfx_uri: file_uri, hml_pfx_uploaded_at: now };
     const body = { ...settings, ...update, environment: env, cnpj: user?.cnpj };

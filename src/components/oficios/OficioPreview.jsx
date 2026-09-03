@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Printer } from 'lucide-react';
 import { format } from 'date-fns';
+import DOMPurify from 'dompurify';
 
 export default function OficioPreview({ oficio, currentUser }) {
   const generateHtmlContent = () => {
@@ -86,7 +87,7 @@ export default function OficioPreview({ oficio, currentUser }) {
             </div>
 
             <div class="body-content">
-              ${oficio.corpo_oficio || ''}
+              ${DOMPurify.sanitize(oficio.corpo_oficio || '')}
             </div>
 
             <div class="signature">

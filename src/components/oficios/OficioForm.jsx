@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import DOMPurify from "dompurify";
 import { Table2, Save, Eye, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Employee } from "@/entities/Employee";
@@ -387,7 +388,7 @@ export default function OficioForm({ oficio, onSave, onCancel, currentUser, sugg
             <div className="max-w-[800px] mx-auto bg-white min-h-full">
               <div
                 className="prose prose-sm max-w-none text-gray-800"
-                dangerouslySetInnerHTML={{ __html: form.corpo_oficio }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(form.corpo_oficio || '') }}
               />
             </div>
           </div>

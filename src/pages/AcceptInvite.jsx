@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UserInvite } from "@/entities/UserInvite";
 import { TeamMember } from "@/entities/TeamMember";
 import { supabase } from "@/api/supabaseClient";
 import { Button } from "@/components/ui/button";
@@ -138,8 +137,12 @@ export default function AcceptInvite() {
         await TeamMember.create(memberData);
       }
 
-      // Mark invite as accepted
-      await UserInvite.update(invite.id, { status: "aceito" });
+      // Mark invite as accepted. Uses the accept_invite() SECURITY DEFINER
+      // function instead of a direct UserInvite.update — the invited user
+      // isn't admin of the invite's cnpj yet, so RLS on user_invites (which
+      // now requires department='admin') would reject a plain client update.
+      const { error: acceptError } = await supabase.rpc("accept_invite", { p_code: invite.invite_code });
+      if (acceptError) throw acceptError;
 
       setPhase("success");
 

@@ -76,7 +76,7 @@ export default function Invoices(){
       const text = await file.text();
       const parsed = parseXmlInvoice(text) || {};
       const { issuer_name, recipient_name, ...parsedForInvoice } = parsed;
-      const { file_uri } = await UploadPrivateFile({ file });
+      const { file_uri } = await UploadPrivateFile({ file, cnpj: me?.cnpj });
       const payload = { ...parsedForInvoice, total_amount: Number(parsed.total_amount)||0, xml_file_uri: file_uri, status: 'uploaded', environment: 'homologacao', cnpj: me?.cnpj };
       const inv = await Invoice.create(payload);
       await createFinRecord({ ...inv, issuer_name, recipient_name });

@@ -961,7 +961,11 @@ ALTER TABLE user_cnpj_access      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE taxes                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE materials             ENABLE ROW LEVEL SECURITY;
 
--- Políticas para profiles: usuário vê/edita apenas seu próprio perfil
+-- Políticas para profiles: usuário vê/edita apenas seu próprio perfil.
+-- IMPORTANTE: "profiles_update" só restringe QUAL linha pode ser alterada
+-- (auth.uid() = id); sem o trigger abaixo, nada impediria o próprio usuário
+-- de sobrescrever "cnpj"/"department" da própria linha e virar admin de
+-- outra empresa — ver migration-fix-profiles-privilege-escalation.sql.
 DROP POLICY IF EXISTS "profiles_select" ON profiles;
 DROP POLICY IF EXISTS "profiles_insert" ON profiles;
 DROP POLICY IF EXISTS "profiles_update" ON profiles;
@@ -969,13 +973,60 @@ CREATE POLICY "profiles_select" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "profiles_insert" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "profiles_update" ON profiles FOR UPDATE USING (auth.uid() = id);
 
--- Para company_cnpjs: todos autenticados podem ler (necessário para CnpjSwitcher)
+-- Bloqueia troca de cnpj/department fora dos fluxos legítimos (troca de
+-- CNPJ já aprovada em user_cnpj_access, ou aceite de convite pendente em
+-- user_invites). Ver migration-fix-profiles-privilege-escalation.sql.
+CREATE OR REPLACE FUNCTION prevent_profile_privilege_escalation()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NEW.cnpj IS DISTINCT FROM OLD.cnpj OR NEW.department IS DISTINCT FROM OLD.department THEN
+    IF EXISTS (
+      SELECT 1 FROM user_invites
+      WHERE email = OLD.email
+        AND cnpj = NEW.cnpj
+        AND department IS NOT DISTINCT FROM NEW.department
+        AND status = 'pendente'
+    ) THEN
+      RETURN NEW;
+    END IF;
+
+    IF NEW.department IS DISTINCT FROM OLD.department THEN
+      RAISE EXCEPTION 'Alteração de department não permitida fora do fluxo de convite';
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1 FROM user_cnpj_access
+      WHERE user_email = OLD.email AND cnpj = NEW.cnpj
+    ) THEN
+      RAISE EXCEPTION 'Troca de CNPJ não permitida: acesso não aprovado para %', NEW.cnpj;
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS profiles_prevent_privilege_escalation ON profiles;
+CREATE TRIGGER profiles_prevent_privilege_escalation
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION prevent_profile_privilege_escalation();
+
+-- Para company_cnpjs: todos autenticados podem ler (necessário para CnpjSwitcher).
+-- ALL com USING(true) aqui é intencional (o cadastro de empresas precisa ser
+-- visível/gerenciável por qualquer usuário autenticado antes de ele ter um
+-- cnpj vinculado) — ver migration-fix-rls-isolamento-entre-empresas.sql.
 DROP POLICY IF EXISTS "company_cnpjs_select" ON company_cnpjs;
 DROP POLICY IF EXISTS "company_cnpjs_all" ON company_cnpjs;
 CREATE POLICY "company_cnpjs_select" ON company_cnpjs FOR SELECT TO authenticated USING (true);
 CREATE POLICY "company_cnpjs_all"    ON company_cnpjs FOR ALL TO authenticated USING (true);
 
--- Para team_members: ler por cnpj ou por email do próprio usuário
+-- Para team_members: ler por cnpj ou por email do próprio usuário; escrever
+-- só dentro do próprio cnpj.
 DROP POLICY IF EXISTS "team_members_select" ON team_members;
 DROP POLICY IF EXISTS "team_members_all" ON team_members;
 CREATE POLICY "team_members_select" ON team_members FOR SELECT TO authenticated
@@ -983,13 +1034,60 @@ CREATE POLICY "team_members_select" ON team_members FOR SELECT TO authenticated
     cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
     OR email = (SELECT p.email FROM profiles p WHERE p.id = auth.uid())
   );
-CREATE POLICY "team_members_all" ON team_members FOR ALL TO authenticated USING (true);
+CREATE POLICY "team_members_all" ON team_members FOR ALL TO authenticated
+  USING (cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid()));
 
--- Para user_invites: ler por cnpj do usuário atual
+-- Para user_invites: só admin do cnpj lê/cria/atualiza/apaga convites —
+-- sem isso, qualquer colaborador podia se autoconvidar como admin (ver
+-- migration-fix-user-invites-admin-only.sql). O aceite do convite em si
+-- (usuário anônimo consultando pelo código, e o próprio convidado marcando
+-- como aceito) passa por funções SECURITY DEFINER (validate_invite,
+-- accept_invite), não por esta policy.
 DROP POLICY IF EXISTS "user_invites_select" ON user_invites;
 DROP POLICY IF EXISTS "user_invites_all" ON user_invites;
-CREATE POLICY "user_invites_select" ON user_invites FOR SELECT TO authenticated USING (true);
-CREATE POLICY "user_invites_all"    ON user_invites FOR ALL TO authenticated USING (true);
+DROP POLICY IF EXISTS "user_invites_insert" ON user_invites;
+DROP POLICY IF EXISTS "user_invites_update" ON user_invites;
+DROP POLICY IF EXISTS "user_invites_delete" ON user_invites;
+CREATE POLICY "user_invites_select" ON user_invites FOR SELECT TO authenticated
+  USING (
+    cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+    AND EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin')
+  );
+CREATE POLICY "user_invites_insert" ON user_invites FOR INSERT TO authenticated
+  WITH CHECK (
+    cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+    AND EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin')
+  );
+CREATE POLICY "user_invites_update" ON user_invites FOR UPDATE TO authenticated
+  USING (
+    cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+    AND EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin')
+  );
+CREATE POLICY "user_invites_delete" ON user_invites FOR DELETE TO authenticated
+  USING (
+    cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+    AND EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin')
+  );
+
+CREATE OR REPLACE FUNCTION public.accept_invite(p_code TEXT)
+RETURNS SETOF user_invites
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_email TEXT := auth.jwt() ->> 'email';
+BEGIN
+  RETURN QUERY
+    UPDATE user_invites
+    SET status = 'aceito', updated_at = now()
+    WHERE invite_code = p_code
+      AND status = 'pendente'
+      AND email = v_email
+    RETURNING *;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.accept_invite(TEXT) TO authenticated;
 
 -- Política genérica para tabelas multi-tenant (baseada em cnpj do profile do usuário)
 -- Aplica-se a: contracts, employees, financial_entries, etc.
@@ -1017,17 +1115,60 @@ BEGIN
       tbl, tbl
     );
     EXECUTE format(
-      'CREATE POLICY "%s_all" ON %s FOR ALL TO authenticated USING (true)',
+      'CREATE POLICY "%s_all" ON %s FOR ALL TO authenticated USING (
+         cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+       )',
       tbl, tbl
     );
   END LOOP;
 END $$;
 
--- Política para cnpj_access_requests e user_cnpj_access
+-- Política para cnpj_access_requests e user_cnpj_access: usuário vê/cria as
+-- próprias solicitações; só admin vê todas, aprova/rejeita e concede/revoga
+-- acesso (ver migration-fix-rls-cnpj-access-requests.sql e
+-- migration-fix-rls-cnpj-access-auth-users.sql — auth.jwt()->>'email' evita
+-- depender de SELECT em auth.users, que a role authenticated não tem).
 DROP POLICY IF EXISTS "cnpj_access_requests_all" ON cnpj_access_requests;
 DROP POLICY IF EXISTS "user_cnpj_access_all" ON user_cnpj_access;
-CREATE POLICY "cnpj_access_requests_all" ON cnpj_access_requests FOR ALL TO authenticated USING (true);
-CREATE POLICY "user_cnpj_access_all"     ON user_cnpj_access     FOR ALL TO authenticated USING (true);
+DROP POLICY IF EXISTS cnpj_access_requests_select ON cnpj_access_requests;
+DROP POLICY IF EXISTS cnpj_access_requests_insert ON cnpj_access_requests;
+DROP POLICY IF EXISTS cnpj_access_requests_update ON cnpj_access_requests;
+DROP POLICY IF EXISTS cnpj_access_requests_delete ON cnpj_access_requests;
+DROP POLICY IF EXISTS user_cnpj_access_select ON user_cnpj_access;
+DROP POLICY IF EXISTS user_cnpj_access_insert ON user_cnpj_access;
+DROP POLICY IF EXISTS user_cnpj_access_delete ON user_cnpj_access;
+
+CREATE POLICY cnpj_access_requests_select ON cnpj_access_requests
+  FOR SELECT TO authenticated
+  USING (
+    requester_email = (auth.jwt() ->> 'email')
+    OR EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin')
+  );
+CREATE POLICY cnpj_access_requests_insert ON cnpj_access_requests
+  FOR INSERT TO authenticated
+  WITH CHECK (requester_email = (auth.jwt() ->> 'email'));
+CREATE POLICY cnpj_access_requests_update ON cnpj_access_requests
+  FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin'));
+CREATE POLICY cnpj_access_requests_delete ON cnpj_access_requests
+  FOR DELETE TO authenticated
+  USING (
+    requester_email = (auth.jwt() ->> 'email')
+    OR EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin')
+  );
+
+CREATE POLICY user_cnpj_access_select ON user_cnpj_access
+  FOR SELECT TO authenticated
+  USING (
+    user_email = (auth.jwt() ->> 'email')
+    OR EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin')
+  );
+CREATE POLICY user_cnpj_access_insert ON user_cnpj_access
+  FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin'));
+CREATE POLICY user_cnpj_access_delete ON user_cnpj_access
+  FOR DELETE TO authenticated
+  USING (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.department = 'admin'));
 
 -- ============================================================
 -- STORAGE: Bucket para uploads
@@ -1044,3 +1185,34 @@ CREATE POLICY "uploads_select" ON storage.objects FOR SELECT USING (bucket_id = 
 CREATE POLICY "uploads_insert" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'uploads');
 CREATE POLICY "uploads_update" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'uploads');
 CREATE POLICY "uploads_delete" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'uploads');
+
+-- ============================================================
+-- STORAGE: Bucket privado (documentos sensíveis: certificados
+-- digitais .pfx, XMLs fiscais) — ver
+-- migration-fix-private-storage-bucket.sql. Diferente de
+-- "uploads", este bucket é public=false e a RLS exige que o
+-- primeiro segmento do caminho do objeto seja o cnpj do usuário,
+-- então cada empresa só acessa os próprios arquivos.
+-- ============================================================
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('private-uploads', 'private-uploads', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
+
+DROP POLICY IF EXISTS "private_uploads_select" ON storage.objects;
+DROP POLICY IF EXISTS "private_uploads_insert" ON storage.objects;
+DROP POLICY IF EXISTS "private_uploads_delete" ON storage.objects;
+CREATE POLICY "private_uploads_select" ON storage.objects FOR SELECT TO authenticated
+  USING (
+    bucket_id = 'private-uploads'
+    AND (storage.foldername(name))[1] IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+  );
+CREATE POLICY "private_uploads_insert" ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'private-uploads'
+    AND (storage.foldername(name))[1] IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+  );
+CREATE POLICY "private_uploads_delete" ON storage.objects FOR DELETE TO authenticated
+  USING (
+    bucket_id = 'private-uploads'
+    AND (storage.foldername(name))[1] IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+  );

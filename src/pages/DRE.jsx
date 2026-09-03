@@ -24,15 +24,20 @@ export default function DRE() {
 
   const load = async () => {
     setLoading(true);
-    const [ar, ap, cons] = await Promise.all([
-      AccountsReceivable.list('-updated_date', 5000),
-      AccountsPayable.list('-updated_at', 5000),
-      Contract.list('-updated_date', 1000)
-    ]);
-    setReceivables(ar || []);
-    setPayables(ap || []);
-    setContracts(cons || []);
-    setLoading(false);
+    try {
+      const [ar, ap, cons] = await Promise.all([
+        AccountsReceivable.list('-updated_at', 5000),
+        AccountsPayable.list('-updated_at', 5000),
+        Contract.list('-updated_at', 1000)
+      ]);
+      setReceivables(ar || []);
+      setPayables(ap || []);
+      setContracts(cons || []);
+    } catch (error) {
+      console.error('Erro ao carregar dados do DRE:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, []);

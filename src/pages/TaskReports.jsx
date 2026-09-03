@@ -50,7 +50,9 @@ export default function TaskReportsPage() {
 
   const scopedTasks = useMemo(() => {
     return tasks.filter((t) => {
-      const matchesPeriod = t.created_at ? isAfter(new Date(t.created_at), cutoff) : true;
+      const createdInPeriod = t.created_at ? isAfter(new Date(t.created_at), cutoff) : true;
+      const completedInPeriod = t.completed_at ? isAfter(new Date(t.completed_at), cutoff) : false;
+      const matchesPeriod = createdInPeriod || completedInPeriod;
       const matchesContract = contractFilter === "all" || t.contract_id === contractFilter;
       const matchesDepartment = departmentFilter === "all" || t.department === departmentFilter;
       return matchesPeriod && matchesContract && matchesDepartment;
@@ -62,12 +64,16 @@ export default function TaskReportsPage() {
   const productivityByWeek = useMemo(() => {
     const map = new Map();
     completedTasks.forEach((t) => {
-      const weekStart = format(startOfWeek(new Date(t.completed_at), { weekStartsOn: 0 }), "dd/MM");
-      map.set(weekStart, (map.get(weekStart) || 0) + 1);
+      const weekStartDate = startOfWeek(new Date(t.completed_at), { weekStartsOn: 0 });
+      const sortKey = format(weekStartDate, "yyyy-MM-dd");
+      const label = format(weekStartDate, "dd/MM");
+      const entry = map.get(sortKey) || { semana: label, concluidas: 0 };
+      entry.concluidas += 1;
+      map.set(sortKey, entry);
     });
     return Array.from(map.entries())
-      .map(([semana, concluidas]) => ({ semana, concluidas }))
-      .sort((a, b) => a.semana.localeCompare(b.semana));
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, entry]) => entry);
   }, [completedTasks]);
 
   const topAssignees = useMemo(() => {

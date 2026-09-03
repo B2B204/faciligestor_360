@@ -120,7 +120,7 @@ export default function CrmDashboard({ user }) {
                 <p className="text-2xl sm:text-3xl font-bold">{dashboardData.totalLeads}</p>
                 <div className="flex items-center mt-1 sm:mt-2">
                   <Target className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                  <span className="text-xs sm:text-sm">Este mês</span>
+                  <span className="text-xs sm:text-sm">Total acumulado</span>
                 </div>
               </div>
               <Target className="w-6 h-6 sm:w-8 sm:h-8 text-blue-200" />
@@ -168,7 +168,7 @@ export default function CrmDashboard({ user }) {
                 <p className="text-2xl sm:text-3xl font-bold">{dashboardData.wonDeals}</p>
                 <div className="flex items-center mt-1 sm:mt-2">
                   <Award className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                  <span className="text-xs sm:text-sm">Este mês</span>
+                  <span className="text-xs sm:text-sm">Total acumulado</span>
                 </div>
               </div>
               <Award className="w-6 h-6 sm:w-8 sm:h-8 text-orange-200" />
@@ -216,16 +216,17 @@ export default function CrmDashboard({ user }) {
               <BarChart data={dashboardData.dealsByStage}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="stage" fontSize={10} angle={-45} textAnchor="end" height={80} />
-                <YAxis fontSize={12} />
-                <Tooltip 
+                <YAxis yAxisId="left" fontSize={12} />
+                <YAxis yAxisId="right" orientation="right" fontSize={12} tickFormatter={(v) => formatCurrency(v)} />
+                <Tooltip
                   formatter={(value, name) => [
-                    name === 'count' ? `${value} negócio(s)` : formatCurrency(value), 
+                    name === 'count' ? `${value} negócio(s)` : formatCurrency(value),
                     name === 'count' ? 'Quantidade' : 'Valor'
                   ]}
                 />
                 <Legend />
-                <Bar dataKey="count" fill="#8884d8" name="Quantidade" />
-                <Bar dataKey="value" fill="#82ca9d" name="Valor (R$)" />
+                <Bar yAxisId="left" dataKey="count" fill="#8884d8" name="Quantidade" />
+                <Bar yAxisId="right" dataKey="value" fill="#82ca9d" name="Valor (R$)" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

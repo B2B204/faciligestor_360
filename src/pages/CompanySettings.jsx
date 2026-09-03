@@ -3,6 +3,7 @@ import { CompanyCnpj } from "@/entities/CompanyCnpj";
 import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
 import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
 import { User } from "@/entities/User";
+import { TeamMember } from "@/entities/TeamMember";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,20 @@ export default function CompanySettings() {
       const existing = await UserCnpjAccess.filter({ user_email: req.requester_email, cnpj: req.cnpj });
       if (!existing || existing.length === 0) {
         await UserCnpjAccess.create({ user_email: req.requester_email, cnpj: req.cnpj });
+      }
+      // Sem isso, quem entra por solicitação aprovada (em vez de convite)
+      // nunca aparece em "Perfis de Usuário" — aquela tela só lê team_members,
+      // que só era populada pelo fluxo de convite (AcceptInvite.jsx).
+      const existingMember = await TeamMember.filter({ email: req.requester_email, cnpj: req.cnpj });
+      if (!existingMember || existingMember.length === 0) {
+        await TeamMember.create({
+          full_name: req.requester_email,
+          email: req.requester_email,
+          department: 'operador',
+          cnpj: req.cnpj,
+          status: 'ativo',
+          created_by: user.email,
+        });
       }
       // Resolve de uma vez todas as solicitações duplicadas do mesmo
       // solicitante para o mesmo CNPJ — sem isso, cada tentativa de reenvio

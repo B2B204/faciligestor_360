@@ -176,6 +176,20 @@ export default function ProfilePage() {
       if (!existingAccess || existingAccess.length === 0) {
         await UserCnpjAccess.create({ user_email: req.requester_email, cnpj: req.cnpj });
       }
+      // Sem isso, quem entra por solicitação aprovada (em vez de convite)
+      // nunca aparece em "Perfis de Usuário" — aquela tela só lê team_members,
+      // que só era populada pelo fluxo de convite (AcceptInvite.jsx).
+      const existingMember = await TeamMember.filter({ email: req.requester_email, cnpj: req.cnpj });
+      if (!existingMember || existingMember.length === 0) {
+        await TeamMember.create({
+          full_name: req.requester_email,
+          email: req.requester_email,
+          department: 'operador',
+          cnpj: req.cnpj,
+          status: 'ativo',
+          created_by: user.email,
+        });
+      }
       await CnpjAccessRequest.update(req.id, {
         status: 'aprovado',
         decided_by: user.email,

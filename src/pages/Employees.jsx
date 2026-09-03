@@ -239,7 +239,30 @@ export default function EmployeesPage() {
     loadInitialData();
   };
 
+  const normalizeCpf = (cpf) => String(cpf || '').replace(/\D/g, '');
+
   const handleSave = async (formData) => {
+    // Validação de CPF duplicado por CNPJ — impede novo cadastro com mesmo CPF
+    const newCpfDigits = normalizeCpf(formData.cpf);
+    if (newCpfDigits) {
+      const duplicate = employees.find((emp) => {
+        const empCpfDigits = normalizeCpf(emp.cpf);
+        if (!empCpfDigits) return false;
+        if (empCpfDigits !== newCpfDigits) return false;
+        // Ao editar, ignora o próprio registro
+        if (selectedEmployee && emp.id === selectedEmployee.id) return false;
+        return true;
+      });
+      if (duplicate) {
+        toast({
+          variant: 'destructive',
+          title: 'CPF já cadastrado',
+          description: `Já existe um funcionário cadastrado com este CPF: "${duplicate.name}" (${duplicate.cpf}). Atualize os dados do funcionário existente ao invés de criar um novo cadastro.`,
+        });
+        return;
+      }
+    }
+
     setIsSaving(true);
     try {
       const dataToSave = {

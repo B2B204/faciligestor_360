@@ -164,6 +164,23 @@ DROP TRIGGER IF EXISTS employees_updated_at ON employees;
 CREATE TRIGGER employees_updated_at BEFORE UPDATE ON employees
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+-- Evita cadastro duplicado de CPF por empresa (cnpj).
+-- Normaliza CPF removendo não-dígitos; permite múltiplos NULL/vazio mas bloqueia duplicado real.
+-- NOTA: Se já existirem duplicados no banco, o índice falhará com 23505. Execute antes
+-- migration-fix-employees-cpf-unique.sql para listar/limpar duplicados.
+-- O bloco abaixo tenta criar e, se houver duplicados, apenas avisa sem quebrar o deploy.
+DO $$
+BEGIN
+  CREATE UNIQUE INDEX IF NOT EXISTS employees_cnpj_cpf_unique
+    ON employees (cnpj, regexp_replace(cpf, '\D', '', 'g'))
+    WHERE cpf IS NOT NULL AND regexp_replace(cpf, '\D', '', 'g') <> '';
+EXCEPTION WHEN unique_violation THEN
+  RAISE NOTICE 'employees_cnpj_cpf_unique não criado: existem CPFs duplicados por CNPJ (ex: cnpj=14842018000145 cpf=19579652821). Rode migration-fix-employees-cpf-unique.sql para corrigir.';
+WHEN duplicate_table THEN
+  -- índice já existe com outro nome/definição
+  RAISE NOTICE 'employees_cnpj_cpf_unique já existe ou conflito de nome.';
+END $$;
+
 -- ============================================================
 -- FINANCIAL ENTRIES
 -- ============================================================

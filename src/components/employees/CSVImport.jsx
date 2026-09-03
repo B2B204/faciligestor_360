@@ -107,7 +107,9 @@ export default function CSVImport({ contracts, user, onSuccess, onCancel }) {
 
       const employeesFromFile = extractResult.output.employees;
       const existingEmployees = await Employee.filter({ cnpj: user.cnpj });
-      const existingCpfs = new Set(existingEmployees.map(e => e.cpf));
+      const normalizeCpf = (cpf) => String(cpf || '').replace(/\D/g, '');
+      const existingCpfsNormalized = new Set(existingEmployees.map(e => normalizeCpf(e.cpf)).filter(Boolean));
+      const seenCpfsInFile = new Set();
       const contractMap = new Map(contracts.map(c => [normalizeText(c.name), c.id]));
 
       let validRows = [];
@@ -120,8 +122,18 @@ export default function CSVImport({ contracts, user, onSuccess, onCancel }) {
         if (!emp.name) rowErrors.push("Nome é obrigatório.");
         if (!emp.cpf) {
           rowErrors.push("CPF é obrigatório.");
-        } else if (existingCpfs.has(String(emp.cpf).trim())) {
-          rowErrors.push("CPF já cadastrado no sistema.");
+        } else {
+          const cpfDigits = normalizeCpf(emp.cpf);
+          if (!cpfDigits) {
+            rowErrors.push("CPF inválido.");
+          } else if (existingCpfsNormalized.has(cpfDigits)) {
+            const dup = existingEmployees.find(e => normalizeCpf(e.cpf) === cpfDigits);
+            rowErrors.push(`CPF já cadastrado no sistema para "${dup?.name || 'funcionário existente'}". Atualize o cadastro existente.`);
+          } else if (seenCpfsInFile.has(cpfDigits)) {
+            rowErrors.push("CPF duplicado no arquivo — já existe outra linha com o mesmo CPF.");
+          }
+          // registra para detectar duplicados intra-arquivo (mesmo que a linha seja inválida por outro motivo, evita contar 2x)
+          if (cpfDigits) seenCpfsInFile.add(cpfDigits);
         }
         if (!emp.role) rowErrors.push("Função é obrigatória.");
         

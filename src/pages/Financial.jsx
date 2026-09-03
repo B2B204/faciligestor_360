@@ -1168,7 +1168,7 @@ export default function FinancialPage() {
                         <TableCell className="text-muted-foreground text-sm">
                           <div className="flex flex-col gap-0.5">
                             <span>{entry.updated_by || entry.created_by}</span>
-                            <span className="text-xs">{format(new Date(entry.updated_date || entry.created_date), "dd/MM/yy HH:mm")}</span>
+                            <span className="text-xs">{format(new Date(entry.updated_at || entry.created_at), "dd/MM/yy HH:mm")}</span>
                           </div>
                         </TableCell>
                         <TableCell>

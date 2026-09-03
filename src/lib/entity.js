@@ -45,7 +45,12 @@ export function createEntity(tableName, options = {}) {
       let query = supabase.from(tableName).select('*');
 
       Object.entries(conditions).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
+        if (value === null) {
+          // Filtro explícito por "IS NULL" (ex.: deleted_at: null para excluir
+          // registros com soft-delete) — sem isso, o valor era simplesmente
+          // ignorado e os registros excluídos continuavam aparecendo.
+          query = query.is(key, null);
+        } else if (value !== undefined && value !== '') {
           query = query.eq(key, value);
         }
       });

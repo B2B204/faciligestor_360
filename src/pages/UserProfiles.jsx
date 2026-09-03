@@ -221,9 +221,11 @@ function ProfileDialog({ open, onClose, profile, onSave }) {
   const [selectedActions, setSelectedActions] = useState([]);
   const [saving, setSaving] = useState(false);
   const [slugManual, setSlugManual] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) return;
+    setError("");
     if (profile) {
       setDisplayName(profile.display_name || "");
       setRoleKey(profile.role_key || "");
@@ -273,6 +275,7 @@ function ProfileDialog({ open, onClose, profile, onSave }) {
   const handleSave = async () => {
     if (!displayName.trim() || !roleKey.trim()) return;
     setSaving(true);
+    setError("");
     try {
       const pages = allPages ? ["all"] : selectedPages;
       const actions = selectedActions;
@@ -286,6 +289,8 @@ function ProfileDialog({ open, onClose, profile, onSave }) {
         is_builtin: isBuiltin,
       });
       onClose();
+    } catch (err) {
+      setError(err?.message || "Erro ao salvar perfil. Tente novamente.");
     } finally {
       setSaving(false);
     }
@@ -433,6 +438,12 @@ function ProfileDialog({ open, onClose, profile, onSave }) {
               ))}
             </div>
           </div>
+
+          {error && (
+            <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+              {error}
+            </div>
+          )}
         </div>
 
         <DialogFooter>
@@ -741,8 +752,12 @@ export default function UserProfiles() {
 
   const handleDeleteProfile = useCallback(
     async (id) => {
-      await RoleProfile.delete(id);
-      await loadProfiles();
+      try {
+        await RoleProfile.delete(id);
+        await loadProfiles();
+      } catch (err) {
+        alert(err?.message || "Erro ao excluir perfil. Tente novamente.");
+      }
     },
     [loadProfiles]
   );

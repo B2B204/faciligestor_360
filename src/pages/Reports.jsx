@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Contract } from "@/entities/Contract";
 import { FinancialEntry } from "@/entities/FinancialEntry";
 import { Employee } from "@/entities/Employee";
-import { Tax } from "@/entities/Tax";
 import { Material } from "@/entities/Material";
 import { User } from "@/entities/User";
 import { InvokeLLM } from "@/integrations/Core";
@@ -50,10 +49,9 @@ export default function ReportsPage() {
 
     setIsGenerating(true);
     try {
-      const [financialEntries, employees, taxes, materials] = await Promise.all([
+      const [financialEntries, employees, materials] = await Promise.all([
         FinancialEntry.filter({ contract_id: selectedContract }),
         Employee.filter({ contract_id: selectedContract }),
-        Tax.filter({ contract_id: selectedContract }),
         Material.filter({ contract_id: selectedContract }),
       ]);
 
@@ -63,7 +61,6 @@ export default function ReportsPage() {
         contract: contractData,
         financialEntries: financialEntries || [],
         employees: employees || [],
-        taxes: taxes || [],
         materials: materials || [],
         generatedAt: new Date(),
         generatedBy: user?.full_name || user?.email || 'Usuário'
@@ -126,9 +123,7 @@ export default function ReportsPage() {
     const revenue = reportData.financialEntries.reduce((sum, item) => sum + (item.net_revenue || 0), 0);
     const personnelCost = reportData.employees.reduce((sum, item) => sum + (item.total_cost || 0), 0);
     const materialCost = reportData.materials.reduce((sum, item) => sum + (item.unit_price || 0), 0);
-    const totalTaxes = reportData.taxes.reduce((sum, item) => 
-      sum + (item.inss || 0) + (item.irrf || 0) + (item.iss || 0) + 
-      (item.csll || 0) + (item.pis || 0) + (item.cofins || 0), 0);
+    const totalTaxes = sumTaxes(reportData.financialEntries);
 
     return {
       contract: reportData.contract,
@@ -145,6 +140,12 @@ export default function ReportsPage() {
 
   const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 
+  // Impostos/retenções ficam armazenados por lançamento em financial_entries
+  // (inss_value, irrf_value, iss_value, csll_value, pis_value, cofins_value)
+  const sumTaxes = (entries) => (entries || []).reduce((sum, item) =>
+    sum + (item.inss_value || 0) + (item.irrf_value || 0) + (item.iss_value || 0) +
+    (item.csll_value || 0) + (item.pis_value || 0) + (item.cofins_value || 0), 0);
+
   const DREReport = () => {
     if (!reportData) return null;
 
@@ -152,9 +153,7 @@ export default function ReportsPage() {
     const personnelCost = reportData.employees.reduce((sum, item) => sum + (item.total_cost || 0), 0);
     const materialCost = reportData.materials.reduce((sum, item) => sum + (item.unit_price || 0), 0);
     const totalCost = personnelCost + materialCost;
-    const totalTaxes = reportData.taxes.reduce((sum, item) => 
-      sum + (item.inss || 0) + (item.irrf || 0) + (item.iss || 0) + 
-      (item.csll || 0) + (item.pis || 0) + (item.cofins || 0), 0);
+    const totalTaxes = sumTaxes(reportData.financialEntries);
     const netProfit = revenue - totalCost - totalTaxes;
     const margin = revenue > 0 ? ((netProfit / revenue) * 100) : 0;
 
@@ -325,9 +324,7 @@ export default function ReportsPage() {
   const TaxReport = () => {
     if (!reportData) return null;
 
-    const totalTaxes = reportData.taxes.reduce((sum, item) => 
-      sum + (item.inss || 0) + (item.irrf || 0) + (item.iss || 0) + 
-      (item.csll || 0) + (item.pis || 0) + (item.cofins || 0), 0);
+    const totalTaxes = sumTaxes(reportData.financialEntries);
 
     return (
       <div className="space-y-6">
@@ -348,20 +345,20 @@ export default function ReportsPage() {
             <div className="text-3xl font-bold text-red-600 mb-4">
               {formatCurrency(totalTaxes)}
             </div>
-            {reportData.taxes.length > 0 ? (
+            {reportData.financialEntries.length > 0 ? (
               <div className="space-y-3">
-                {reportData.taxes.map((tax, index) => (
+                {reportData.financialEntries.map((entry, index) => (
                   <div key={index} className="bg-muted/50 p-4 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-2">
-                      Referência: {tax.reference_month || format(new Date(tax.payment_date), 'MM/yyyy')}
+                      Referência: {entry.reference_month || 'N/A'}
                     </p>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                      <div>INSS: {formatCurrency(tax.inss)}</div>
-                      <div>IRRF: {formatCurrency(tax.irrf)}</div>
-                      <div>ISS: {formatCurrency(tax.iss)}</div>
-                      <div>CSLL: {formatCurrency(tax.csll)}</div>
-                      <div>PIS: {formatCurrency(tax.pis)}</div>
-                      <div>COFINS: {formatCurrency(tax.cofins)}</div>
+                      <div>INSS: {formatCurrency(entry.inss_value)}</div>
+                      <div>IRRF: {formatCurrency(entry.irrf_value)}</div>
+                      <div>ISS: {formatCurrency(entry.iss_value)}</div>
+                      <div>CSLL: {formatCurrency(entry.csll_value)}</div>
+                      <div>PIS: {formatCurrency(entry.pis_value)}</div>
+                      <div>COFINS: {formatCurrency(entry.cofins_value)}</div>
                     </div>
                   </div>
                 ))}
@@ -381,9 +378,7 @@ export default function ReportsPage() {
     const revenue = reportData.financialEntries.reduce((sum, item) => sum + (item.net_revenue || 0), 0);
     const costs = reportData.employees.reduce((sum, item) => sum + (item.total_cost || 0), 0) +
                   reportData.materials.reduce((sum, item) => sum + (item.unit_price || 0), 0);
-    const taxes = reportData.taxes.reduce((sum, item) => 
-      sum + (item.inss || 0) + (item.irrf || 0) + (item.iss || 0) + 
-      (item.csll || 0) + (item.pis || 0) + (item.cofins || 0), 0);
+    const taxes = sumTaxes(reportData.financialEntries);
     const profit = revenue - costs - taxes;
     const margin = revenue > 0 ? ((profit / revenue) * 100) : 0;
 

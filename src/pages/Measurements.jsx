@@ -239,10 +239,10 @@ export default function MeasurementsPage() {
     const matchesContract = contractFilter === 'all' || item.contract.id === contractFilter;
     const matchesCategory = categoryFilter === 'all' || item.contract.service_type === categoryFilter;
     const matchesSearch = !searchTerm ||
-      item.contract.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.contract.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.measurements.some(m =>
-        m.measurement_month.includes(searchTerm) ||
-        m.status.toLowerCase().includes(searchTerm.toLowerCase())
+        (m.measurement_month || '').includes(searchTerm) ||
+        (m.status || '').toLowerCase().includes(searchTerm.toLowerCase())
       );
 
     return matchesContract && matchesCategory && matchesSearch;

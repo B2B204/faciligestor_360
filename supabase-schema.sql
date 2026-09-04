@@ -969,7 +969,11 @@ ALTER TABLE materials             ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "profiles_select" ON profiles;
 DROP POLICY IF EXISTS "profiles_insert" ON profiles;
 DROP POLICY IF EXISTS "profiles_update" ON profiles;
-CREATE POLICY "profiles_select" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "profiles_select" ON profiles FOR SELECT TO authenticated
+  USING (
+    auth.uid() = id
+    OR cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+  );
 CREATE POLICY "profiles_insert" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "profiles_update" ON profiles FOR UPDATE USING (auth.uid() = id);
 

@@ -23,16 +23,19 @@ export default function Login() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        const params = new URLSearchParams(location.search);
-        const redirect = params.get('redirect') || '/';
-        navigate(redirect, { replace: true });
+        navigate(getRedirect(), { replace: true });
       }
     });
   }, []);
 
   const getRedirect = () => {
     const params = new URLSearchParams(location.search);
-    return params.get('redirect') || '/';
+    const redirect = params.get('redirect') || '/';
+    // Só aceita caminhos relativos same-origin (evita "/login/https://..." e open redirect)
+    if (redirect.startsWith('/') && !redirect.startsWith('//')) {
+      return redirect;
+    }
+    return '/';
   };
 
   const parseError = (err) => {

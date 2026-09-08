@@ -460,7 +460,7 @@ export default function Layout({ children, currentPageName }) {
       setTimeout(() => {
         // Substitui redirecionamento externo por método nativo, sem referência a provedores externos
         try {
-          const callbackUrl = window.location.href;
+          const callbackUrl = window.location.pathname + window.location.search;
           User.loginWithRedirect(callbackUrl);
         } catch (e) {
           // fallback

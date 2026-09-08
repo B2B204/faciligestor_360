@@ -966,13 +966,26 @@ ALTER TABLE materials             ENABLE ROW LEVEL SECURITY;
 -- (auth.uid() = id); sem o trigger abaixo, nada impediria o próprio usuário
 -- de sobrescrever "cnpj"/"department" da própria linha e virar admin de
 -- outra empresa — ver migration-fix-profiles-privilege-escalation.sql.
+-- Função SECURITY DEFINER: obtém o CNPJ do usuário logado ignorando RLS.
+-- Necessária porque uma policy de "profiles" não pode consultar a própria
+-- tabela "profiles" no USING (causa "infinite recursion detected in policy").
+CREATE OR REPLACE FUNCTION my_profile_cnpj()
+RETURNS text
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT cnpj FROM profiles WHERE id = auth.uid();
+$$;
+
 DROP POLICY IF EXISTS "profiles_select" ON profiles;
 DROP POLICY IF EXISTS "profiles_insert" ON profiles;
 DROP POLICY IF EXISTS "profiles_update" ON profiles;
 CREATE POLICY "profiles_select" ON profiles FOR SELECT TO authenticated
   USING (
     auth.uid() = id
-    OR cnpj IN (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid())
+    OR cnpj = my_profile_cnpj()
   );
 CREATE POLICY "profiles_insert" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "profiles_update" ON profiles FOR UPDATE USING (auth.uid() = id);

@@ -1,5 +1,5 @@
 -- ============================================================
--- CAUSA RAIZ (relatado pelo usuário): um novo usuário conseguiu
+-- CAUSA RAIZ (relatado pelo usuário): um novo conseguiu
 -- ficar vinculado a um CNPJ já existente sem NUNCA aparecer para o
 -- administrador aprovar.
 --
@@ -9,7 +9,7 @@
 -- direto — sem checar se aquele CNPJ já pertencia a outra empresa
 -- com admin. Como todo signup novo (Login.jsx) nasce com
 -- department='admin' por padrão (handle_new_user), qualquer pessoa
--- que digitasse o CNPJ de uma empresa já cadastrada virava
+-- que digitasse o CNPJ de uma empresa já registrationsistrada virava
 -- instantaneamente um segundo "admin" dela — o fluxo de aprovação
 -- (cnpj_access_requests) só existia no botão "Solicitar CNPJ"
 -- (RequestCnpjDialog), que essa tela de onboarding não usava.

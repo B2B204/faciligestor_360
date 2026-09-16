@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { supabase } from "@/api/supabaseClient";
 import { CompanyCnpj } from "@/entities/CompanyCnpj";
 import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
 import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
@@ -62,6 +63,18 @@ export default function CompanySettings() {
           status: 'ativo',
           created_by: user.email,
         });
+      }
+      // Sincroniza o profile.cnpj do solicitante: sem isso, o profile
+      // continua com o CNPJ antigo (ou NULL) e a RLS profiles_select
+      // (que usa my_profile_cnpj()) não deixa ele ver os colegas do
+      // CNPJ aprovado. A função SECURITY DEFINER no banco ignora RLS.
+      try {
+        await supabase.rpc('sync_profile_cnpj_on_approval', {
+          p_email: req.requester_email,
+          p_cnpj: req.cnpj,
+        });
+      } catch (syncErr) {
+        console.warn('sync_profile_cnpj_on_approval falhou:', syncErr);
       }
       // Resolve de uma vez todas as solicitações duplicadas do mesmo
       // solicitante para o mesmo CNPJ — sem isso, cada tentativa de reenvio

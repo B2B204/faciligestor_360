@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { supabase } from "@/api/supabaseClient";
 import { User } from "@/entities/User";
 import { UserInvite } from "@/entities/UserInvite";
 import { DataSubjectRequest } from "@/entities/DataSubjectRequest";
@@ -189,6 +190,18 @@ export default function ProfilePage() {
           status: 'ativo',
           created_by: user.email,
         });
+      }
+      // Sincroniza o profile.cnpj do solicitante: sem isso, o profile
+      // continua com o CNPJ antigo (ou NULL) e a RLS profiles_select
+      // (que usa my_profile_cnpj()) não deixa ele ver os colegas do
+      // CNPJ aprovado. A função SECURITY DEFINER no banco ignora RLS.
+      try {
+        await supabase.rpc('sync_profile_cnpj_on_approval', {
+          p_email: req.requester_email,
+          p_cnpj: req.cnpj,
+        });
+      } catch (syncErr) {
+        console.warn('sync_profile_cnpj_on_approval falhou:', syncErr);
       }
       await CnpjAccessRequest.update(req.id, {
         status: 'aprovado',

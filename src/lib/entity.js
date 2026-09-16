@@ -1,17 +1,35 @@
 import { supabase } from '@/api/supabaseClient';
 
-// Garante que todo registro criado carregue o cnpj da empresa do usuário
+// Garantido com fallback em user_cnpj_access (ver
+// migration-fix-rls-cnpj-access-fallback.sql) para que usuários
+// com acesso aprovado mas profile.cnpj vazio não fiquem sem dados.
 // logado, mesmo que a tela que o criou tenha esquecido de informá-lo —
 // sem isso o registro não aparece para nenhum usuário da mesma empresa
 // (nem para quem criou), pois as listagens filtram por cnpj.
 async function getCurrentUserCnpj(user) {
   if (!user?.id) return null;
+  // Tenta profile direto primeiro (caminho rápido)
   const { data: profile } = await supabase
     .from('profiles')
     .select('cnpj')
     .eq('id', user.id)
     .single();
-  return profile?.cnpj || null;
+  if (profile?.cnpj) return profile.cnpj;
+  // Fallback: usuário pode ter acesso aprovado em user_cnpj_access
+  // mas o profile.cnpj ficou vazio (cadastro legado, falha de sync,
+  // onboarding incompleto). Sem isso o usuário fica sem informação
+  // mesmo pertencendo ao mesmo CNPJ. Ver migration-fix-rls-cnpj-access-fallback.sql.
+  try {
+    const { data: accessRow } = await supabase
+      .from('user_cnpj_access')
+      .select('cnpj')
+      .eq('user_email', user.email)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+    if (accessRow?.cnpj) return accessRow.cnpj;
+  } catch (e) { /* ignora */ }
+  return null;
 }
 
 function parseSortField(sortStr) {

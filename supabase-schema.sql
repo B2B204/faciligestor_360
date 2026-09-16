@@ -969,6 +969,13 @@ ALTER TABLE materials             ENABLE ROW LEVEL SECURITY;
 -- Função SECURITY DEFINER: obtém o CNPJ do usuário logado ignorando RLS.
 -- Necessária porque uma policy de "profiles" não pode consultar a própria
 -- tabela "profiles" no USING (causa "infinite recursion detected in policy").
+-- Fallback em user_cnpj_access: alguns usuários têm acesso aprovado a um
+-- CNPJ mas o profile.cnpj ficou vazio (cadastro legado, onboarding
+-- incompleto ou falha de sync_profile_cnpj_on_approval). Sem o fallback,
+-- my_profile_cnpj() retorna NULL e todas as políticas cnpj-scoped
+-- (contratos, funcionários, etc.) deixam de ver dados — o usuário
+-- parece "sem informação" mesmo pertencendo ao mesmo CNPJ. Ver
+-- migration-fix-rls-cnpj-access-fallback.sql.
 CREATE OR REPLACE FUNCTION my_profile_cnpj()
 RETURNS text
 LANGUAGE sql
@@ -976,7 +983,13 @@ SECURITY DEFINER
 STABLE
 SET search_path = public
 AS $$
-  SELECT cnpj FROM profiles WHERE id = auth.uid();
+  SELECT COALESCE(
+    (SELECT p.cnpj FROM profiles p WHERE p.id = auth.uid()),
+    (SELECT u.cnpj FROM user_cnpj_access u
+     WHERE u.user_email = (SELECT p.email FROM profiles p WHERE p.id = auth.uid())
+     ORDER BY u.created_at
+     LIMIT 1)
+  );
 $$;
 
 DROP POLICY IF EXISTS "profiles_select" ON profiles;

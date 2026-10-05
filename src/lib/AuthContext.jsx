@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
         .from('profiles')
         .select('*')
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
       const merged = profile
         ? { id: authUser.id, email: authUser.email, ...profile }
         : { id: authUser.id, email: authUser.email };

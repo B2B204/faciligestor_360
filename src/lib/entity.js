@@ -9,12 +9,15 @@ import { supabase } from '@/api/supabaseClient';
 async function getCurrentUserCnpj(user) {
   if (!user?.id) return null;
   // Tenta profile direto primeiro (caminho rápido)
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('cnpj')
-    .eq('id', user.id)
-    .single();
-  if (profile?.cnpj) return profile.cnpj;
+  try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('cnpj')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (profile?.cnpj) return profile.cnpj;
+  } catch (e) { /* ignora */ }
+
   // Fallback: usuário pode ter acesso aprovado em user_cnpj_access
   // mas o profile.cnpj ficou vazio (cadastro legado, falha de sync,
   // onboarding incompleto). Sem isso o usuário fica sem informação
@@ -26,7 +29,7 @@ async function getCurrentUserCnpj(user) {
       .eq('user_email', user.email)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     if (accessRow?.cnpj) return accessRow.cnpj;
   } catch (e) { /* ignora */ }
   return null;

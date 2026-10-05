@@ -405,68 +405,29 @@ export default function Layout({ children, currentPageName }) {
         console.log("👑 Usuário é o proprietário da conta (Admin)");
         setUser(currentUser);
         
-        // Para admins, verificar o status do plano normalmente
-        if (currentUser?.plan_status === 'active' || currentUser?.plan_status === 'demo') {
-          setIsSubscriptionActive(true);
-          console.log("✅ Admin com plano ativo:", currentUser.plan_status);
-        } else {
+        // Para admins, permitir acesso ativo por padrão (ativo, demo, trial, pro, etc.), exceto se explicitamente cancelado/inativo
+        if (currentUser?.plan_status === 'canceled' || currentUser?.plan_status === 'inactive') {
           setIsSubscriptionActive(false);
           console.log("❌ Admin sem plano ativo:", currentUser.plan_status);
+        } else {
+          setIsSubscriptionActive(true);
+          console.log("✅ Admin com plano ativo:", currentUser?.plan_status || 'ativo (padrão)');
         }
       }
 
     } catch (error) {
-      console.warn("❌ Sessão expirada. Redirecionando para autenticação.", error);
-      
-      // Mostrar tela personalizada antes do redirecionamento
-      const authOverlay = document.createElement('div');
-      authOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      `;
-      
-      authOverlay.innerHTML = `
-        <div style="text-align: center; max-width: 400px; padding: 40px;">
-          <img src="${BRAND.logoUrl}" alt="${BRAND.name}" style="height:56px; margin-bottom:16px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;" />
-          <h2 style="font-size: 28px; margin-bottom: 16px;">Sessão Expirada</h2>
-          <p style="font-size: 18px; margin-bottom: 24px; opacity: 0.9;">
-            Por segurança, você precisa fazer login novamente no ${BRAND.name}.
-          </p>
-          <p style="font-size: 16px; opacity: 0.8;">
-            Redirecionando para área de login...
-          </p>
-          <div style="margin-top: 30px;">
-            <div style="width: 40px; height: 40px; border: 3px solid white; border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-          </div>
-        </div>
-        <style>
-          @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
-        </style>
-      `;
-      
-      document.body.appendChild(authOverlay);
-      
-      setTimeout(() => {
-        // Substitui redirecionamento externo por método nativo, sem referência a provedores externos
-        try {
-          const callbackUrl = window.location.pathname + window.location.search;
-          User.loginWithRedirect(callbackUrl);
-        } catch (e) {
-          // fallback
-          window.location.reload();
+      console.warn("❌ Erro ao carregar dados do usuário:", error);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUser({ id: session.user.id, email: session.user.email });
+          setIsSubscriptionActive(true);
+        } else {
+          navigate('/login', { replace: true });
         }
-      }, 2500);
+      } catch {
+        navigate('/login', { replace: true });
+      }
     } finally {
       setIsLoadingUser(false);
     }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "@/api/supabaseClient";
 import { createPageUrl } from "@/utils";
 import { User } from "@/entities/User";
 import { TeamMember } from "@/entities/TeamMember";

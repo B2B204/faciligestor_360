@@ -9,15 +9,14 @@ import { format, differenceInDays, startOfDay, addMonths, parseISO, isAfter, isB
 import { ptBR } from 'date-fns/locale';
 import {
   CreditCard, Plus, Search, X, ChevronDown, ChevronUp, CheckCircle2,
-  Edit2, Trash2, MoreVertical, AlertCircle, Clock, Ban, DollarSign,
-  CalendarDays, TrendingDown, AlertTriangle, Layers, ArrowLeft, ArrowRight,
-  Save, XCircle, History as HistoryIcon
+  Edit2, Trash2, MoreVertical, AlertCircle, Ban, DollarSign,
+  CalendarDays, TrendingDown, Layers, ArrowLeft, ArrowRight,
+  Save, History as HistoryIcon
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';

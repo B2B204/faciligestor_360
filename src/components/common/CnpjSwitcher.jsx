@@ -30,7 +30,7 @@ export default function CnpjSwitcher({ user, onChanged }) {
   useEffect(() => {
     load();
     setAggregate(localStorage.getItem("cnpj-aggregate") === "1");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user?.email]);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function CnpjSwitcher({ user, onChanged }) {
     // evento, a lista só atualizaria depois de um F5 manual.
     window.addEventListener('cnpj-access-changed', load);
     return () => window.removeEventListener('cnpj-access-changed', load);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user?.email]);
 
   // Garante que o cnpj selecionado sempre tenha um SelectItem correspondente

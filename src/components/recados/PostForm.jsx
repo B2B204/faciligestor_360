@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, X, ImageIcon, Smile } from 'lucide-react';
+import { Send, X, ImageIcon } from 'lucide-react';
 import { UploadFile } from '@/integrations/Core';
 
 export default function PostForm({ user, onPost }) {

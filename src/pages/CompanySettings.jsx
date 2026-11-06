@@ -178,14 +178,22 @@ export default function CompanySettings() {
     }
     setSaving(true);
     try {
-      await CompanyCnpj.create({ ...form, cnpj });
-      // Sem isso o admin que cadastra o CNPJ não consegue trocar para ele no
-      // CnpjSwitcher, pois a listagem lá depende de uma linha em
-      // user_cnpj_access — que só um admin pode inserir (RLS), então ele
-      // precisa se auto-conceder o acesso ao criar o CNPJ.
-      const existing = await UserCnpjAccess.filter({ user_email: user.email, cnpj });
-      if (!existing || existing.length === 0) {
-        await UserCnpjAccess.create({ user_email: user.email, cnpj });
+      // register_company_cnpj (banco) cria o cadastro e o acesso do admin
+      // numa só operação, e recusa CNPJ que já pertence a outra conta.
+      const { error: rpcError } = await supabase.rpc('register_company_cnpj', {
+        p_cnpj: cnpj,
+        p_display_name: form.display_name || null,
+        p_notify_accounting: form.notify_accounting,
+      });
+      if (rpcError) {
+        if (rpcError.message?.includes('CNPJ_JA_REGISTRADO')) {
+          throw new Error('Este CNPJ já pertence a outra conta. Use "Solicitar acesso" para pedir a um administrador dela.');
+        }
+        throw rpcError;
+      }
+      if (!form.is_active) {
+        const [created] = await CompanyCnpj.filter({ cnpj });
+        if (created) await CompanyCnpj.update(created.id, { is_active: false });
       }
       // O seletor de CNPJ no topo (CnpjSwitcher) vive no Layout, fora desta
       // página — avisa ele para recarregar a lista de acessos.

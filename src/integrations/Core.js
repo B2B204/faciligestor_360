@@ -41,7 +41,15 @@ const BLOCKED_PUBLIC_EXTENSIONS = /\.(html?|svg|xhtml|mhtml|js|jse)$/i;
 export async function UploadFile({ file }) {
   if (file.size > MAX_UPLOAD_BYTES) throw new Error('Arquivo excede o tamanho máximo permitido (20MB).');
   if (BLOCKED_PUBLIC_EXTENSIONS.test(file.name)) throw new Error('Tipo de arquivo não permitido.');
-  const fileName = `uploads/${Date.now()}_${file.name}`;
+  // A pasta é o CNPJ da empresa: a RLS do storage só deixa gravar, trocar
+  // ou apagar arquivos dentro da pasta da própria empresa.
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = user
+    ? await supabase.from('profiles').select('cnpj').eq('id', user.id).maybeSingle()
+    : { data: null };
+  if (!profile?.cnpj) throw new Error('Selecione uma empresa antes de enviar arquivos.');
+  const safeName = file.name.replace(/[^\w.-]+/g, '_');
+  const fileName = `${profile.cnpj}/${Date.now()}_${safeName}`;
   const { error } = await supabase.storage.from('uploads').upload(fileName, file);
   if (error) throw error;
   const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(fileName);

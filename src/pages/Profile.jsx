@@ -5,7 +5,6 @@ import { UserInvite } from "@/entities/UserInvite";
 import { DataSubjectRequest } from "@/entities/DataSubjectRequest";
 import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
 import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
-import { CompanyCnpj } from "@/entities/CompanyCnpj";
 import { TeamMember } from "@/entities/TeamMember";
 import { Contract } from "@/entities/Contract";
 import { Employee } from "@/entities/Employee";
@@ -499,8 +498,18 @@ Esta ação irá:
         // (era isso que permitia qualquer conta recém-criada virar admin
         // instantâneo de qualquer CNPJ só de digitar o número, sem nunca
         // aparecer para o admin real aprovar).
-        const existingCompany = await CompanyCnpj.filter({ cnpj: cnpjDigits });
-        if (existingCompany && existingCompany.length > 0) {
+        //
+        // A verificação é feita no banco (register_company_cnpj): a RLS não
+        // deixa este usuário enxergar empresas das quais ele não faz parte,
+        // então uma consulta aqui no front não saberia se o CNPJ já existe.
+        const { error: registerError } = await supabase.rpc('register_company_cnpj', {
+          p_cnpj: cnpjDigits,
+          p_display_name: formData.company_name || null,
+        });
+        if (registerError && !registerError.message?.includes('CNPJ_JA_REGISTRADO')) {
+          throw registerError;
+        }
+        if (registerError) {
           const already = (myCnpjRequests || []).some(r => r.cnpj === cnpjDigits && (!r.status || r.status === 'pendente'));
           if (!already) {
             await CnpjAccessRequest.create({
@@ -516,11 +525,9 @@ Esta ação irá:
           return;
         }
 
-        // CNPJ inédito: completar o perfil também registra a empresa (mesmo
-        // efeito de Configurações da Empresa), e este usuário vira o admin
-        // fundador dela.
+        // CNPJ inédito: o banco já registrou a empresa e vinculou o perfil
+        // a ela; aqui só salvamos os demais campos do formulário.
         await User.update(user.id, { ...formData, cnpj: cnpjDigits });
-        await CompanyCnpj.create({ cnpj: cnpjDigits, display_name: formData.company_name });
       } else {
         await User.update(user.id, formData);
       }

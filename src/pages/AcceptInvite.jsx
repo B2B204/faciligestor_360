@@ -81,10 +81,10 @@ export default function AcceptInvite() {
           email: invite.email,
           password,
           options: {
+            // Só o nome: empresa e departamento vêm do convite, conferido
+            // no banco (o trigger ignora cnpj/department dos metadados).
             data: {
               full_name: invite.full_name,
-              department: invite.department,
-              cnpj: invite.cnpj,
             },
           },
         });

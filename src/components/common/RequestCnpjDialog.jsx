@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { CnpjAccessRequest } from "@/entities/CnpjAccessRequest";
-import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
+import { supabase } from "@/api/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,31 +38,31 @@ export default function RequestCnpjDialog({ user, onSubmitted }) {
         return;
       }
 
-      // Admin já tem autoridade para aprovar qualquer solicitação em
-      // Configurações da Empresa — pedir para si mesmo e depois ter que ir
-      // aprovar manualmente é só fricção, então o acesso já sai liberado.
-      const isAdmin = user.department === 'admin';
-      const now = new Date().toISOString();
-      await CnpjAccessRequest.create({
-        requester_email: user.email,
-        cnpj: digits,
-        reason,
-        status: isAdmin ? 'aprovado' : 'pendente',
-        ...(isAdmin ? { decided_by: user.email, decided_at: now } : {}),
-      });
-      if (isAdmin) {
-        const existingAccess = await UserCnpjAccess.filter({ user_email: user.email, cnpj: digits });
-        if (!existingAccess || existingAccess.length === 0) {
-          await UserCnpjAccess.create({ user_email: user.email, cnpj: digits });
-        }
+      // Admin pode registrar na hora um CNPJ que ainda não pertence a
+      // ninguém (register_company_cnpj, no banco). Se o CNPJ já tem dono,
+      // o pedido fica pendente até um admin DAQUELA empresa aprovar — o
+      // banco recusa qualquer autoaprovação.
+      let registered = false;
+      if (user.department === 'admin') {
+        const { error: rpcError } = await supabase.rpc('register_company_cnpj', { p_cnpj: digits });
+        if (!rpcError) registered = true;
+        else if (!rpcError.message?.includes('CNPJ_JA_REGISTRADO')) throw rpcError;
+      }
+      if (!registered) {
+        await CnpjAccessRequest.create({
+          requester_email: user.email,
+          cnpj: digits,
+          reason,
+          status: 'pendente',
+        });
       }
       setOpen(false);
       resetForm();
       onSubmitted?.();
-      if (isAdmin) window.dispatchEvent(new Event('cnpj-access-changed'));
-      toast(isAdmin ? {
-        title: 'Acesso liberado',
-        description: 'Você é administrador, então o CNPJ já está disponível no seletor.',
+      if (registered) window.dispatchEvent(new Event('cnpj-access-changed'));
+      toast(registered ? {
+        title: 'CNPJ registrado',
+        description: 'O CNPJ é novo no sistema e já está disponível no seletor.',
       } : {
         title: 'Solicitação enviada',
         description: 'Um administrador precisa aprovar em Configurações da Empresa antes que o CNPJ apareça no seletor.',

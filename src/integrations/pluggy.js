@@ -5,8 +5,36 @@ import { supabase } from '@/api/supabaseClient';
 async function call(action, params = {}) {
   const qs = new URLSearchParams({ action, ...params }).toString();
   const { data, error } = await supabase.functions.invoke(`pluggy-proxy?${qs}`, { method: 'GET' });
-  if (error) throw new Error(`Pluggy proxy error: ${error.message}`);
+  if (error) {
+    // FunctionsHttpError traz a Response em error.context; usa a mensagem da function.
+    let message = error.message;
+    try {
+      const body = await error.context?.json();
+      if (body?.error) message = body.error;
+    } catch { /* corpo não-JSON */ }
+    const err = new Error(message);
+    err.status = error.context?.status;
+    throw err;
+  }
   return data;
+}
+
+// Conexões bancárias da empresa. O RLS de pluggy_items só devolve itens de
+// CNPJs dos quais o usuário faz parte.
+export async function listItems(cnpj) {
+  const { data, error } = await supabase
+    .from('pluggy_items')
+    .select('item_id, label, created_at')
+    .eq('cnpj', cnpj)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+// Vincula um item recém-conectado ao CNPJ (a function confere que o item foi
+// criado pelo próprio usuário antes de gravar).
+export async function registerItem(itemId, cnpj) {
+  return call('register_item', { itemId, cnpj });
 }
 
 export async function getConnectToken(itemId = null) {

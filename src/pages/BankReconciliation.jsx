@@ -11,6 +11,8 @@ import {
   getTransactions,
   getItem,
   deleteItem,
+  listItems,
+  registerItem,
   loadPluggyWidget,
   openPluggyWidget,
 } from '@/integrations/pluggy';
@@ -103,19 +105,35 @@ const firstDayOfMonth = () => {
   return d.toISOString().slice(0, 10);
 };
 
-const PLUGGY_ITEMS_KEY = (cnpj) => `pluggy_items_${cnpj}`;
+// Versões antigas guardavam os itens só no navegador. Na primeira carga,
+// tenta vincular esses itens ao CNPJ no servidor e depois limpa a chave.
+const LEGACY_PLUGGY_ITEMS_KEY = (cnpj) => `pluggy_items_${cnpj}`;
 
-function loadStoredItems(cnpj) {
+function takeLegacyItemIds(cnpj) {
   try {
-    const raw = localStorage.getItem(PLUGGY_ITEMS_KEY(cnpj));
-    return raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(LEGACY_PLUGGY_ITEMS_KEY(cnpj));
+    localStorage.removeItem(LEGACY_PLUGGY_ITEMS_KEY(cnpj));
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.map((e) => e?.itemId).filter(Boolean) : [];
   } catch {
     return [];
   }
 }
 
-function saveStoredItems(cnpj, items) {
-  localStorage.setItem(PLUGGY_ITEMS_KEY(cnpj), JSON.stringify(items));
+async function loadTenantItems(cnpj) {
+  const legacyIds = takeLegacyItemIds(cnpj);
+  let lostLegacy = 0;
+  if (legacyIds.length > 0) {
+    const results = await Promise.allSettled(legacyIds.map((id) => registerItem(id, cnpj)));
+    lostLegacy = results.filter((r) => r.status === 'rejected').length;
+  }
+  const rows = await listItems(cnpj);
+  const entries = rows.map((r) => ({
+    itemId: r.item_id,
+    connectedAt: r.created_at,
+    label: r.label || `Banco ${r.item_id.slice(0, 8)}`,
+  }));
+  return { entries, lostLegacy };
 }
 
 function statusColor(status) {
@@ -250,11 +268,24 @@ export default function BankReconciliation() {
   // Load persisted Pluggy items and fetch their current status
   useEffect(() => {
     if (!me?.cnpj) return;
-    const stored = loadStoredItems(me.cnpj);
-    setConnectedItems(stored);
-    if (stored.length === 0) return;
-    // Refresh statuses silently
+    let cancelled = false;
     (async () => {
+      let stored = [];
+      try {
+        const { entries, lostLegacy } = await loadTenantItems(me.cnpj);
+        stored = entries;
+        if (lostLegacy > 0) {
+          setOfError(
+            `${lostLegacy} conexão(ões) bancária(s) antiga(s) não puderam ser vinculadas à empresa. Conecte o banco novamente.`
+          );
+        }
+      } catch (err) {
+        setOfError(err?.message || 'Erro ao carregar as conexões bancárias.');
+      }
+      if (cancelled) return;
+      setConnectedItems(stored);
+      if (stored.length === 0) return;
+      // Refresh statuses silently
       const updated = await Promise.all(
         stored.map(async (entry) => {
           try {
@@ -271,12 +302,14 @@ export default function BankReconciliation() {
           }
         })
       );
+      if (cancelled) return;
       setConnectedItems(updated);
       const flat = updated.flatMap((e) =>
         (e.accounts || []).map((a) => ({ ...a, itemId: e.itemId }))
       );
       setAllPluggyAccounts(flat);
     })();
+    return () => { cancelled = true; };
   }, [me]);
 
   const totalBalance = bankAccounts.reduce(
@@ -356,13 +389,26 @@ export default function BankReconciliation() {
     setWidgetLoading(true);
     try {
       await loadPluggyWidget();
-      const { accessToken: connectToken } = await getConnectToken();
+      // getConnectToken já devolve a string do token (antes era desestruturada
+      // como objeto e o widget recebia undefined).
+      const connectToken = await getConnectToken();
       openPluggyWidget({
         connectToken,
         onSuccess: async (item) => {
           setWidgetLoading(false);
           const itemId = item?.id || item?.itemId;
           if (!itemId) return;
+          if (!me?.cnpj) {
+            setOfError('Selecione uma empresa antes de conectar um banco.');
+            return;
+          }
+          // Sem o vínculo no servidor, as próximas chamadas do item são recusadas.
+          try {
+            await registerItem(itemId, me.cnpj);
+          } catch (err) {
+            setOfError(err?.message || 'Não foi possível vincular o banco à empresa.');
+            return;
+          }
           const connectedAt = new Date().toISOString();
           // Fetch item details
           let itemDetails = {};
@@ -381,11 +427,7 @@ export default function BankReconciliation() {
             institution: itemDetails?.connector?.name,
             accounts,
           };
-          setConnectedItems((prev) => {
-            const next = [...prev.filter((e) => e.itemId !== itemId), entry];
-            if (me?.cnpj) saveStoredItems(me.cnpj, next);
-            return next;
-          });
+          setConnectedItems((prev) => [...prev.filter((e) => e.itemId !== itemId), entry]);
           setAllPluggyAccounts((prev) => {
             const withoutItem = prev.filter((a) => a.itemId !== itemId);
             return [
@@ -428,13 +470,9 @@ export default function BankReconciliation() {
           institution: itemDetails?.connector?.name || entry.label,
           accounts: accounts || [],
         };
-        setConnectedItems((prev) => {
-          const next = prev.map((e) =>
-            e.itemId === entry.itemId ? updated : e
-          );
-          if (me?.cnpj) saveStoredItems(me.cnpj, next);
-          return next;
-        });
+        setConnectedItems((prev) =>
+          prev.map((e) => (e.itemId === entry.itemId ? updated : e))
+        );
         setAllPluggyAccounts((prev) => {
           const withoutItem = prev.filter((a) => a.itemId !== entry.itemId);
           return [
@@ -456,17 +494,18 @@ export default function BankReconciliation() {
       setOfError('');
       try {
         await deleteItem(itemId);
-      } catch {
-        // ignore API errors on delete
+      } catch (err) {
+        // 404 = já não existe para esta empresa; nos demais casos o vínculo
+        // continua no servidor, então mantém o banco na lista.
+        if (err?.status !== 404) {
+          setOfError(err?.message || 'Erro ao desconectar o banco.');
+          return;
+        }
       }
-      setConnectedItems((prev) => {
-        const next = prev.filter((e) => e.itemId !== itemId);
-        if (me?.cnpj) saveStoredItems(me.cnpj, next);
-        return next;
-      });
+      setConnectedItems((prev) => prev.filter((e) => e.itemId !== itemId));
       setAllPluggyAccounts((prev) => prev.filter((a) => a.itemId !== itemId));
     },
-    [me]
+    []
   );
 
   // ── Open Finance: import transactions ─────────────────────────────────────

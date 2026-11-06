@@ -18,7 +18,8 @@ import { createPageUrl } from "@/utils";
 import {
   TrendingUp, TrendingDown, FileText, Users, DollarSign,
   BarChart3, Calendar, AlertCircle, CheckCircle, Award, AlertTriangle, Shield, FileCheck,
-  Columns3, Settings2, ClipboardCheck, Banknote
+  Columns3, Settings2, ClipboardCheck, Banknote, SlidersHorizontal, RefreshCw, X,
+  ArrowUpRight
 } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell } from "recharts";
 import { format, subMonths } from "date-fns";
@@ -57,7 +58,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [contractAlerts, setContractAlerts] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
-  const [selectedView, setSelectedView] = useState("mensal"); // Kept for now, but will be replaced by periodType logic
+  const [showFilters, setShowFilters] = useState(false);
 
   const [preferences, setPreferences] = useState({
     kpis: true, strategic: true, alerts: true, charts: true,
@@ -309,7 +310,8 @@ export default function Dashboard() {
       const averageMargin = totalRevActive > 0 ? (totalProfitActive / totalRevActive) * 100 : 0;
 
       setStrategicKpis(prev => ({
-        ...prev, // Keep efficiencyIndex
+        ...prev,
+        efficiencyIndex,
         atRiskContracts,
         topContracts,
         bottomContracts,
@@ -487,6 +489,24 @@ export default function Dashboard() {
     }).format(value);
   };
 
+  const activeFilterCount = [contractFilter, unitFilter, responsibleFilter]
+    .filter(value => value !== 'all').length + (periodType === 'custom' && fromMonth ? 1 : 0);
+
+  const clearFilters = () => {
+    setPeriodType('mensal');
+    setSelectedMonth(format(new Date(), 'yyyy-MM'));
+    setFromMonth('');
+    setContractFilter('all');
+    setUnitFilter('all');
+    setResponsibleFilter('all');
+  };
+
+  const periodLabel = periodType === 'mensal'
+    ? format(new Date(`${selectedMonth}-02T12:00:00`), "MMMM 'de' yyyy", { locale: pt })
+    : periodType === 'trimestral' ? 'Últimos 3 meses'
+      : periodType === 'anual' ? `Ano de ${selectedMonth.slice(0, 4)}`
+        : fromMonth ? `${fromMonth} a ${selectedMonth}` : 'Período personalizado';
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
@@ -510,20 +530,64 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+    <div className="min-h-screen bg-background p-3 sm:p-6 lg:p-8 space-y-5 sm:space-y-7">
 
       {/* Welcome Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">
-          Olá, {user?.full_name || 'Usuário'}! 👋
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: pt })}
-        </p>
+      <div className="relative overflow-hidden rounded-2xl border border-blue-200/70 bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-700 px-5 py-6 text-white shadow-lg shadow-blue-950/10 sm:px-7 sm:py-7">
+        <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-medium text-blue-100">
+              <span className="rounded-full bg-white/15 px-2.5 py-1 capitalize">{periodLabel}</span>
+              <span className="hidden sm:inline">•</span>
+              <span className="hidden capitalize sm:inline">{format(new Date(), "EEEE, dd 'de' MMMM", { locale: pt })}</span>
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              Olá, {user?.full_name?.split(' ')[0] || 'Usuário'}!
+            </h1>
+            <p className="mt-1.5 max-w-xl text-sm text-blue-100 sm:text-base">
+              Acompanhe os resultados da operação e priorize o que precisa da sua atenção.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:flex">
+            <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-100">Margem líquida</p>
+              <p className="mt-1 text-xl font-bold tabular-nums">{kpis.netMargin.toFixed(1)}%</p>
+            </div>
+            <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-100">Pontos de atenção</p>
+              <p className="mt-1 text-xl font-bold tabular-nums">{contractAlerts.length + extraKpis.delayedRepacts}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filtros Avançados */}
-      <Card className="bg-card border-border shadow-sm">
+      <Card className="bg-card border-border shadow-sm overflow-hidden">
+        <div className="flex flex-col gap-3 border-b border-border/70 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <SlidersHorizontal className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Visão do dashboard</p>
+              <p className="text-xs text-muted-foreground">{activeFilterCount ? `${activeFilterCount} filtro(s) aplicado(s)` : 'Todos os contratos e unidades'}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {activeFilterCount > 0 && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1.5 text-muted-foreground">
+                <X className="h-3.5 w-3.5" /> Limpar
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={() => setShowFilters(value => !value)} className="gap-2">
+              <Settings2 className="h-4 w-4" /> {showFilters ? 'Ocultar filtros' : 'Mais filtros'}
+            </Button>
+            <Button size="sm" onClick={loadDashboardData} className="gap-2">
+              <RefreshCw className="h-4 w-4" /> <span className="hidden sm:inline">Atualizar</span>
+            </Button>
+          </div>
+        </div>
         <CardContent className="p-4 sm:p-5 space-y-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
@@ -550,13 +614,10 @@ export default function Dashboard() {
                 <Input type="month" value={fromMonth} onChange={(e) => setFromMonth(e.target.value)} className="w-36 bg-background border-border text-foreground" />
               </div>
             )}
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Settings2 className="w-4 h-4 shrink-0" />
-              <span className="text-xs">KPIs e gráficos respeitam filtros e período.</span>
-            </div>
+            <span className="text-xs text-muted-foreground">KPIs e gráficos respeitam o período selecionado.</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {showFilters && <div className="grid grid-cols-1 md:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-1">
             <div className="space-y-1">
               <span className="text-sm font-medium text-foreground">Contrato</span>
               <Select value={contractFilter} onValueChange={setContractFilter}>
@@ -581,10 +642,10 @@ export default function Dashboard() {
               <Input placeholder="Nome do gestor" value={responsibleFilter === 'all' ? '' : responsibleFilter}
                 onChange={(e) => setResponsibleFilter(e.target.value || 'all')} className="w-full bg-background border-border text-foreground" />
             </div>
-          </div>
+          </div>}
 
           {/* Preferências (Admin) */}
-          {user?.department === 'admin' && (
+          {user?.department === 'admin' && showFilters && (
             <div className="flex flex-wrap gap-2 pt-3 border-t border-border items-center">
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Columns3 className="w-3 h-3" /> Widgets
@@ -631,7 +692,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 animate-in fade-in slide-in-from-bottom-2">
 
           {/* Contratos Ativos */}
-          <Card className="bg-card border-border border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
+          <Card className="group bg-card border-border shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all">
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -642,7 +703,7 @@ export default function Dashboard() {
                     <span className="text-xs sm:text-sm">Total</span>
                   </div>
                 </div>
-                <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center transition-transform group-hover:scale-105">
                   <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
               </div>
@@ -650,7 +711,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Faturamento Período */}
-          <Card className="bg-card border-border border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-shadow">
+          <Card className="group bg-card border-border shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all">
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -663,7 +724,7 @@ export default function Dashboard() {
                     <span className="text-xs sm:text-sm">Soma das entradas</span>
                   </div>
                 </div>
-                <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center transition-transform group-hover:scale-105">
                   <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                 </div>
               </div>
@@ -686,7 +747,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="text-right mt-2">
-                <Link className="text-xs text-blue-600 hover:underline" to={createPageUrl("Contracts")}>Ver detalhes</Link>
+                <Link className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline" to={createPageUrl("Contracts")}>Ver detalhes <ArrowUpRight className="h-3 w-3" /></Link>
               </div>
             </CardContent>
           </Card>
@@ -723,7 +784,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="text-right mt-2">
-                <Link className="text-xs text-blue-600 hover:underline" to={createPageUrl("ReajusteContratual")}>Ver detalhes</Link>
+                <Link className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline" to={createPageUrl("ReajusteContratual")}>Ver detalhes <ArrowUpRight className="h-3 w-3" /></Link>
               </div>
             </CardContent>
           </Card>
@@ -781,7 +842,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="text-right mt-2">
-                <Link className="text-xs text-blue-600 hover:underline" to={createPageUrl("AccountsReceivable")}>Ver detalhes</Link>
+                <Link className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline" to={createPageUrl("AccountsReceivable")}>Ver detalhes <ArrowUpRight className="h-3 w-3" /></Link>
               </div>
             </CardContent>
           </Card>

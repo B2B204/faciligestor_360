@@ -47,6 +47,7 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import { lazy } from 'react';
 const AcceptInvite = lazy(() => import('./pages/AcceptInvite'));
 const AccessDeniedPage = lazy(() => import('./pages/AccessDeniedPage'));
 const AccountsReceivable = lazy(() => import('./pages/AccountsReceivable'));

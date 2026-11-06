@@ -20,8 +20,11 @@ const DEPT_LABELS = {
   operador: "Visualização",
 };
 
+// Código imprevisível (crypto), já que ele dá acesso à empresa.
 function generateCode() {
-  return `INV-${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 9)}`.toUpperCase();
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  const random = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return `INV-${random}`.toUpperCase();
 }
 
 export default function UserInviteModal({ isOpen, onClose, currentUser, onSuccess }) {

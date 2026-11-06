@@ -1,11 +1,12 @@
 import React from "react";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { reportError } from "@/lib/errorReporter";
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, errorId: null };
   }
 
   static getDerivedStateFromError() {
@@ -13,7 +14,11 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    console.error("[ErrorBoundary] Erro não tratado na renderização:", error, info?.componentStack);
+    const errorId = reportError(error, {
+      source: "ErrorBoundary",
+      componentStack: info?.componentStack,
+    });
+    this.setState({ errorId });
   }
 
   handleReload = () => {
@@ -38,6 +43,11 @@ export default class ErrorBoundary extends React.Component {
             <p className="text-muted-foreground text-sm">
               Ocorreu um erro inesperado ao exibir esta página. Você pode tentar recarregar ou voltar para o início.
             </p>
+            {this.state.errorId && (
+              <p className="text-xs text-muted-foreground">
+                Código para o suporte: <strong className="font-mono text-foreground">{this.state.errorId}</strong>
+              </p>
+            )}
             <div className="flex items-center justify-center gap-2 pt-2">
               <Button variant="outline" onClick={this.handleGoHome}>Ir para o início</Button>
               <Button onClick={this.handleReload}>Recarregar página</Button>

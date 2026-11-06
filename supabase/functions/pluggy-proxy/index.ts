@@ -1,5 +1,7 @@
-const PLUGGY_CLIENT_ID = '2ec0e93e-15e0-4637-a770-b559c4dc8442';
-const PLUGGY_CLIENT_SECRET = 'sf-MA8NqiUmeCvUbsW-_iMWiX36LmMb3le5-SxN4q2U';
+// Credenciais lidas dos secrets da função (supabase secrets set PLUGGY_CLIENT_ID=... PLUGGY_CLIENT_SECRET=...).
+// Nunca escreva estes valores no código.
+const PLUGGY_CLIENT_ID = Deno.env.get('PLUGGY_CLIENT_ID') ?? '';
+const PLUGGY_CLIENT_SECRET = Deno.env.get('PLUGGY_CLIENT_SECRET') ?? '';
 const PLUGGY_API = 'https://api.pluggy.ai';
 
 const corsHeaders = {

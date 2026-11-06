@@ -30,6 +30,8 @@ import { canEditPage } from "@/components/permissions";
 import { recordContractVersion } from "@/lib/contractVersioning";
 import ContractHistoryDialog from "@/components/contracts/ContractHistoryDialog";
 import { instantiateTemplateForContract } from "@/lib/taskTemplateEngine";
+import { notifyError, notifySuccess, notifyWarning } from "@/lib/feedback";
+import { logDataAccess } from "@/lib/lgpdAudit";
 
 const planLimits = {
   essencial: { contracts: 10, users: 5 },
@@ -85,7 +87,10 @@ export default function ContractsPage() {
       const data = await Contract.filter({ cnpj: currentUser.cnpj, deleted_at: null }, "-created_date");
       setContracts(data);
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+      notifyError(error, {
+        title: "Não foi possível carregar os contratos",
+        context: { action: "contracts.load" },
+      });
     }
     setIsLoading(false);
   };
@@ -99,7 +104,7 @@ export default function ContractsPage() {
       const planLimit = planLimits[currentPlan]?.contracts;
 
       if (!selectedContract && planLimit !== Infinity && contracts.length >= planLimit) {
-        alert(`Você atingiu o limite de ${planLimit} contratos do seu plano. Faça um upgrade para adicionar mais.`);
+        notifyWarning("Limite do plano atingido", `Seu plano permite até ${planLimit} contratos.`);
         setIsSaving(false);
         return;
       }
@@ -119,6 +124,13 @@ export default function ContractsPage() {
           before: selectedContract,
           after: { ...selectedContract, ...dataToSave },
         });
+        await logDataAccess({
+          user,
+          action: "update",
+          resourceType: "contract",
+          resourceId: selectedContract.id,
+          resourceLabel: dataToSave.name,
+        });
         setSaveMessage("Contrato atualizado com sucesso!");
       } else {
         const created = await Contract.create(dataToSave);
@@ -128,6 +140,13 @@ export default function ContractsPage() {
           changedBy: user.email,
           after: created,
           isCreation: true,
+        });
+        await logDataAccess({
+          user,
+          action: "create",
+          resourceType: "contract",
+          resourceId: created.id,
+          resourceLabel: created.name,
         });
 
         if (created.task_template_id) {
@@ -140,7 +159,10 @@ export default function ContractsPage() {
               actorEmail: user.email,
             });
           } catch (templateError) {
-            console.error("Erro ao criar tarefas a partir do modelo:", templateError);
+            notifyError(templateError, {
+              title: "Contrato salvo, mas as tarefas não foram criadas",
+              context: { action: "contracts.instantiateTemplate", contractId: created.id },
+            });
           }
         }
 
@@ -156,9 +178,11 @@ export default function ContractsPage() {
       }, 2000);
 
     } catch (error) {
-      console.error("Erro ao salvar contrato:", error);
-      const detail = error?.message || error?.error_description || error?.details;
-      alert(detail ? `Erro ao salvar contrato: ${detail}` : "Erro ao salvar contrato. Verifique se todos os campos obrigatórios foram preenchidos corretamente.");
+      notifyError(error, {
+        title: "Não foi possível salvar o contrato",
+        description: "Revise os campos obrigatórios e tente novamente.",
+        context: { action: "contracts.save", contractId: selectedContract?.id },
+      });
     }
     setIsSaving(false);
   };
@@ -173,7 +197,7 @@ export default function ContractsPage() {
     const planLimit = planLimits[currentPlan]?.contracts;
 
     if (planLimit !== Infinity && contracts.length >= planLimit) {
-      alert(`Você atingiu o limite de ${planLimit} contratos do seu plano. Faça um upgrade para adicionar mais.`);
+      notifyWarning("Limite do plano atingido", `Seu plano permite até ${planLimit} contratos.`);
       return;
     }
 
@@ -198,12 +222,22 @@ export default function ContractsPage() {
           before: contract,
           after: { ...contract, ...patch },
         });
+        await logDataAccess({
+          user,
+          action: "delete",
+          resourceType: "contract",
+          resourceId: contract.id,
+          resourceLabel: contract.name,
+          details: { deletionMode: "soft-delete" },
+        });
 
         await loadData();
-        alert("Contrato excluído (enviado para a Lixeira) com sucesso!");
+        notifySuccess("Contrato enviado para a lixeira", "Ele poderá ser restaurado posteriormente.");
       } catch (error) {
-        console.error("Erro ao excluir contrato:", error);
-        alert("Erro ao excluir contrato.");
+        notifyError(error, {
+          title: "Não foi possível excluir o contrato",
+          context: { action: "contracts.delete", contractId: contract.id },
+        });
       }
     }
   };

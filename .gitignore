@@ -32,3 +32,5 @@ dist-ssr
 *.sw?
 
 .env
+# Exportações com dados pessoais (LGPD) — não versionar
+imports/

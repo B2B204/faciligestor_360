@@ -1,4 +1,5 @@
 import { DataAccessLog } from '@/entities/DataAccessLog';
+import { reportError } from '@/lib/errorReporter';
 
 // Registra acesso/alteração a dados pessoais sensíveis, para atender ao
 // dever de rastreabilidade da LGPD (art. 37). Nunca deve interromper a
@@ -17,6 +18,6 @@ export async function logDataAccess({ user, action, resourceType, resourceId, re
       details: details || null,
     });
   } catch (err) {
-    console.warn('[lgpdAudit] falha ao registrar log de acesso:', err);
+    reportError(err, { source: 'audit', action, resourceType, resourceId });
   }
 }

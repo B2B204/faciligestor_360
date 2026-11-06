@@ -9,7 +9,11 @@
 // cliente. Por padrão o Supabase exige um JWT de sessão válido para invocar a
 // function, então só usuários autenticados do app conseguem chamar isto.
 
+import { requireUser } from '../_shared/auth.ts';
+
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
+// Teto de entrada para impedir que um único usuário esgote a cota/custo da conta.
+const MAX_INPUT_CHARS = 60_000;
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
@@ -33,9 +37,17 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'GROQ_API_KEY não configurada nas secrets da function.' }, 500);
   }
 
+  // O verify_jwt padrão aceita a anon key pública; exige sessão real.
+  const user = await requireUser(req);
+  if (!user) return json({ error: 'Não autenticado' }, 401);
+
   try {
     const { prompt, response_json_schema, system_prompt } = await req.json();
-    if (!prompt) return json({ error: 'prompt é obrigatório' }, 400);
+    if (typeof prompt !== 'string' || !prompt) return json({ error: 'prompt é obrigatório' }, 400);
+    const inputSize = prompt.length
+      + (typeof system_prompt === 'string' ? system_prompt.length : 0)
+      + (response_json_schema ? JSON.stringify(response_json_schema).length : 0);
+    if (inputSize > MAX_INPUT_CHARS) return json({ error: 'Entrada muito grande' }, 413);
 
     const messages: { role: string; content: string }[] = [];
     if (system_prompt) {
@@ -73,6 +85,7 @@ Deno.serve(async (req: Request) => {
 
     return json(data);
   } catch (err) {
-    return json({ error: err instanceof Error ? err.message : 'Erro desconhecido' }, 400);
+    console.error('[groq-proxy]', err);
+    return json({ error: 'Requisição inválida' }, 400);
   }
 });

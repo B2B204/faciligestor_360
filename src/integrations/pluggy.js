@@ -1,13 +1,12 @@
-const SUPABASE_EDGE_URL = 'https://ihmwofghodonuvzzirmj.supabase.co/functions/v1/pluggy-proxy';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlobXdvZmdob2RvbnV2enppam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzODc3MDIsImV4cCI6MjA1NTk2MzcwMn0.p_5YSGBMQ-MQ96Nd3LLBUVRFRaVFidtUmPXuaaBq6NM';
+import { supabase } from '@/api/supabaseClient';
 
+// A Edge Function exige a sessão do usuário logado (não só a anon key):
+// supabase.functions.invoke envia o access_token da sessão atual.
 async function call(action, params = {}) {
   const qs = new URLSearchParams({ action, ...params }).toString();
-  const res = await fetch(`${SUPABASE_EDGE_URL}?${qs}`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-  });
-  if (!res.ok) throw new Error(`Pluggy proxy error ${res.status}`);
-  return res.json();
+  const { data, error } = await supabase.functions.invoke(`pluggy-proxy?${qs}`, { method: 'GET' });
+  if (error) throw new Error(`Pluggy proxy error: ${error.message}`);
+  return data;
 }
 
 export async function getConnectToken(itemId = null) {

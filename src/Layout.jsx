@@ -8,7 +8,7 @@ import { BRAND } from "@/components/common/Branding";
 import BrandLogo from "@/components/common/BrandLogo";
 import { LayoutDashboard, FileText, Users, DollarSign, BarChart3,
   Menu, X, LogOut, Settings, Bell, ChevronDown, Package, Calculator,
-  ClipboardCheck, ShoppingCart, ShieldCheck, Banknote, HeartPulse, Mail, Award, HandCoins, UsersRound, LineChart, LifeBuoy, Shirt, SlidersHorizontal, RefreshCw, Wallet, CalendarRange, Star, Landmark, Tags, Briefcase
+  ClipboardCheck, ShoppingCart, ShieldCheck, Banknote, HeartPulse, Award, HandCoins, LineChart, LifeBuoy, Shirt, SlidersHorizontal, RefreshCw, Wallet, CalendarRange, Landmark, Tags, Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,7 +23,6 @@ import AccessBlocked from "./components/AccessBlocked";
 import { hasPageAccess } from '@/components/permissions';
 import AccessDeniedPage from "./pages/AccessDeniedPage";
 import CnpjSwitcher from "./components/common/CnpjSwitcher";
-import ThemeToggle from "./components/common/ThemeToggle";
 import { lookupCnpj } from "@/functions/lookupCnpj";
 import { PRIVACY_POLICY_VERSION } from "./pages/PrivacyPolicy";
 
@@ -47,7 +46,6 @@ const navItems = [
     title: "Comercial",
     icon: LineChart,
     subItems: [
-      { title: "CRM", url: createPageUrl("CRM"), icon: UsersRound },
       { title: "Contratos", url: createPageUrl("Contracts"), icon: FileText },
       { title: "Reajuste Contratual", url: createPageUrl("ReajusteContratual"), icon: ClipboardCheck },
       { title: "Seguros e Laudos", url: createPageUrl("SegurosLaudos"), icon: HeartPulse },
@@ -60,9 +58,7 @@ const navItems = [
     icon: Users,
     subItems: [
       { title: "Funcionários", url: createPageUrl("Employees"), icon: Users },
-      { title: "Onboarding/Offboarding", url: "/onboarding", icon: ClipboardCheck },
       { title: "Férias e Ausências", url: "/ferias-ausencias", icon: CalendarRange },
-      { title: "Avaliação de Desempenho", url: "/avaliacao-desempenho", icon: Star },
       { title: "Recibos VA/VT", url: createPageUrl("AllowanceReceipts"), icon: Banknote },
     ],
   },
@@ -102,19 +98,6 @@ const navItems = [
     ],
   },
 
-
-  { type: "link", title: "Ofícios/Comunicados", url: createPageUrl("Oficios"), icon: Mail },
-  { type: "link", title: "Medição", url: createPageUrl("Measurements"), icon: ClipboardCheck },
-
-  {
-    type: "group",
-    title: "Operações",
-    icon: CalendarRange,
-    subItems: [
-      { title: "Ordens de Serviço", url: createPageUrl("OS"), icon: ClipboardCheck },
-      { title: "Planejamento por Técnico", url: "/planejamento-tecnico", icon: CalendarRange },
-    ],
-  },
 
   {
     type: "group",
@@ -819,7 +802,6 @@ export default function Layout({ children, currentPageName }) {
                 <SlidersHorizontal className="w-4 h-4" />
               </Button>
               <CnpjSwitcher user={user} onChanged={loadUser} />
-              <ThemeToggle />
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full text-xs"></span>

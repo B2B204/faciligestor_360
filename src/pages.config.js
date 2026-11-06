@@ -47,38 +47,34 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import AcceptInvite from './pages/AcceptInvite';
-import AccessDeniedPage from './pages/AccessDeniedPage';
-import AccountsReceivable from './pages/AccountsReceivable';
-import Alerts from './pages/Alerts';
-import AllowanceReceipts from './pages/AllowanceReceipts';
-import CRM from './pages/CRM';
-import Contracts from './pages/Contracts';
-import Dashboard from './pages/Dashboard';
-import Employees from './pages/Employees';
-import Financial from './pages/Financial';
-import HomePage from './pages/HomePage';
-import IndirectCosts from './pages/IndirectCosts';
-import LogoutSuccess from './pages/LogoutSuccess';
-import Marketing from './pages/Marketing';
-import Marketplace from './pages/Marketplace';
-import Measurements from './pages/Measurements';
-import OS from './pages/OS';
-import Oficios from './pages/Oficios';
-import Patrimony from './pages/Patrimony';
-import Profile from './pages/Profile';
-import ReajusteContratual from './pages/ReajusteContratual';
-import Recognitions from './pages/Recognitions';
-import Reports from './pages/Reports';
-import SegurosLaudos from './pages/SegurosLaudos';
-import Supplies from './pages/Supplies';
-import Support from './pages/Support';
-import Tasks from './pages/Tasks';
-import TaskTemplates from './pages/TaskTemplates';
-import TaskAutomations from './pages/TaskAutomations';
-import TaskReports from './pages/TaskReports';
-import Uniforms from './pages/Uniforms';
-import UserProfiles from './pages/UserProfiles';
+const AcceptInvite = lazy(() => import('./pages/AcceptInvite'));
+const AccessDeniedPage = lazy(() => import('./pages/AccessDeniedPage'));
+const AccountsReceivable = lazy(() => import('./pages/AccountsReceivable'));
+const Alerts = lazy(() => import('./pages/Alerts'));
+const AllowanceReceipts = lazy(() => import('./pages/AllowanceReceipts'));
+const Contracts = lazy(() => import('./pages/Contracts'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Employees = lazy(() => import('./pages/Employees'));
+const Financial = lazy(() => import('./pages/Financial'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const IndirectCosts = lazy(() => import('./pages/IndirectCosts'));
+const LogoutSuccess = lazy(() => import('./pages/LogoutSuccess'));
+const Marketing = lazy(() => import('./pages/Marketing'));
+const Marketplace = lazy(() => import('./pages/Marketplace'));
+const Patrimony = lazy(() => import('./pages/Patrimony'));
+const Profile = lazy(() => import('./pages/Profile'));
+const ReajusteContratual = lazy(() => import('./pages/ReajusteContratual'));
+const Recognitions = lazy(() => import('./pages/Recognitions'));
+const Reports = lazy(() => import('./pages/Reports'));
+const SegurosLaudos = lazy(() => import('./pages/SegurosLaudos'));
+const Supplies = lazy(() => import('./pages/Supplies'));
+const Support = lazy(() => import('./pages/Support'));
+const Tasks = lazy(() => import('./pages/Tasks'));
+const TaskTemplates = lazy(() => import('./pages/TaskTemplates'));
+const TaskAutomations = lazy(() => import('./pages/TaskAutomations'));
+const TaskReports = lazy(() => import('./pages/TaskReports'));
+const Uniforms = lazy(() => import('./pages/Uniforms'));
+const UserProfiles = lazy(() => import('./pages/UserProfiles'));
 import __Layout from './Layout.jsx';
 
 
@@ -88,7 +84,6 @@ export const PAGES = {
     "AccountsReceivable": AccountsReceivable,
     "Alerts": Alerts,
     "AllowanceReceipts": AllowanceReceipts,
-    "CRM": CRM,
     "Contracts": Contracts,
     "Dashboard": Dashboard,
     "Employees": Employees,
@@ -98,9 +93,6 @@ export const PAGES = {
     "LogoutSuccess": LogoutSuccess,
     "Marketing": Marketing,
     "Marketplace": Marketplace,
-    "Measurements": Measurements,
-    "OS": OS,
-    "Oficios": Oficios,
     "Patrimony": Patrimony,
     "Profile": Profile,
     "ReajusteContratual": ReajusteContratual,

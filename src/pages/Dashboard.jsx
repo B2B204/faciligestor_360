@@ -740,9 +740,6 @@ export default function Dashboard() {
                   <FileCheck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
                 </div>
               </div>
-              <div className="text-right mt-2">
-                <Link className="text-xs text-blue-600 hover:underline" to={createPageUrl("Measurements")}>Ver detalhes</Link>
-              </div>
             </CardContent>
           </Card>
 

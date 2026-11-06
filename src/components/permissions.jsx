@@ -30,7 +30,7 @@ export const hasPageAccess = (role, pageName) => {
   const permissions = PERMISSIONS[userRole] || PERMISSIONS['comercial'];
   if (!permissions) return false;
   if (permissions.pages.includes('all')) return true;
-  const systemPages = ['Dashboard','Contracts','ReajusteContratual','Employees','Financial','Reports','Profile','Measurements','Uniforms','Patrimony','Supplies','IndirectCosts','Marketplace','AccessDeniedPage','SegurosLaudos','AccountsReceivable','Oficios','AllowanceReceipts','Recognitions','CRM','Alerts','Marketing','Support','Tasks','TaskTemplates','TaskAutomations','TaskReports'];
+  const systemPages = ['Dashboard','Contracts','ReajusteContratual','Employees','Financial','Reports','Profile','Uniforms','Patrimony','Supplies','IndirectCosts','Marketplace','AccessDeniedPage','SegurosLaudos','AccountsReceivable','AllowanceReceipts','Recognitions','Alerts','Marketing','Support','Tasks','TaskTemplates','TaskAutomations','TaskReports'];
   if (systemPages.includes(pageName)) {
     return permissions.pages.includes(pageName);
   }
@@ -72,7 +72,7 @@ export const canEditPage = (role, pageName) => {
   const RH_PAGES = ['Employees', 'AllowanceReceipts'];
   const FIN_PAGES = ['Financial', 'AccountsReceivable', 'IndirectCosts'];
   const COMPRAS_PAGES = ['Supplies', 'Patrimony', 'Uniforms'];
-  const COMERCIAL_PAGES = ['CRM', 'Contracts', 'ReajusteContratual', 'SegurosLaudos'];
+  const COMERCIAL_PAGES = ['Contracts', 'ReajusteContratual', 'SegurosLaudos'];
 
   if (r === 'rh') return RH_PAGES.includes(pageName);
   if (r === 'financeiro') return FIN_PAGES.includes(pageName);

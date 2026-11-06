@@ -42,7 +42,7 @@ import {
 
 const PAGE_GROUPS = {
   Geral: ["Dashboard", "Reports", "Alerts", "Support"],
-  Comercial: ["CRM", "Contracts", "ReajusteContratual", "SegurosLaudos", "Measurements"],
+  Comercial: ["Contracts", "ReajusteContratual", "SegurosLaudos"],
   RH: ["Employees", "AllowanceReceipts", "Recognitions"],
   Financeiro: [
     "Financial",
@@ -65,7 +65,6 @@ const PAGE_GROUPS = {
     "Profile",
     "Marketing",
     "Marketplace",
-    "Oficios",
   ],
 };
 
@@ -76,11 +75,9 @@ const PAGE_LABELS = {
   Reports: "Relatórios",
   Alerts: "Alertas",
   Support: "Suporte",
-  CRM: "CRM",
   Contracts: "Contratos",
   ReajusteContratual: "Reajuste Contratual",
   SegurosLaudos: "Seguros e Laudos",
-  Measurements: "Medições",
   Employees: "Funcionários",
   AllowanceReceipts: "Recibos de Adiantamento",
   Recognitions: "Reconhecimentos",
@@ -104,7 +101,6 @@ const PAGE_LABELS = {
   Profile: "Meu Perfil",
   Marketing: "Marketing",
   Marketplace: "Marketplace",
-  Oficios: "Ofícios",
 };
 
 const ALL_ACTIONS = [
@@ -113,7 +109,6 @@ const ALL_ACTIONS = [
   { key: "edit", label: "Editar registros" },
   { key: "delete", label: "Excluir registros" },
   { key: "all", label: "Acesso total (inclui tudo)" },
-  { key: "approve_measurements", label: "Aprovar medições" },
   { key: "edit_rh", label: "Editar módulo RH" },
   { key: "edit_financeiro", label: "Editar módulo Financeiro" },
   { key: "edit_compras", label: "Editar módulo Compras" },

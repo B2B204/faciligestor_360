@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Contract } from "@/entities/Contract";
 import { FinancialEntry } from "@/entities/FinancialEntry";
 import { TaxExcess } from "@/entities/TaxExcess";
@@ -40,6 +41,7 @@ const planLimits = {
 };
 
 export default function FinancialPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState(null);
   const [contracts, setContracts] = useState([]);
   const [financialData, setFinancialData] = useState([]);
@@ -108,6 +110,13 @@ export default function FinancialPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (searchParams.get('action') !== 'new') return;
+    setEditingEntry(null);
+    setIsFormOpen(true);
+    setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 

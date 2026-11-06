@@ -17,7 +17,7 @@ import CSVImport from "../components/employees/CSVImport";
 import BulkUpdateForm from "../components/employees/BulkUpdateForm";
 
 import { User } from "@/entities/User";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { canEditPage } from '@/components/permissions';
 import { generateEmployeeTasks } from '@/lib/hrOnboarding';
@@ -25,6 +25,7 @@ import { logDataAccess } from '@/lib/lgpdAudit';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function EmployeesPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
@@ -50,6 +51,13 @@ export default function EmployeesPage() {
   // Status global de visualização
   const [statusView, setStatusView] = useState('ativos');
   const [lastFilters, setLastFilters] = useState({});
+
+  useEffect(() => {
+    if (searchParams.get('action') !== 'new') return;
+    setSelectedEmployee(null);
+    setIsFormOpen(true);
+    setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const isFerista = useCallback((emp) => {
     if (emp?.is_ferista) return true;

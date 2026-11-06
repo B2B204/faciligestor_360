@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Contract } from "@/entities/Contract";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,7 @@ const planLimits = {
 };
 
 export default function ContractsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [contracts, setContracts] = useState([]);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +58,13 @@ export default function ContractsPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get('action') !== 'new') return;
+    setSelectedContract(null);
+    setIsFormOpen(true);
+    setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const loadData = async () => {
     setIsLoading(true);

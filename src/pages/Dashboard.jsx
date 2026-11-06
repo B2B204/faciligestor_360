@@ -1214,7 +1214,7 @@ export default function Dashboard() {
               </Link>
             </Button>
             <Button asChild variant="secondary" className="h-16 sm:h-20 flex flex-col items-center justify-center text-xs sm:text-sm">
-              <Link to={createPageUrl("FinancialEntries", "new")} className="flex flex-col items-center justify-center gap-1 sm:gap-2">
+              <Link to={createPageUrl("Financial", "new")} className="flex flex-col items-center justify-center gap-1 sm:gap-2">
                 <DollarSign className="w-4 h-4 sm:w-6 sm:h-6" />
                 <span className="text-center">Lançamento Financeiro</span>
               </Link>

@@ -69,10 +69,11 @@ export default function CompanySettings() {
       // (que usa my_profile_cnpj()) não deixa ele ver os colegas do
       // CNPJ aprovado. A função SECURITY DEFINER no banco ignora RLS.
       try {
-        await supabase.rpc('sync_profile_cnpj_on_approval', {
+        const { error: syncError } = await supabase.rpc('sync_profile_cnpj_on_approval', {
           p_email: req.requester_email,
           p_cnpj: req.cnpj,
         });
+        if (syncError) throw syncError;
       } catch (syncErr) {
         console.warn('sync_profile_cnpj_on_approval falhou:', syncErr);
       }

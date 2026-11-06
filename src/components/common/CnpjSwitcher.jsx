@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
-import { User } from "@/entities/User";
+import { supabase } from "@/api/supabaseClient";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/use-toast";
 import RequestCnpjDialog from "./RequestCnpjDialog";
 
 export default function CnpjSwitcher({ user, onChanged }) {
+  const { toast } = useToast();
   const [list, setList] = useState([]);
   const [value, setValue] = useState(user?.cnpj || "");
-  const [aggregate, setAggregate] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
   const load = async () => {
     if (!user?.email) return;
@@ -29,9 +30,7 @@ export default function CnpjSwitcher({ user, onChanged }) {
 
   useEffect(() => {
     load();
-    setAggregate(localStorage.getItem("cnpj-aggregate") === "1");
-     
-  }, [user?.email]);
+  }, [user?.email, user?.cnpj]);
 
   useEffect(() => {
     // O CnpjSwitcher vive no Layout, fora das páginas onde o acesso a um
@@ -40,7 +39,7 @@ export default function CnpjSwitcher({ user, onChanged }) {
     window.addEventListener('cnpj-access-changed', load);
     return () => window.removeEventListener('cnpj-access-changed', load);
      
-  }, [user?.email]);
+  }, [user?.email, user?.cnpj]);
 
   // Garante que o cnpj selecionado sempre tenha um SelectItem correspondente
   // já renderizado, mesmo no primeiro paint (antes de load() resolver) —
@@ -49,33 +48,46 @@ export default function CnpjSwitcher({ user, onChanged }) {
   const displayList = value && !list.includes(value) ? [...list, value] : list;
 
   const handleChange = async (cnpj) => {
-    if (cnpj === value) return;
-    setValue(cnpj);
-    const me = await User.me();
-    // O CNPJ atual só existe como profile.cnpj (nem sempre tem uma linha
-    // própria em user_cnpj_access) — sem guardar um acesso pra ele antes de
-    // trocar, ele simplesmente some da lista ao virar o "de antes".
-    if (me.cnpj && me.cnpj !== cnpj) {
-      const existing = await UserCnpjAccess.filter({ user_email: me.email, cnpj: me.cnpj });
-      if (!existing || existing.length === 0) {
-        await UserCnpjAccess.create({ user_email: me.email, cnpj: me.cnpj });
-      }
-    }
-    await User.update(me.id, { cnpj });
-    onChanged?.();
-    window.location.reload();
-  };
+    if (cnpj === value || switching) return;
+    const previousValue = value;
 
-  const toggleAggregate = (v) => {
-    setAggregate(v);
-    localStorage.setItem("cnpj-aggregate", v ? "1" : "0");
+    // Não confia somente no valor enviado pelo Select. O alvo precisa estar
+    // entre os acessos que acabaram de ser carregados para o usuário.
+    if (!displayList.includes(cnpj)) {
+      toast({ title: "Acesso negado", description: "Este CNPJ não está autorizado para seu usuário.", variant: "destructive" });
+      return;
+    }
+
+    setSwitching(true);
+    setValue(cnpj);
+    try {
+      // A função do banco valida o acesso, preserva o CNPJ anterior na lista
+      // e atualiza o perfil em uma única transação. Isso evita estado parcial
+      // quando a RLS impede inserções diretas em user_cnpj_access.
+      const { error } = await supabase.rpc('switch_active_cnpj', { p_cnpj: cnpj });
+      if (error) throw error;
+
+      await onChanged?.();
+      window.location.reload();
+    } catch (error) {
+      console.error('Erro ao trocar CNPJ:', error);
+      setValue(previousValue);
+      setSwitching(false);
+      toast({
+        title: "Não foi possível trocar o CNPJ",
+        description: error?.message?.includes('switch_active_cnpj')
+          ? "A atualização de banco para troca de CNPJ ainda não foi aplicada."
+          : (error?.message || "Verifique seu acesso e tente novamente."),
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={value} onValueChange={handleChange}>
+      <Select value={value} onValueChange={handleChange} disabled={switching || displayList.length < 2}>
         <SelectTrigger className="w-44">
-          <SelectValue placeholder="Selecionar CNPJ" />
+          <SelectValue placeholder={switching ? "Trocando..." : "Selecionar CNPJ"} />
         </SelectTrigger>
         <SelectContent>
           {displayList.map(c => (
@@ -83,11 +95,6 @@ export default function CnpjSwitcher({ user, onChanged }) {
           ))}
         </SelectContent>
       </Select>
-
-      <div className="flex items-center gap-1 px-2">
-        <Switch checked={aggregate} onCheckedChange={toggleAggregate} />
-        <span className="text-sm text-gray-600">Agregado</span>
-      </div>
 
       <RequestCnpjDialog user={user} onSubmitted={load} />
     </div>

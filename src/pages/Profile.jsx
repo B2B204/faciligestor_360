@@ -29,6 +29,7 @@ import TrashManager from '@/components/common/TrashManager';
 import CnpjLookupInput from "@/components/common/CnpjLookupInput";
 import DataRecovery from "@/components/common/DataRecovery";
 import BackupManager from "@/components/common/BackupManager"; // NEW IMPORT
+import ChangePasswordCard from "@/components/profile/ChangePasswordCard";
 import {
   Dialog,
   DialogContent,
@@ -196,10 +197,11 @@ export default function ProfilePage() {
       // (que usa my_profile_cnpj()) não deixa ele ver os colegas do
       // CNPJ aprovado. A função SECURITY DEFINER no banco ignora RLS.
       try {
-        await supabase.rpc('sync_profile_cnpj_on_approval', {
+        const { error: syncError } = await supabase.rpc('sync_profile_cnpj_on_approval', {
           p_email: req.requester_email,
           p_cnpj: req.cnpj,
         });
+        if (syncError) throw syncError;
       } catch (syncErr) {
         console.warn('sync_profile_cnpj_on_approval falhou:', syncErr);
       }
@@ -654,7 +656,7 @@ Esta ação irá:
             </div>
             {user.department === 'admin' && (
               <Button
-                onClick={() => navigate(createPageUrl("PricingPage"))}
+                onClick={() => navigate(createPageUrl("Support"))}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
@@ -728,6 +730,8 @@ Esta ação irá:
           </CardContent>
         </Card>
       </div>
+
+      <ChangePasswordCard email={user.email} />
 
       <Card>
         <CardHeader>

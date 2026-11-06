@@ -371,9 +371,13 @@ export default function Layout({ children, currentPageName }) {
         console.log("⚠️ Erro ao buscar TeamMembers:", error);
       }
 
-      if (teamMembers.length > 0) {
+      const memberForActiveCnpj = teamMembers.find(
+        (member) => member.cnpj === currentUser.cnpj
+      );
+
+      if (memberForActiveCnpj) {
         // É um membro convidado - verificar se está ativo
-        const memberData = teamMembers[0];
+        const memberData = memberForActiveCnpj;
         console.log("📋 Dados do TeamMember:", memberData);
         
         if (memberData.status === 'ativo') {
@@ -381,7 +385,9 @@ export default function Layout({ children, currentPageName }) {
           const hybridUser = {
             ...currentUser,
             department: memberData.department,
-            cnpj: memberData.cnpj,
+            // O profile é a fonte de verdade do CNPJ ativo. Usar o primeiro
+            // team_member aqui fazia a troca de empresa ser desfeita no reload.
+            cnpj: currentUser.cnpj,
             is_team_member: true // Flag para identificar
           };
 
@@ -396,7 +402,7 @@ export default function Layout({ children, currentPageName }) {
           setUser({
             ...currentUser,
             department: memberData.department,
-            cnpj: memberData.cnpj,
+            cnpj: currentUser.cnpj,
             is_team_member: true,
             member_status: memberData.status
           });

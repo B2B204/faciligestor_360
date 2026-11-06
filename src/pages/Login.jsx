@@ -118,21 +118,22 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 p-4 sm:p-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(37,99,235,.30),transparent_32%),radial-gradient(circle_at_85%_80%,rgba(14,165,233,.18),transparent_30%)]" />
+      <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-2xl shadow-blue-950/40">
               <BrandLogo className="h-10 w-auto" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">{BRAND.name}</h1>
-          <p className="text-gray-500 mt-1">Gestão completa de facilities</p>
+          <h1 className="text-3xl font-extrabold text-white">{BRAND.name}</h1>
+          <p className="mt-1 text-sm text-slate-400">Sua operação inteira, em um só lugar.</p>
         </div>
 
-        <Card className="shadow-xl border-0">
+        <Card className="border-white/10 bg-card/95 shadow-2xl shadow-black/30 backdrop-blur-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl text-center">
+            <CardTitle className="text-center text-2xl font-extrabold">
               {mode === 'login' && 'Entrar na sua conta'}
               {mode === 'register' && 'Criar nova conta'}
               {mode === 'forgot' && 'Recuperar senha'}
@@ -143,7 +144,7 @@ export default function Login() {
               </CardDescription>
             )}
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-7">
             {message && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
                 {message}
@@ -195,7 +196,8 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800"
+                size="lg"
+                className="w-full"
                 disabled={loading}
               >
                 {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -234,7 +236,7 @@ export default function Login() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="mt-6 text-center text-xs text-slate-500">
           © {new Date().getFullYear()} {BRAND.name} — Sistema de Gestão de Facilities
           {" · "}
           <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" className="hover:underline">

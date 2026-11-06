@@ -581,113 +581,20 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className={`min-h-screen bg-background flex ${density === 'compact' ? 'density-compact' : 'density-comfortable'}`}>
-      {/* CSS global para responsividade avançada */}
-      <style>{`
-        html { font-size: clamp(14px, 1.1vw + 9px, 16px); }
-        :root { --radius: 12px; --container-max: 1440px; }
-
-        .app-content h1 { font-size: clamp(1.6rem, 1.1rem + 2vw, 2.4rem); line-height: 1.2; }
-        .app-content h2 { font-size: clamp(1.3rem, 1rem + 1.5vw, 2rem); line-height: 1.25; }
-        .app-content h3 { font-size: clamp(1.1rem, 0.9rem + 1vw, 1.5rem); line-height: 1.3; }
-
-        .app-content img, .app-content video, .app-content canvas, .app-content svg {
-          max-width: 100%; height: auto; border-radius: var(--radius);
-        }
-
-        /* Números/currency: nunca quebrar linha e usar largura tabular */
-        .kpi-value, .mono-number { white-space: nowrap; font-variant-numeric: tabular-nums; letter-spacing: 0; }
-        .nowrap { white-space: nowrap; }
-
-        /* Tabelas */
-        .app-content table { width: 100%; table-layout: auto; border-collapse: separate; border-spacing: 0; }
-        .app-content th, .app-content td { vertical-align: middle; white-space: nowrap; }
-        .app-content th { font-weight: 600; color: #4b5563; }
-        .app-content .badge { white-space: nowrap; }
-        .app-content td .cell-wrap { white-space: normal; overflow-wrap: break-word; word-break: normal; }
-
-        .app-shell { padding-inline: clamp(8px, 2vw, 24px); }
-
-        /* Evitar quebras agressivas globais (remove 'anywhere') */
-        .app-content { word-break: normal; overflow-wrap: break-word; hyphens: manual; }
-
-        .app-content .overflow-x-auto, .app-content .overflow-auto { -webkit-overflow-scrolling: touch; }
-
-        @media (max-width: 640px) {
-          .app-content p, .app-content li, .app-content td, .app-content th { font-size: 0.97rem; }
-        }
-
-        .app-content .rounded, .app-content .rounded-md, .app-content .rounded-lg, .app-content .rounded-xl {
-          border-radius: var(--radius);
-        }
-
-        @media print { .app-content { padding: 0 !important; } }
-      `}</style>
-
-      <style>{`
-        /* Melhorias globais: cabeçalhos fixos, zebra, hover, densidade e scrollbars */
-        html { font-size: clamp(14px, 1.12vw + 8px, 16.5px); }
-
-        /* Densidade */
-        .density-compact .app-content table th,
-        .density-compact .app-content table td { padding-top: 0.4rem; padding-bottom: 0.4rem; }
-        .density-compact .app-shell { padding-inline: clamp(6px, 1.4vw, 16px); }
-        .density-comfortable .app-shell { padding-inline: clamp(10px, 2.4vw, 28px); }
-        .density-compact .app-content h1 { font-size: clamp(1.4rem, 1rem + 1.6vw, 2.1rem); }
-
-        /* Tabelas com cabeçalho fixo e melhor leitura */
-        .app-content table thead th {
-          position: sticky;
-          top: 0;
-          z-index: 2;
-          background: hsl(var(--card));
-          box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.03);
-        }
-        .app-content tbody tr:nth-child(even) { background-color: hsl(var(--muted)); }
-        .app-content tbody tr:hover { background-color: hsl(var(--accent)); }
-
-        /* Tabs responsivas no mobile */
-        @media (max-width: 640px) {
-          [role="tablist"] {
-            display: flex;
-            overflow-x: auto;
-            gap: 0.5rem;
-            padding: 0.25rem 0.25rem 0.5rem;
-            -webkit-overflow-scrolling: touch;
-          }
-          [role="tablist"] > * { flex: 0 0 auto; }
-          [role="tab"] {
-            padding-inline: 0.75rem;
-            padding-block: 0.4rem;
-            font-size: 0.9rem;
-          }
-        }
-
-        /* Scrollbars suaves (WebKit e Firefox) */
-        * { scrollbar-width: thin; scrollbar-color: #c7d2fe transparent; }
-        *::-webkit-scrollbar { width: 10px; height: 10px; }
-        *::-webkit-scrollbar-thumb {
-          background-color: #c7d2fe;
-          border-radius: 9999px;
-          border: 2px solid transparent;
-          background-clip: content-box;
-        }
-        *::-webkit-scrollbar-track { background: transparent; }
-      `}</style>
       {/* Sidebar Mobile/Desktop */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-80 sm:w-64 bg-card shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-[290px] bg-[hsl(var(--sidebar-background))] text-[hsl(var(--sidebar-foreground))] shadow-2xl shadow-slate-950/20 transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:w-[272px] lg:shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="relative overflow-hidden flex items-center justify-between p-4 sm:p-6 bg-gradient-to-br from-blue-600 via-indigo-600 to-indigo-800 shadow-md">
+          <div className="relative overflow-hidden flex h-[76px] items-center justify-between border-b border-white/10 px-5">
             {/* Decorative glow accents */}
-            <div className="pointer-events-none absolute -top-8 -right-6 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-10 -left-8 w-28 h-28 bg-blue-400/20 rounded-full blur-2xl" />
+            <div className="pointer-events-none absolute -top-12 -right-8 h-36 w-36 rounded-full bg-blue-500/15 blur-3xl" />
 
             <div className="relative flex items-center gap-3 min-w-0">
               {/* Replaced img tag with BrandLogo component */}
-              <BrandLogo className="h-8 sm:h-9 w-auto bg-white/0" />
-              <div className="hidden sm:block min-w-0">
-                <h1 className="text-lg sm:text-xl font-bold text-white leading-tight tracking-tight truncate">{BRAND.name}</h1>
-                <p className="flex items-center gap-1.5 text-xs text-blue-200 font-medium mt-0.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-lg shadow-blue-950/30"><BrandLogo className="h-7 w-auto" /></div>
+              <div className="min-w-0">
+                <h1 className="truncate text-base font-extrabold leading-tight tracking-tight text-white">{BRAND.name}</h1>
+                <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   Gestão completa
                 </p>
@@ -704,7 +611,7 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
             {navItems.map((item) => {
               if (item.type === "external") {
                 return (
@@ -713,7 +620,7 @@ export default function Layout({ children, currentPageName }) {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-3 px-3 sm:px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-white/[0.07] hover:text-white"
                   >
                     <item.icon className="w-5 h-5 flex-shrink-0" />
                     <span className="truncate">{item.title}</span>
@@ -727,10 +634,10 @@ export default function Layout({ children, currentPageName }) {
                   <Link
                     key={item.title}
                     to={item.url}
-                    className={`flex items-center space-x-3 px-3 sm:px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
                       isActive
-                        ? "bg-accent text-accent-foreground shadow-sm"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        ? "bg-blue-500/15 text-blue-300 shadow-sm ring-1 ring-inset ring-blue-400/15 before:absolute before:left-0 before:h-5 before:w-1 before:rounded-r-full before:bg-blue-400"
+                        : "text-slate-400 hover:bg-white/[0.07] hover:text-white"
                     }`}
                     onClick={() => setSidebarOpen(false)}
                   >
@@ -749,8 +656,8 @@ export default function Layout({ children, currentPageName }) {
                 <div key={item.title} className="pt-1">
                   <button
                     onClick={() => setOpenMenu(isMenuOpen ? null : item.title)}
-                    className={`flex items-center justify-between w-full space-x-3 px-3 sm:px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-left ${
-                      isCategoryActive ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all duration-200 ${
+                      isCategoryActive ? "bg-white/[0.07] text-white" : "text-slate-400 hover:bg-white/[0.07] hover:text-white"
                     }`}
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -760,15 +667,15 @@ export default function Layout({ children, currentPageName }) {
                     <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isMenuOpen ? "rotate-180" : ""}`} />
                   </button>
                   {isMenuOpen && (
-                    <div className="pl-3 sm:pl-4 pt-1 pb-2 space-y-1">
+                    <div className="ml-5 space-y-1 border-l border-white/10 pb-2 pl-3 pt-1">
                       {item.subItems.map((sub) => {
                         const isActive = location.pathname === sub.url;
                         return (
                           <Link
                             key={sub.title}
                             to={sub.url}
-                            className={`flex items-center space-x-3 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                              isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200 ${
+                              isActive ? "bg-blue-500/15 text-blue-300" : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
                             }`}
                             onClick={() => setSidebarOpen(false)}
                           >
@@ -785,10 +692,10 @@ export default function Layout({ children, currentPageName }) {
           </nav>
 
           {/* User Profile com branding personalizado */}
-          <div className="p-3 sm:p-4 border-t border-border bg-card">
+          <div className="border-t border-white/10 bg-black/10 p-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start p-3 h-auto hover:bg-accent">
+                <Button variant="ghost" className="h-auto w-full justify-start p-3 text-slate-200 hover:bg-white/[0.07] hover:text-white">
                   <div className="flex items-center space-x-3 w-full min-w-0">
                     <Avatar className="w-8 h-8 flex-shrink-0 ring-2 ring-blue-200">
                       <AvatarImage src={user?.photo_url} />
@@ -797,10 +704,10 @@ export default function Layout({ children, currentPageName }) {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 text-left min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
+                      <p className="truncate text-sm font-semibold text-white">
                         {user?.full_name || 'Usuário'}
                       </p>
-                      <p className="text-xs text-primary capitalize truncate font-medium">
+                      <p className="truncate text-xs font-medium capitalize text-blue-300">
                         {user?.department === 'admin' ? '👑 Administrador' :
                                                        user?.department === 'gestor' ? '🎯 Gestor' :
                                                        user?.department === 'financeiro' ? '💰 Financeiro' :
@@ -827,12 +734,12 @@ export default function Layout({ children, currentPageName }) {
             </DropdownMenu>
           </div>
         </div>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
+      <div className="flex min-w-0 flex-1 flex-col lg:ml-0">
         {/* Header personalizado */}
-        <header className="bg-card shadow-sm border-b border-border px-4 sm:px-6 py-3 sm:py-4">
+        <header className="sticky top-0 z-30 border-b border-border/80 bg-card/90 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4 min-w-0 flex-1">
               <Button
@@ -844,7 +751,7 @@ export default function Layout({ children, currentPageName }) {
                 <Menu className="w-5 h-5" />
               </Button>
               <div className="min-w-0 flex-1">
-                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent truncate">
+                <h2 className="truncate text-lg font-extrabold text-foreground sm:text-xl">
                   {currentPageName === "Recognitions" ? "Reconhecimentos e Recados" :
                    currentPageName === "Dashboard" ? "Dashboard" :
                    currentPageName === "CRM" ? "CRM - Gestão de Relacionamento" :
@@ -877,7 +784,7 @@ export default function Layout({ children, currentPageName }) {
                    currentPageName === "CostCenters" ? "Centros de Custo" :
                    currentPageName === "Profile" ? "Perfil" : currentPageName}
                 </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+                <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">
                   {currentPageName === "CRM" ? "Gerencie leads, negócios e relacionamento com clientes" :
                    currentPageName === "Recognitions" ? "Celebre conquistas e comunique-se com a equipe" :
                    currentPageName === "AllowanceReceipts" ? "Gere e gerencie recibos de vale alimentação e transporte" :
@@ -922,7 +829,7 @@ export default function Layout({ children, currentPageName }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-background">
+        <main className="flex-1 overflow-auto bg-background bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.045),transparent_32%)]">
           <div className="app-shell">
             <div className="app-content max-w-screen-2xl mx-auto min-h-full">
               {children}
@@ -934,7 +841,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

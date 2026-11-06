@@ -542,6 +542,11 @@ export default function Dashboard() {
       : periodType === 'anual' ? `Ano de ${selectedMonth.slice(0, 4)}`
         : fromMonth ? `${fromMonth} a ${selectedMonth}` : 'Período personalizado';
 
+  const rawUserName = user?.full_name || '';
+  const userFirstName = rawUserName && !rawUserName.includes('@')
+    ? rawUserName.trim().split(' ')[0]
+    : '';
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
@@ -568,53 +573,30 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background p-3 sm:p-6 lg:p-8 space-y-5 sm:space-y-7">
 
       {/* Welcome Header */}
-      <div className="relative overflow-hidden rounded-2xl border border-blue-200/70 bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-700 px-5 py-6 text-white shadow-lg shadow-blue-950/10 sm:px-7 sm:py-7">
-        <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div className="relative overflow-hidden rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-600 to-indigo-700 px-5 py-5 text-white shadow-md shadow-blue-950/10 sm:px-7">
+        <div className="pointer-events-none absolute -right-12 -top-28 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
+        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="mb-2 flex items-center gap-2 text-xs font-medium text-blue-100">
+            <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-blue-100">
               <span className="rounded-full bg-white/15 px-2.5 py-1 capitalize">{periodLabel}</span>
               <span className="hidden sm:inline">•</span>
               <span className="hidden capitalize sm:inline">{format(new Date(), "EEEE, dd 'de' MMMM", { locale: pt })}</span>
             </div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-              Olá, {user?.full_name?.split(' ')[0] || 'Usuário'}!
+            <h1 className="text-2xl font-extrabold tracking-tight text-white">
+              Olá{userFirstName ? `, ${userFirstName}` : ''}!
             </h1>
-            <p className="mt-1.5 max-w-xl text-sm text-blue-100 sm:text-base">
-              Acompanhe os resultados da operação e priorize o que precisa da sua atenção.
+            <p className="mt-1 max-w-xl text-sm text-blue-100">
+              Visão executiva dos resultados e prioridades da operação.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-end">
-            {availableCnpjs.length > 1 && (
-              <div className="col-span-2 min-w-[240px] rounded-xl border border-white/15 bg-white/10 p-2 backdrop-blur-sm sm:col-span-1">
-                <div className="mb-1 flex items-center gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wider text-blue-100">
-                  {cnpjScope === 'group' ? <Layers3 className="h-3 w-3" /> : <Building2 className="h-3 w-3" />}
-                  Empresa analisada
-                </div>
-                <Select value={cnpjScope || user?.cnpj || ''} onValueChange={handleCnpjScopeChange}>
-                  <SelectTrigger className="h-9 border-white/20 bg-white text-slate-900 shadow-none">
-                    <SelectValue placeholder="Selecionar empresa" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="group">
-                      Grupo consolidado ({availableCnpjs.length} CNPJs)
-                    </SelectItem>
-                    {availableCnpjs.map(company => (
-                      <SelectItem key={company.cnpj} value={company.cnpj}>
-                        {company.display_name} · {company.cnpj}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
+          <div className="grid grid-cols-2 gap-2.5 sm:flex">
+            <div className="min-w-[135px] rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 backdrop-blur-sm">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-100">Margem líquida</p>
-              <p className="mt-1 text-xl font-bold tabular-nums">{kpis.netMargin.toFixed(1)}%</p>
+              <p className="mt-0.5 text-xl font-bold tabular-nums">{kpis.netMargin.toFixed(1)}%</p>
             </div>
-            <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
+            <div className="min-w-[135px] rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 backdrop-blur-sm">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-100">Pontos de atenção</p>
-              <p className="mt-1 text-xl font-bold tabular-nums">{contractAlerts.length + extraKpis.delayedRepacts}</p>
+              <p className="mt-0.5 text-xl font-bold tabular-nums">{contractAlerts.length + extraKpis.delayedRepacts}</p>
             </div>
           </div>
         </div>
@@ -659,9 +641,33 @@ export default function Dashboard() {
           </div>
         </div>
         <CardContent className="p-4 sm:p-5 space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground whitespace-nowrap">Visão</span>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(240px,1.25fr)_auto_auto_1fr] xl:items-end">
+            {availableCnpjs.length > 1 && (
+              <div className="space-y-1.5">
+                <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                  {cnpjScope === 'group' ? <Layers3 className="h-4 w-4 text-primary" /> : <Building2 className="h-4 w-4 text-primary" />}
+                  Empresa / grupo
+                </span>
+                <Select value={cnpjScope || user?.cnpj || ''} onValueChange={handleCnpjScopeChange}>
+                  <SelectTrigger className="w-full bg-background border-border text-foreground">
+                    <SelectValue placeholder="Selecionar empresa" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="group">Grupo consolidado ({availableCnpjs.length} CNPJs)</SelectItem>
+                    {availableCnpjs.map(company => {
+                      const hasFriendlyName = company.display_name && company.display_name !== company.cnpj;
+                      return (
+                        <SelectItem key={company.cnpj} value={company.cnpj}>
+                          {hasFriendlyName ? `${company.display_name} · ${company.cnpj}` : company.cnpj}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <span className="block text-sm font-medium text-foreground whitespace-nowrap">Período</span>
               <Select value={periodType} onValueChange={setPeriodType}>
                 <SelectTrigger className="w-36 bg-background border-border text-foreground">
                   <SelectValue placeholder="Selecione" />
@@ -674,8 +680,8 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground whitespace-nowrap">Mês ref.</span>
+            <div className="space-y-1.5">
+              <span className="block text-sm font-medium text-foreground whitespace-nowrap">Referência</span>
               <Input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="w-40 bg-background border-border text-foreground" />
             </div>
             {periodType === 'custom' && (
@@ -684,7 +690,7 @@ export default function Dashboard() {
                 <Input type="month" value={fromMonth} onChange={(e) => setFromMonth(e.target.value)} className="w-36 bg-background border-border text-foreground" />
               </div>
             )}
-            <span className="text-xs text-muted-foreground">KPIs e gráficos respeitam o período selecionado.</span>
+            <span className="self-center text-xs text-muted-foreground xl:pl-2">Os indicadores respeitam a empresa e o período selecionados.</span>
           </div>
 
           {showFilters && <div className="grid grid-cols-1 md:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-1">
@@ -762,7 +768,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 animate-in fade-in slide-in-from-bottom-2">
 
           {/* Contratos Ativos */}
-          <Card className="group bg-card border-border shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all">
+          <Card className="group bg-card border-border border-l-4 border-l-blue-500 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all">
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -781,7 +787,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Faturamento Período */}
-          <Card className="group bg-card border-border shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all">
+          <Card className="group bg-card border-border border-l-4 border-l-green-500 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all">
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">

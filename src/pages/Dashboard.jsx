@@ -8,6 +8,8 @@ import { User } from "@/entities/User";
 import { AccountsReceivable } from "@/entities/AccountsReceivable";
 import { Repactuacao } from "@/entities/Repactuacao";
 import { DashboardPreference } from "@/entities/DashboardPreference";
+import { CompanyCnpj } from "@/entities/CompanyCnpj";
+import { UserCnpjAccess } from "@/entities/UserCnpjAccess";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +21,7 @@ import {
   TrendingUp, TrendingDown, FileText, Users, DollarSign,
   BarChart3, Calendar, AlertCircle, CheckCircle, Award, AlertTriangle, Shield, FileCheck,
   Columns3, Settings2, ClipboardCheck, Banknote, SlidersHorizontal, RefreshCw, X,
-  ArrowUpRight
+  ArrowUpRight, Building2, Layers3
 } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell } from "recharts";
 import { format, subMonths } from "date-fns";
@@ -59,6 +61,8 @@ export default function Dashboard() {
   const [contractAlerts, setContractAlerts] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
   const [showFilters, setShowFilters] = useState(false);
+  const [cnpjScope, setCnpjScope] = useState("");
+  const [availableCnpjs, setAvailableCnpjs] = useState([]);
 
   const [preferences, setPreferences] = useState({
     kpis: true, strategic: true, alerts: true, charts: true,
@@ -138,16 +142,40 @@ export default function Dashboard() {
       const currentUser = await User.me();
       setUser(currentUser);
 
+      const [accessRows, registeredCnpjs] = await Promise.all([
+        UserCnpjAccess.filter({ user_email: currentUser.email }),
+        CompanyCnpj.filter({ is_active: true }),
+      ]);
+
+      // A visão consolidada usa exclusivamente CNPJs explicitamente autorizados
+      // ao usuário. Os registros da empresa servem apenas para exibir nomes.
+      const allowedCnpjValues = Array.from(new Set([
+        currentUser.cnpj,
+        ...(accessRows || []).map(row => row.cnpj),
+      ].filter(Boolean)));
+      const nameByCnpj = new Map((registeredCnpjs || []).map(company => [company.cnpj, company.display_name]));
+      const allowedCompanies = allowedCnpjValues.map(cnpj => ({ cnpj, display_name: nameByCnpj.get(cnpj) || cnpj }));
+      setAvailableCnpjs(allowedCompanies);
+
+      const effectiveScope = cnpjScope || currentUser.cnpj;
+      const selectedCnpjs = effectiveScope === 'group' ? allowedCnpjValues : [effectiveScope];
+      if (!cnpjScope) setCnpjScope(currentUser.cnpj);
+
+      const loadForCompanies = async (entity) => {
+        const resultSets = await Promise.all(selectedCnpjs.map(cnpj => entity.filter({ cnpj })));
+        return resultSets.flat();
+      };
+
       const [contracts, employees, financialEntries, measurements, indirectCosts, receivables, repacts, seguros, laudos] = await Promise.all([
-        Contract.filter({ cnpj: currentUser.cnpj }),
-        Employee.filter({ cnpj: currentUser.cnpj }),
-        FinancialEntry.filter({ cnpj: currentUser.cnpj }),
-        Measurement.filter({ cnpj: currentUser.cnpj }),
-        IndirectCost.filter({ cnpj: currentUser.cnpj }),
-        AccountsReceivable.filter({ cnpj: currentUser.cnpj }),
-        Repactuacao.filter({ cnpj: currentUser.cnpj }),
-        Seguro.filter({ cnpj: currentUser.cnpj }),
-        Laudo.filter({ cnpj: currentUser.cnpj })
+        loadForCompanies(Contract),
+        loadForCompanies(Employee),
+        loadForCompanies(FinancialEntry),
+        loadForCompanies(Measurement),
+        loadForCompanies(IndirectCost),
+        loadForCompanies(AccountsReceivable),
+        loadForCompanies(Repactuacao),
+        loadForCompanies(Seguro),
+        loadForCompanies(Laudo),
       ]);
 
       setAllContracts(contracts); // Save for filter dropdown
@@ -438,7 +466,7 @@ export default function Dashboard() {
       console.error('Erro ao carregar dados do dashboard:', error);
     }
     setIsLoading(false);
-  }, [computePeriodMonths, selectedMonth, periodType, contractFilter, unitFilter, responsibleFilter]);
+  }, [computePeriodMonths, selectedMonth, periodType, contractFilter, unitFilter, responsibleFilter, cnpjScope]);
 
   useEffect(() => {
     loadDashboardData();
@@ -501,6 +529,13 @@ export default function Dashboard() {
     setResponsibleFilter('all');
   };
 
+  const handleCnpjScopeChange = (value) => {
+    setContractFilter('all');
+    setUnitFilter('all');
+    setResponsibleFilter('all');
+    setCnpjScope(value);
+  };
+
   const periodLabel = periodType === 'mensal'
     ? format(new Date(`${selectedMonth}-02T12:00:00`), "MMMM 'de' yyyy", { locale: pt })
     : periodType === 'trimestral' ? 'Últimos 3 meses'
@@ -549,7 +584,30 @@ export default function Dashboard() {
               Acompanhe os resultados da operação e priorize o que precisa da sua atenção.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:flex">
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-end">
+            {availableCnpjs.length > 1 && (
+              <div className="col-span-2 min-w-[240px] rounded-xl border border-white/15 bg-white/10 p-2 backdrop-blur-sm sm:col-span-1">
+                <div className="mb-1 flex items-center gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wider text-blue-100">
+                  {cnpjScope === 'group' ? <Layers3 className="h-3 w-3" /> : <Building2 className="h-3 w-3" />}
+                  Empresa analisada
+                </div>
+                <Select value={cnpjScope || user?.cnpj || ''} onValueChange={handleCnpjScopeChange}>
+                  <SelectTrigger className="h-9 border-white/20 bg-white text-slate-900 shadow-none">
+                    <SelectValue placeholder="Selecionar empresa" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="group">
+                      Grupo consolidado ({availableCnpjs.length} CNPJs)
+                    </SelectItem>
+                    {availableCnpjs.map(company => (
+                      <SelectItem key={company.cnpj} value={company.cnpj}>
+                        {company.display_name} · {company.cnpj}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-100">Margem líquida</p>
               <p className="mt-1 text-xl font-bold tabular-nums">{kpis.netMargin.toFixed(1)}%</p>
@@ -561,6 +619,18 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {cnpjScope === 'group' && (
+        <div className="flex items-start gap-3 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-indigo-950 dark:border-indigo-900 dark:bg-indigo-950/30 dark:text-indigo-100">
+          <Layers3 className="mt-0.5 h-5 w-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+          <div>
+            <p className="text-sm font-semibold">Visão consolidada do grupo</p>
+            <p className="mt-0.5 text-xs text-indigo-700 dark:text-indigo-300">
+              Indicadores somam os {availableCnpjs.length} CNPJs autorizados. Contratos, custos e resultados permanecem identificados em suas empresas de origem.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Filtros Avançados */}
       <Card className="bg-card border-border shadow-sm overflow-hidden">

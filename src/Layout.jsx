@@ -310,7 +310,6 @@ export default function Layout({ children, currentPageName }) {
   const [isSubscriptionActive, setIsSubscriptionActive] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [openMenu, setOpenMenu] = useState(null);
-  const [density, setDensity] = useState('comfortable');
 
   useEffect(() => {
     // Abrir automaticamente o grupo que contém a página ativa
@@ -329,15 +328,6 @@ export default function Layout({ children, currentPageName }) {
     }
     loadUser();
   }, [currentPageName]);
-
-  // Densidade da interface (confortável/compacta) com persistência
-  useEffect(() => {
-    const stored = localStorage.getItem('ui-density');
-    if (stored === 'compact') setDensity('compact');
-  }, []);
-  useEffect(() => {
-    localStorage.setItem('ui-density', density);
-  }, [density]);
 
   const loadUser = async () => {
     setIsLoadingUser(true);
@@ -428,8 +418,6 @@ export default function Layout({ children, currentPageName }) {
       loadUser();
     }, 500);
   };
-
-  const toggleDensity = () => setDensity(d => d === 'compact' ? 'comfortable' : 'compact');
 
   const handleLogout = async () => {
     if (window.confirm("Tem certeza que deseja sair do FaciliGestor360?")) {
@@ -563,7 +551,7 @@ export default function Layout({ children, currentPageName }) {
   }
 
   return (
-    <div className={`min-h-screen bg-background flex ${density === 'compact' ? 'density-compact' : 'density-comfortable'}`}>
+    <div className="min-h-screen bg-background flex density-comfortable">
       {/* Sidebar Mobile/Desktop */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-[290px] bg-[hsl(var(--sidebar-background))] text-[hsl(var(--sidebar-foreground))] shadow-2xl shadow-slate-950/20 transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:w-[272px] lg:shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
@@ -794,13 +782,6 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-              <Button variant="ghost" size="sm" onClick={toggleDensity} className="hidden sm:inline-flex">
-                <SlidersHorizontal className="w-4 h-4 mr-2" />
-                {density === 'compact' ? 'Compacto' : 'Conforto'}
-              </Button>
-              <Button variant="ghost" size="icon" onClick={toggleDensity} className="sm:hidden">
-                <SlidersHorizontal className="w-4 h-4" />
-              </Button>
               <CnpjSwitcher user={user} onChanged={loadUser} />
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
